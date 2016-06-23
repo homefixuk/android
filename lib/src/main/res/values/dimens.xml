@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- text sizes -->
+    <dimen name="text_size_extra_small">11sp</dimen>
+    <dimen name="text_size_small">13sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_large">16sp</dimen>
+    <dimen name="text_size_large_plus">18sp</dimen>
+    <dimen name="text_size_extra_large">20sp</dimen>
+    <dimen name="text_size_extra_extra_large">26sp</dimen>
+
+    <!-- Action bar values -->
+
+    <dimen name="action_bar_height_quarter">14dp</dimen>
+    <dimen name="action_bar_height_half">28dp</dimen>
+    <dimen name="action_bar_height_three_quarters">42dp</dimen>
+    <dimen name="action_bar_height">56dp</dimen>
+    <dimen name="action_bar_height_with_shadow">62dp</dimen>
+    <dimen name="action_bar_height_and_half">84dp</dimen>
+    <dimen name="action_bar_height_double">112dp</dimen>
+    <dimen name="action_bar_height_triple">168dp</dimen>
+
+    <!-- Action bar values for large (tablets) -->
+
+    <dimen name="action_bar_height_quarter_large">16dp</dimen>
+    <dimen name="action_bar_height_half_large">32dp</dimen>
+    <dimen name="action_bar_height_three_quarters_large">48dp</dimen>
+    <dimen name="action_bar_height_large">64dp</dimen>
+    <dimen name="action_bar_height_with_shadow_large">70dp</dimen>
+    <dimen name="action_bar_height_and_half_large">96dp</dimen>
+    <dimen name="action_bar_height_double_large">128dp</dimen>
+    <dimen name="action_bar_height_triple_large">192dp</dimen>
+
+    <!-- Nav drawer menu paddings -->
+    <dimen name="menu_base_padding_normal">16dp</dimen>
+    <dimen name="menu_base_padding_small_normal">8dp</dimen>
+    <dimen name="menu_item_height_normal">48dp</dimen>
+    <dimen name="menu_item_icon_margin_right_normal">32dp</dimen>
+    <dimen name="menu_item_icon_dim_normal">24dp</dimen>
+
+    <!-- Nav drawer menu paddings -->
+    <dimen name="menu_base_padding_large">24dp</dimen>
+    <dimen name="menu_base_padding_small_large">8dp</dimen>
+    <dimen name="menu_item_height_large">48dp</dimen>
+    <dimen name="menu_item_icon_margin_right_large">32dp</dimen>
+    <dimen name="menu_item_icon_dim_large">24dp</dimen>
+
+    <!-- other general dimensions -->
+    <dimen name="shadow_bar_dim">3dp</dimen>
+
+    <!-- negative values -->
+    <dimen name="minus_action_bar_height">-56dp</dimen>
+    <dimen name="minus_action_bar_height_and_half">-84dp</dimen>
+
+</resources>

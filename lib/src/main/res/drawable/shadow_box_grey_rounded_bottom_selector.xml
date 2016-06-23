@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/shadow_box_dark_grey_rounded_bottom" android:state_pressed="true"/>
+    <item android:drawable="@drawable/shadow_box_dark_grey_rounded_bottom" android:state_focused="true"/>
+    <item android:drawable="@drawable/shadow_box_dark_grey_rounded_bottom" android:state_selected="true"/>
+    <item android:drawable="@drawable/shadow_box_dark_grey_rounded_bottom" android:state_activated="true"/>
+    <item android:drawable="@drawable/shadow_box_grey_rounded_bottom"/>
+
+</selector>

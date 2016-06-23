@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.gc.materialdesign.views.ProgressBarCircularIndeterminate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loading_spinner"
+    android:layout_width="@dimen/base_padding_quad"
+    android:layout_height="@dimen/base_padding_quad"
+    android:layout_centerInParent="true"
+    android:background="@color/colorPrimary" />

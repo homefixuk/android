@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/base_padding_two_thirds" >
+
+    <!-- The back caret -->
+
+    <ImageView
+        android:id="@+id/toolbar_back_caret"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/action_bar_height_quarter"
+        android:layout_gravity="center_vertical"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_back_caret_white" />
+
+    <!-- The profile title -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/base_padding_0.2"
+        android:paddingLeft="@dimen/base_padding_two_thirds" >
+
+        <TextView
+            android:id="@+id/toolbar_title_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAppearance="@style/SingleLineActionBarTheme" />
+
+        <!-- The profile sub title (email for user and charity) -->
+
+        <TextView
+            android:id="@+id/toolbar_sub_title_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/minus_base_padding_third"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAppearance="@style/SingleLineTheme.White"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

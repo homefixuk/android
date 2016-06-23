@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/drawer_menu_background"
+    android:clickable="true"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/menu_cover_image_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drawer_cover_image_height"
+        android:layout_marginBottom="@dimen/menu_base_padding_small_normal" >
+
+        <!-- cover image as the background for the top layout -->
+
+        <ImageView
+            android:id="@+id/menu_cover_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@color/purple" />
+
+        <!-- semi transparent cover for the cover image -->
+
+        <View
+            android:id="@+id/cover_image_dark_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_10_percent" />
+
+        <!-- profile, name and email layout -->
+
+        <LinearLayout
+            android:id="@+id/menu_profile_image_names_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/menu_base_padding_normal"
+            android:layout_marginRight="@dimen/menu_base_padding_normal"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <!-- profile image with white circle layout -->
+
+            <include
+                android:layout_width="@dimen/drawer_profile_image_dim"
+                android:layout_height="@dimen/drawer_profile_image_dim"
+                layout="@layout/user_profile_image_layout" />
+
+            <!-- profile and sub profile names -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/menu_base_padding_normal"
+                android:orientation="vertical" >
+
+                <!-- profile name -->
+
+                <TextView
+                    android:id="@+id/profile_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/SingleLineTheme.Bold"
+                    android:textColor="@color/white" />
+
+                <!-- sub profile name -->
+
+                <TextView
+                    android:id="@+id/sub_profile_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/text_size_padding_cut"
+                    android:textAppearance="@style/SingleLineTheme"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Home -->
+
+    <RelativeLayout
+        android:id="@+id/menu_home_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/menu_item_height_normal"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/menu_base_padding_normal"
+        android:paddingRight="@dimen/menu_base_padding_normal" >
+
+        <!-- my news feed icon -->
+
+        <ImageView
+            android:id="@+id/menu_home_icon"
+            android:layout_width="@dimen/menu_item_icon_dim_normal"
+            android:layout_height="@dimen/menu_item_icon_dim_normal"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_sort_by_size" />
+
+        <!-- my news feed title name -->
+
+        <TextView
+            android:id="@+id/menu_my_news_feed_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/menu_item_icon_margin_right_normal"
+            android:layout_toRightOf="@id/menu_home_icon"
+            android:text="Home"
+            android:textAppearance="@style/SingleLineTheme" />
+    </RelativeLayout>
+
+    <!-- horizontal rule -->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/base_padding_0.1"
+        android:layout_marginBottom="@dimen/menu_base_padding_small_normal"
+        android:layout_marginTop="@dimen/menu_base_padding_small_normal"
+        android:background="@color/light_grey" />
+
+    <!-- Settings -->
+
+    <RelativeLayout
+        android:id="@+id/menu_settings_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/menu_item_height_normal"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/menu_base_padding_normal"
+        android:paddingRight="@dimen/menu_base_padding_normal" >
+
+        <!-- browse projects icon -->
+
+        <ImageView
+            android:id="@+id/menu_settings_icon"
+            android:layout_width="@dimen/menu_item_icon_dim_normal"
+            android:layout_height="@dimen/menu_item_icon_dim_normal"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_dialog_info" />
+
+        <!-- browse projects name -->
+
+        <TextView
+            android:id="@+id/menu_settings_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/menu_item_icon_margin_right_normal"
+            android:layout_toRightOf="@id/menu_settings_icon"
+            android:text="Settings"
+            android:textAppearance="@style/SingleLineTheme.Grey" />
+    </RelativeLayout>
+
+</LinearLayout>

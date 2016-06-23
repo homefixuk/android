@@ -1,0 +1,182 @@
+<resources>
+
+    <style name="TextTheme" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="TextTheme.Large" parent="@style/TextTheme">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="TextTheme.Large.Bold" parent="@style/TextTheme.Large">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextTheme.Large.Bold.Grey" parent="@style/TextTheme.Large.Bold">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="TextTheme.ExtraLarge" parent="@style/TextTheme">
+        <item name="android:textSize">@dimen/text_size_extra_large</item>
+    </style>
+
+    <style name="TextTheme.ExtraLarge.Bold" parent="@style/TextTheme.ExtraLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextTheme.Grey" parent="@style/TextTheme">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="TextTheme.DarkGrey" parent="@style/TextTheme">
+        <item name="android:textColor">@color/dark_grey</item>
+    </style>
+
+    <style name="TextTheme.Grey.Bold" parent="@style/TextTheme.Grey">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextTheme.Grey.Large" parent="@style/TextTheme.Grey">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="TextTheme.Grey.Bold.Large" parent="@style/TextTheme.Grey.Bold">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="TextTheme.White" parent="@style/TextTheme">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextTheme.Small" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="TextTheme.White.Small" parent="TextTheme.White">
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="TextTheme.ExtraSmall" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/text_size_extra_small</item>
+    </style>
+
+    <style name="TextTheme.ExtraSmall.Grey" parent="@style/TextTheme.ExtraSmall">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="TextTheme.Small.Bold" parent="@style/TextTheme.Small">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TagLineTheme" parent="@style/TextTheme">
+        <item name="android:textColor">@color/grey</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="SingleLineTheme" parent="@style/TextTheme">
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="SingleLineTheme.Large" parent="@style/SingleLineTheme">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="SingleLineTheme.Large.Bold" parent="@style/SingleLineTheme">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SingleLineTheme.Grey" parent="@style/SingleLineTheme">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="SingleLineTheme.Large.Bold.Grey" parent="@style/SingleLineTheme.Large.Bold">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="SingleLineTheme.White" parent="@style/SingleLineTheme">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="SingleLineTheme.DarkGrey" parent="@style/SingleLineTheme">
+        <item name="android:textColor">@color/dark_grey</item>
+    </style>
+
+    <style name="SingleLineTheme.Bold" parent="@style/SingleLineTheme">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SingleLineTheme.White.Bold" parent="@style/SingleLineTheme.White">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SingleLineTheme.Grey.Bold" parent="@style/SingleLineTheme.Grey">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextTheme.Edit" parent="@android:style/TextAppearance.Small">
+        <item name="android:inputType">textCapSentences|textAutoCorrect</item>
+    </style>
+
+    <style name="TextTheme.Edit.Grey" parent="@style/TextTheme.Edit">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="TextTheme.Bold" parent="@style/TextTheme">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextTheme.Caps" parent="@style/TextTheme">
+        <item name="android:inputType">textCapWords</item>
+    </style>
+
+    <style name="TextTheme.White.Bold" parent="@style/TextTheme.White">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SingleLineTheme.DarkGrey.ExtraLarge" parent="@style/SingleLineTheme.DarkGrey">
+        <item name="android:textSize">@dimen/text_size_extra_large</item>
+    </style>
+
+    <style name="SingleLineTheme.White.Caps" parent="@style/SingleLineTheme.White">
+        <item name="android:inputType">textCapWords</item>
+    </style>
+
+    <style name="SingleLineTheme.White.Large" parent="@style/SingleLineTheme.White">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="SingleLineActionBarTheme" parent="@style/SingleLineTheme.White">
+        <item name="android:textSize">@dimen/text_size_extra_large</item>
+    </style>
+
+    <style name="SingleLineActionBarTheme.Bold" parent="@style/SingleLineActionBarTheme">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SingleLineActionBarTheme.Light" parent="@style/SingleLineActionBarTheme">
+        <item name="android:textColor">@color/white_50_percent</item>
+    </style>
+
+    <style name="TextTheme.White.Caps.Large" parent="@style/SingleLineTheme.White.Caps">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="TextTheme.White.Caps.Large.Bold" parent="@style/TextTheme.White.Caps.Large">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SingleLineTheme.White.ExtraLarge" parent="@style/SingleLineTheme.White">
+        <item name="android:textSize">@dimen/text_size_extra_large</item>
+    </style>
+
+    <style name="CustomProgressBarHorizontal" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:minHeight">2dp</item>
+        <item name="android:maxHeight">2dp</item>
+        <item name="android:height">2dp</item>
+    </style>
+
+</resources>

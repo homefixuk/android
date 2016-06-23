@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- base padding value used across the app -->
+    <dimen name="base_padding_one_sixth">2dp</dimen>
+    <dimen name="base_padding_0.05">0.6dp</dimen>
+    <dimen name="base_padding_0.1">1.2dp</dimen>
+    <dimen name="base_padding_0.2">2dp</dimen>
+    <dimen name="base_padding_quarter">3dp</dimen>
+    <dimen name="base_padding_third">4dp</dimen>
+    <dimen name="base_padding_0.4">4.8dp</dimen>
+    <dimen name="base_padding_half">6dp</dimen>
+    <dimen name="base_padding_0.6">7.2dp</dimen>
+    <dimen name="base_padding_two_thirds">8dp</dimen>
+    <dimen name="base_padding_three_quarts">9dp</dimen>
+    <dimen name="base_padding_0.8">9.6dp</dimen>
+    <dimen name="base_padding">12dp</dimen>
+    <dimen name="base_padding_plus_quarter">15dp</dimen>
+    <dimen name="base_padding_plus_half">18dp</dimen>
+    <dimen name="base_padding_double">24dp</dimen>
+    <dimen name="base_padding_2.5">30dp</dimen>
+    <dimen name="base_padding_triple">36dp</dimen>
+    <dimen name="base_padding_3.5">42dp</dimen>
+    <dimen name="base_padding_quad">48dp</dimen>
+    <dimen name="base_padding_4.5">54dp</dimen>
+    <dimen name="base_padding_five">60dp</dimen>
+    <dimen name="base_padding_5.5">66dp</dimen>
+    <dimen name="base_padding_six">72dp</dimen>
+    <dimen name="base_padding_ten">120dp</dimen>
+    <dimen name="base_padding_12">144dp</dimen>
+    <dimen name="base_padding_15">180dp</dimen>
+
+    <!-- base padding with adjustments + text_view_padding_cut -->
+    <dimen name="base_padding_text_view">9dp</dimen>
+    <dimen name="base_padding_quarter_text_view">1dp</dimen>
+    <dimen name="base_padding_half_text_view">3dp</dimen>
+    <dimen name="base_padding_0.6_text_view">4dp</dimen>
+    <dimen name="base_padding_three_quarts_text_view">6dp</dimen>
+    <dimen name="base_padding_0.8_text_view">7dp</dimen>
+    <dimen name="base_padding_plus_half_text_view">15dp</dimen>
+    <dimen name="base_padding_double_text_view">21dp</dimen>
+    <dimen name="base_padding_shadow_background">8dp</dimen>
+
+    <!-- negative base padding value used across the app -->
+    <dimen name="minus_base_padding_one_sixth">-2dp</dimen>
+    <dimen name="minus_base_padding_0.2">-2dp</dimen>
+    <dimen name="minus_base_padding_quarter">-3dp</dimen>
+    <dimen name="minus_base_padding_third">-4dp</dimen>
+    <dimen name="minus_base_padding_half">-6dp</dimen>
+    <dimen name="minus_base_padding_0.6">-7dp</dimen>
+    <dimen name="minus_base_padding_two_thirds">-8dp</dimen>
+    <dimen name="minus_base_padding_three_quarts">-9dp</dimen>
+    <dimen name="minus_base_padding_0.8">-10dp</dimen>
+    <dimen name="minus_base_padding">-12dp</dimen>
+    <dimen name="minus_base_padding_plus_half">-18dp</dimen>
+    <dimen name="minus_base_padding_double">-24dp</dimen>
+    <dimen name="minus_base_padding_2.5">-30dp</dimen>
+    <dimen name="minus_base_padding_triple">-36dp</dimen>
+    <dimen name="minus_base_padding_3.5">-42dp</dimen>
+    <dimen name="minus_base_padding_quad">-48dp</dimen>
+    <dimen name="minus_base_padding_4.5">-54dp</dimen>
+    <dimen name="minus_base_padding_five">-60dp</dimen>
+    <dimen name="minus_base_padding_six">-72dp</dimen>
+
+    <!-- text view padding cut -->
+    <dimen name="text_size_padding_cut">-3dp</dimen>
+
+    <!-- Button size -->
+    <dimen name="action_button_dim">72dp</dimen>
+
+    <!-- Drawer sizes -->
+    <dimen name="drawer_width">240dp</dimen>
+    <dimen name="drawer_cover_image_height">140dp</dimen>
+    <dimen name="drawer_profile_image_dim">55dp</dimen>
+
+    <!-- small_icon_dim = 2*bp -->
+    <dimen name="small_icon_dim">24dp</dimen>
+    <!-- small_icon_dim = 1.75*bp -->
+    <dimen name="smaller_icon_dim">20dp</dimen>
+    <!-- super_small_icon_dim = 1.333333*bp -->
+    <dimen name="super_small_icon_dim">16dp</dimen>
+    <!-- extra_super_small_icon_dim = 1*bp -->
+    <dimen name="extra_super_small_icon_dim">12dp</dimen>
+    <!-- badge_icon_dim = 3*bp -->
+    <dimen name="badge_icon_dim">36dp</dimen>
+
+    <!-- youtube video dimen -->
+    <dimen name="video_thumbnail">200dp</dimen>
+
+    <!-- base padding value used across the app -->
+    <dimen name="bp_0_05">0.8dp</dimen>
+    <dimen name="bp_0_0625">1dp</dimen>
+    <dimen name="bp_0_1">1.6dp</dimen>
+    <dimen name="bp_0_125">2dp</dimen>
+    <dimen name="bp_0_167">2.667dp</dimen>
+    <dimen name="bp_0_2">3.2dp</dimen>
+    <dimen name="bp_0_25">4dp</dimen>
+    <dimen name="bp_0_333">5.333dp</dimen>
+    <dimen name="bp_0_4">6.4dp</dimen>
+    <dimen name="bp_0_5">8dp</dimen>
+    <dimen name="bp_0_6">9.6dp</dimen>
+    <dimen name="bp_0_666">10.666dp</dimen>
+    <dimen name="bp_0_75">12dp</dimen>
+    <dimen name="bp_0_8">12.8dp</dimen>
+    <dimen name="bp">16dp</dimen>
+    <dimen name="bp_1_25">20dp</dimen>
+    <dimen name="bp_1_5">24dp</dimen>
+    <dimen name="bp_2">32dp</dimen>
+    <dimen name="bp_2_5">40dp</dimen>
+    <dimen name="bp_3">48dp</dimen>
+    <dimen name="bp_3_5">56dp</dimen>
+    <dimen name="bp_4">64dp</dimen>
+    <dimen name="bp_4_5">72dp</dimen>
+    <dimen name="bp_5">80dp</dimen>
+    <dimen name="bp_6">96dp</dimen>
+    <dimen name="bp_10">160dp</dimen>
+    <dimen name="bp_12">192dp</dimen>
+    <dimen name="bp_15">240dp</dimen>
+
+</resources>

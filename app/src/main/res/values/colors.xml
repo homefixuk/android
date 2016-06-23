@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryLight">#c1e8fa</color>
+    <color name="colorPrimary">#64C6F3</color>
+    <color name="colorPrimaryDark">#284f61</color>
+
+    <color name="colorAccent">#f8bc6e</color>
+    <color name="colorAccentDark">#ad834d</color>
+
+    <color name="greyLight">#b7bfc1</color>
+    <color name="greyDark">#3f4447</color>
+    <color name="blackHomefix">#191b1c</color>
+
+</resources>

@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 23
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile('com.android.support:appcompat-v7:23.4.0') {
+        exclude module: 'multidex'
+    }
+    compile('com.android.support:support-v13:23.4.0') {
+        exclude module: 'multidex'
+    }
+    compile('com.melnykov:floatingactionbutton:1.3.0') {
+        exclude module: 'recyclerview-v7'
+    }
+    compile('com.github.vajro:MaterialDesignLibrary:1.6') {
+        exclude module: 'recyclerview-v7'
+    }
+    provided('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') {
+        transitive = true
+    }
+
+    // notification library
+    compile 'com.github.halysongoncalves:pugnotification:1.8.1'
+
+    // image loading
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+    androidTestCompile 'com.android.support:support-annotations:23.3.0'
+}
+
+configurations {
+    all*.exclude group: 'com.nineoldandroids'
+}

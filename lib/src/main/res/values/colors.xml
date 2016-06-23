@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="background">#D8D8D8</color>
+    <color name="black">#10131a</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+    <color name="red">#EC5D57</color>
+    <color name="blue">#3498db</color>
+    <color name="light_blue">#3498DB</color>
+    <color name="green">#6ac6b3</color>
+    <color name="orange">#F39019</color>
+    <color name="brown">#926239</color>
+    <color name="purple">#9B59B6</color>
+    <color name="yellow">#E6C821</color>
+    <color name="turquoise">#1ABC9C</color>
+    <color name="dark_grey">#4A4A4A</color>
+    <color name="unread">#F0F0F0</color>
+    <color name="twitter">#00ACED</color>
+    <color name="facebook">#3B5998</color>
+
+    <!-- grey variants -->
+    <color name="grey">#979797</color>
+    <color name="light_grey">#DBDBDB</color>
+    <color name="sub_title_grey">#4A4A4A</color>
+    
+    <!-- grey transparencies -->
+    <color name="grey_10_percent">#1A979797</color>
+    <color name="grey_20_percent">#33979797</color>
+    <color name="grey_30_percent">#4D979797</color>
+    <color name="grey_50_percent">#80979797</color>
+    <color name="grey_60_percent">#B3979797</color>
+    <color name="grey_90_percent">#E6979797</color>
+    <color name="grey_95_percent">#F2979797</color>
+
+    <!-- black transparencies -->
+    <color name="black_10_percent">#1A10131a</color>
+    <color name="black_20_percent">#3310131a</color>
+    <color name="black_30_percent">#4D10131a</color>
+    <color name="black_50_percent">#8010131a</color>
+    <color name="black_60_percent">#B310131a</color>
+    <color name="black_90_percent">#E610131a</color>
+    <color name="black_95_percent">#F210131a</color>
+
+    <!-- white transparencies -->
+    <color name="white_10_percent">#1AFFFFFF</color>
+    <color name="white_20_percent">#33FFFFFF</color>
+    <color name="white_30_percent">#4DFFFFFF</color>
+    <color name="white_50_percent">#80FFFFFF</color>
+    <color name="white_60_percent">#B3FFFFFF</color>
+    <color name="white_90_percent">#E6FFFFFF</color>
+    <color name="white_95_percent">#F2FFFFFF</color>
+
+    <!-- Drawer colours -->
+    <color name="drawer_scrim">#66000000</color>
+
+</resources>

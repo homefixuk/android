@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/text_size_padding_cut"
+    android:layout_marginRight="@dimen/text_size_padding_cut"
+    android:layout_marginTop="@dimen/base_padding_quarter"
+    android:autoLink="web"
+    android:background="@color/transparent"
+    android:hint="Say something..."
+    android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+    android:paddingLeft="@dimen/base_padding_quarter"
+    android:paddingRight="@dimen/base_padding_quarter"
+    android:paddingTop="@dimen/base_padding_quarter"
+    android:textAppearance="@style/TextTheme" />

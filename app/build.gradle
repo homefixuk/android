@@ -1,0 +1,94 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+    defaultConfig {
+        applicationId "com.homefix.tradesman"
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    productFlavors {
+        apiary_mock {
+            applicationId "com.homefix.tradesman.apiary_mock"
+            versionName "1.0-apiary"
+        }
+
+        salesforce {
+            applicationId "com.homefix.tradesman.sf"
+            versionName "1.0-sf"
+        }
+
+        custom {
+            applicationId "com.homefix.tradesman"
+            versionName "1.0"
+        }
+    }
+
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':lib')
+
+    // Google
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha1'
+    compile 'com.android.support:multidex:1.0.1'
+
+    // Mosby (MVP)
+    compile 'com.hannesdorfmann.mosby:mvp:2.0.1'
+    compile 'com.hannesdorfmann.mosby:viewstate:2.0.1'
+
+    // Cache library
+    compile 'com.lifeofcoding:cacheutilslibrary:1.1.0@aar'
+    compile 'com.google.code.gson:gson:2.2.2'
+    compile 'commons-io:commons-io:2.4'
+
+    // Icepick
+    compile 'frankiesardo:icepick:3.2.0'
+    provided 'frankiesardo:icepick-processor:3.2.0'
+
+    // EventBus
+    compile 'org.greenrobot:eventbus:3.0.0'
+
+    // Rx and Retrofit
+    compile 'io.reactivex:rxjava:1.0.+'
+    compile 'io.reactivex:rxandroid:0.23.+'
+    compile 'com.squareup.retrofit:retrofit:1.9.+'
+
+    provided 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+    compile 'org.glassfish.jersey.core:jersey-server:2.22.2'
+    // Jersey core Servlet 3.x implementation
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.22.2'
+    // Jersey Test Framework — Grizzly2 container
+    testCompile 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.22.2'
+
+    // Material Dialogs
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') {
+        transitive = true
+        exclude module: 'recyclerview-v7'
+        exclude module: 'support'
+    }
+
+    // test
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support:support-annotations:23.4.0'
+}

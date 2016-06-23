@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.samdroid.layout.MyRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:theme="@style/AppTheme">
+
+    <RelativeLayout
+        android:id="@+id/imgLogo_holder"
+        android:layout_width="@dimen/base_padding_six"
+        android:layout_height="@dimen/base_padding_six"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/base_padding_double"
+        android:layout_marginTop="@dimen/base_padding_double">
+
+        <include layout="@layout/logo_layout" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imgLogo_holder"
+        android:scrollbarSize="0dip"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/base_padding"
+            android:paddingRight="@dimen/base_padding">
+
+            <!-- Read & Write to Storage -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75"
+                    android:orientation="vertical"
+                    android:paddingRight="@dimen/base_padding_double">
+
+                    <com.samdroid.andifirebase.view.AndiTextView
+                        android:id="@+id/permission_write_storage_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/base_padding_0.2"
+                        android:text="Allow Andi to read and write to your external storage"
+                        android:textAppearance="@style/TextTheme"
+                        android:textColor="@color/colorPrimaryDark" />
+
+                    <com.samdroid.andifirebase.view.AndiTextView
+                        android:id="@+id/permission_write_storage_desc_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Then we can make the app perform better by caching information. We promise not to use up too much of your memory."
+                        android:textAppearance="@style/TextTheme.ExtraSmall"
+                        android:textColor="@color/colorPrimaryDark" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/permission_write_storage_btn"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/primary_light_to_dark_color_selector"
+                    android:gravity="center"
+                    android:lines="2"
+                    android:padding="@dimen/base_padding"
+                    android:text="Click to Enable"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextTheme"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="@dimen/base_padding"
+                android:layout_marginTop="@dimen/base_padding"
+                android:background="@color/light_grey" />
+
+            <!-- Read Phone State -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75"
+                    android:orientation="vertical"
+                    android:paddingRight="@dimen/base_padding_double">
+
+                    <com.samdroid.andifirebase.view.AndiTextView
+                        android:id="@+id/permission_read_phone_state_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/base_padding_0.2"
+                        android:text="Allow Andi to read your phone state"
+                        android:textAppearance="@style/TextTheme"
+                        android:textColor="@color/colorPrimaryDark" />
+
+                    <com.samdroid.andifirebase.view.AndiTextView
+                        android:id="@+id/permission_read_phone_state_desc_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="We want to make sure you are playing the best games and do not disturb you when you are already busy before we make game recommendations."
+                        android:textAppearance="@style/TextTheme.ExtraSmall"
+                        android:textColor="@color/colorPrimaryDark" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/permission_read_phone_state_btn"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/primary_light_to_dark_color_selector"
+                    android:gravity="center"
+                    android:lines="2"
+                    android:padding="@dimen/base_padding"
+                    android:text="Click to Enable"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextTheme"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="@dimen/base_padding"
+                android:layout_marginTop="@dimen/base_padding"
+                android:background="@color/light_grey" />
+
+            <!-- Draw Screen Overlay -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75"
+                    android:orientation="vertical"
+                    android:paddingRight="@dimen/base_padding_double">
+
+                    <com.samdroid.andifirebase.view.AndiTextView
+                        android:id="@+id/permission_screen_overlay_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/base_padding_0.2"
+                        android:text="Allow Andi to draw screen overlays"
+                        android:textAppearance="@style/TextTheme"
+                        android:textColor="@color/colorPrimaryDark" />
+
+                    <com.samdroid.andifirebase.view.AndiTextView
+                        android:id="@+id/permission_screen_overlay_desc_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Andi is your personal assistant and might pop up with some cool new games or when it’s a good time to play a game with your friends."
+                        android:textAppearance="@style/TextTheme.ExtraSmall"
+                        android:textColor="@color/colorPrimaryDark" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/permission_screen_overlay_btn"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/accent_color_selector"
+                    android:gravity="center"
+                    android:lines="2"
+                    android:padding="@dimen/base_padding"
+                    android:text="Click to Enable"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextTheme"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="@dimen/base_padding"
+                android:background="@color/light_grey" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</com.samdroid.layout.MyRelativeLayout>
