@@ -22,7 +22,10 @@ import com.homefix.tradesman.base.presenter.BaseToolbarNavMenuActivityPresenter;
 import com.homefix.tradesman.base.view.BaseToolbarNavMenuActivityView;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
+import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.CCA;
+import com.homefix.tradesman.model.User;
+import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
 
 /**
@@ -33,9 +36,10 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         implements BaseToolbarNavMenuActivityView, NavigationView.OnNavigationItemSelectedListener {
 
     private NavigationView navigationView;
+    private View navHeaderView;
     private DrawerLayout drawerLayout;
     private FloatingActionButton mFab;
-    private TextView mCallCcaTxt;
+    private TextView mUserNameTxt, mUserInfoTxt, mCallCcaTxt;
 
     private String ccaPhoneNumber;
 
@@ -55,8 +59,14 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     @Override
     public void injectDependencies() {
         super.injectDependencies();
-
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
+
+        navHeaderView = navigationView.getHeaderView(0);
+        if (navHeaderView != null) {
+            mUserNameTxt = (TextView) navHeaderView.findViewById(R.id.user_name);
+            mUserInfoTxt = (TextView) navHeaderView.findViewById(R.id.user_info);
+        }
+
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mCallCcaTxt = (TextView) findViewById(R.id.call_cca_text);
@@ -66,7 +76,6 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // hide the recommendations option if it is set to false in the config
         Menu menu = navigationView.getMenu();
 
         // Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
@@ -112,6 +121,8 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
                 getPresenter().onFabClicked();
             }
         });
+
+        setupUser();
     }
 
     @Override
@@ -135,6 +146,15 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         if (drawerLayout == null) return;
 
         drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    public void setupUser() {
+        User user = UserController.getCurrentUser();
+
+        if (user == null) return;
+
+        if (mUserNameTxt != null) mUserNameTxt.setText(user.getName());
+        if (mUserInfoTxt != null) mUserInfoTxt.setText(user.getEmail());
     }
 
     public void setCCANumber(String phone) {

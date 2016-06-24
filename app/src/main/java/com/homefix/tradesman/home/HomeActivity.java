@@ -45,11 +45,11 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        HomeFix.API service = HomeFix.getAPI();
-
-        Map<String, String> params = new HashMap<>();
-        params.put("email", "test@gmail.com");
-        params.put("password", "doivjfivjfv");
+//        HomeFix.API service = HomeFix.getAPI();
+//
+//        Map<String, String> params = new HashMap<>();
+//        params.put("email", "test@gmail.com");
+//        params.put("password", "doivjfivjfv");
 //        service.login(params)
 //                .subscribeOn(Schedulers.newThread())
 //                .observeOn(AndroidSchedulers.mainThread())
@@ -70,27 +70,27 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 //                        MyLog.e("HomeActivity", "Tradesman first name: " + response.getFirst_name());
 //                    }
 //                });
-
-        service.getTradesmanEvents("id", params)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Timeslot>() {
-                    @Override
-                    public final void onCompleted() {
-                        // do nothing
-                        MyLog.e("HomeActivity", "onComplete");
-                    }
-
-                    @Override
-                    public final void onError(Throwable e) {
-                        MyLog.e("HomeActivity", e.getMessage());
-                    }
-
-                    @Override
-                    public final void onNext(Timeslot response) {
-                        MyLog.e("HomeActivity", "Timeslot start: " + response.getStart());
-                    }
-                });
+//
+//        service.getTradesmanEvents("id", params)
+//                .subscribeOn(Schedulers.newThread())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Subscriber<Timeslot>() {
+//                    @Override
+//                    public final void onCompleted() {
+//                        // do nothing
+//                        MyLog.e("HomeActivity", "onComplete");
+//                    }
+//
+//                    @Override
+//                    public final void onError(Throwable e) {
+//                        MyLog.e("HomeActivity", e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public final void onNext(Timeslot response) {
+//                        MyLog.e("HomeActivity", "Timeslot start: " + response.getStart());
+//                    }
+//                });
     }
 
     @Override

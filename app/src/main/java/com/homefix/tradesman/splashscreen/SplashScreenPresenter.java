@@ -3,6 +3,10 @@ package com.homefix.tradesman.splashscreen;
 import android.os.Bundle;
 
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
+import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.model.User;
+import com.samdroid.common.MyLog;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,14 +21,24 @@ public class SplashScreenPresenter extends BaseActivityPresenter<SplashScreenVie
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new Timer().schedule(new TimerTask() {
-
+        // load the current user
+        UserController.loadCurrentUser(new OnGotObjectListener<User>() {
             @Override
-            public void run() {
-                getView().goToApp(false, null);
-            }
+            public void onGotThing(User user) {
+                if (user == null) MyLog.e("HomeFixApplication", "No Current user found");
+                else MyLog.e("HomeFixApplication", "Loaded User: " + user.getName());
 
-        }, 3 * 1000);
+                // now wait before going into the app
+                new Timer().schedule(new TimerTask() {
+
+                    @Override
+                    public void run() {
+                        getView().goToApp(false, null);
+                    }
+
+                }, 3 * 1000);
+            }
+        });
     }
 
 }
