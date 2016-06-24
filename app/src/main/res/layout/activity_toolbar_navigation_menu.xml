@@ -84,7 +84,7 @@
                 android:layout_alignParentBottom="true"
                 android:gravity="center"
                 android:padding="@dimen/base_padding"
-                android:text="Call CCA 080012341066"
+                android:text="Call CCA"
                 android:textSize="@dimen/text_size_extra_large" />
 
         </RelativeLayout>

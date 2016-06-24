@@ -25,18 +25,13 @@ import rx.schedulers.Schedulers;
 
 public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePresenter> implements HomeView {
 
-    private TextView mCallCcaTxt;
-
     public HomeActivity() {
         super(HomeActivity.class.getSimpleName());
     }
 
     @Override
     public HomePresenter getPresenter() {
-        if (presenter == null) {
-            presenter = new HomePresenter();
-            presenter.attachView(getThisView());
-        }
+        if (presenter == null) presenter = new HomePresenter();
 
         return presenter;
     }
@@ -47,17 +42,10 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     }
 
     @Override
-    public void injectDependencies() {
-        super.injectDependencies();
-
-        mCallCcaTxt = (TextView) findViewById(R.id.call_cca_text);
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        HomeFix.API service = ServiceFactory.createRetrofitService(HomeFix.API.class, HomeFix.HOST_NAME);
+        HomeFix.API service = HomeFix.getAPI();
 
         Map<String, String> params = new HashMap<>();
         params.put("email", "test@gmail.com");

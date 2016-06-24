@@ -29,10 +29,6 @@ public interface BaseActivityView extends BaseView {
 
     boolean isDestroyed();
 
-    void onAppInstalled(String androidPackage);
-
-    void onAppUninstalled(String androidPackage);
-
     HomeFixBaseActivity getBaseActivity();
 
     void onActivityResult(int requestCode, int resultCode, Intent data);
@@ -44,8 +40,6 @@ public interface BaseActivityView extends BaseView {
     void finishWithAnimation();
 
     void goToApp(boolean isUserNew, View logoView);
-
-    View getLogoView();
 
     void onScrollingStarted();
 

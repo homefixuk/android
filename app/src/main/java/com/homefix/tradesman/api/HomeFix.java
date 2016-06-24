@@ -1,6 +1,7 @@
 package com.homefix.tradesman.api;
 
 import com.homefix.tradesman.BuildConfig;
+import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.model.Tradesman;
 import com.samdroid.common.MyLog;
@@ -77,6 +78,13 @@ public class HomeFix {
         @GET("/tradesman/timeslots")
         Observable<Timeslot> getTradesmanEvents(@Query("id") String id, @QueryMap Map<String, String> params);
 
+        @GET("/cca")
+        Observable<CCA> getCCA(@Query("id") String id);
+
+    }
+
+    public static API getAPI() {
+        return ServiceFactory.createRetrofitService(HomeFix.API.class, HomeFix.HOST_NAME);
     }
 
     /**

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.presenter.BaseToolbarActivityPresenter;
 import com.homefix.tradesman.base.view.BaseToolbarActivityView;
+import com.homefix.tradesman.model.CCA;
 import com.samdroid.string.Strings;
 import com.samdroid.view.ScreenUtils;
 

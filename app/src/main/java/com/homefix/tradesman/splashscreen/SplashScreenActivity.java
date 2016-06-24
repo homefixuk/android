@@ -1,5 +1,7 @@
 package com.homefix.tradesman.splashscreen;
 
+import android.os.Bundle;
+
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.HomeFixBaseActivity;
 
@@ -15,10 +17,7 @@ public class SplashScreenActivity extends HomeFixBaseActivity<SplashScreenView, 
 
     @Override
     public SplashScreenPresenter getPresenter() {
-        if (presenter == null) {
-            presenter = new SplashScreenPresenter();
-            presenter.attachView(this);
-        }
+        if (presenter == null) presenter = new SplashScreenPresenter();
 
         return presenter;
     }
@@ -33,4 +32,9 @@ public class SplashScreenActivity extends HomeFixBaseActivity<SplashScreenView, 
         return this;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        checkPermissions = false;
+    }
 }

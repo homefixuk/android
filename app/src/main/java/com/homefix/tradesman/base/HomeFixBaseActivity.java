@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,20 +19,29 @@ import android.view.WindowManager;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.base.view.BaseActivityView;
+import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
 import com.homefix.tradesman.home.HomeActivity;
+import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.MyLog;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
 import icepick.Icepick;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by samuel on 1/7/2016.
  */
-public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends BaseActivityPresenter<V>> extends AppCompatActivity implements BaseActivityView {
+public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends BaseActivityPresenter<V>>
+        extends AppCompatActivity
+        implements BaseActivityView, OnGotObjectListener<CCA> {
 
     protected final String TAG;
 
@@ -39,7 +49,12 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
     protected P presenter;
 
-    protected View mLogoView;
+    protected boolean
+            checkPermissions = true,
+            calledPermissionResult = false;
+    protected String permissionRequested;
+
+    protected CCA mCca;
 
     public HomeFixBaseActivity(String TAG) {
         this.TAG = TAG;
@@ -61,7 +76,6 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
      * Inject the views into this activity
      */
     public void injectDependencies() {
-        mLogoView = findViewById(R.id.logo_img);
     }
 
     @Override
@@ -87,12 +101,44 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
         }
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            checkPermissions = intent.getBooleanExtra("checkPermissions", true);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         getPresenter().onResume();
+
+        // make sure we have the CCA
+        if (mCca == null) {
+            HomeFix.getAPI().getCCA("id")
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<CCA>() {
+                        @Override
+                        public final void onCompleted() {
+                            // do nothing
+                            MyLog.e(TAG, "[cca] onComplete");
+                        }
+
+                        @Override
+                        public final void onError(Throwable e) {
+                            MyLog.e(TAG, e.getMessage());
+                        }
+
+                        @Override
+                        public final void onNext(CCA cca) {
+                            mCca = cca;
+                            onGotThing(mCca);
+                        }
+                    });
+        }
+
+        if (checkPermissions && !calledPermissionResult) approveAllRequiredPermissions();
     }
 
     @Override
@@ -227,16 +273,6 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
     }
 
     @Override
-    public void onAppInstalled(String androidPackage) {
-
-    }
-
-    @Override
-    public void onAppUninstalled(String androidPackage) {
-
-    }
-
-    @Override
     public void goToApp(boolean isUserNew, View logoView) {
         Bundle optionsBundle = new Bundle();
         if (logoView != null) {
@@ -245,37 +281,26 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
             optionsBundle = options.toBundle();
         }
 
+        // TODO: check if user from cache
         Object user = "";
 
         // if there is no user
         if (user == null) {
-//            startActivity(new Intent(this, LoginSignupActivity.class));
+            // TODO: go to login activity
 
         } else {
-            if (PermissionsHelper.isMissingPermission(this)) {
-                // else if there is a missing permissions //
-//                startActivity(new Intent(this, PermissionsActivity.class));
-
-            } else {
-                // else go to HomeActivity //
-                Intent i = new Intent(this, HomeActivity.class);
-                i.putExtra("previousActivity", TAG);
-                startActivity(i);
-            }
+            // else go to HomeActivity //
+            Intent i = new Intent(this, HomeActivity.class);
+            i.putExtra("previousActivity", TAG);
+            startActivity(i);
         }
 
-        overridePendingTransition(R.anim.right_slide_in, R.anim.left_slide_out);
-        finish();
+        finishWithAnimation();
     }
 
     @Override
     public void onBackPressed() {
         getPresenter().onBackPressed();
-    }
-
-    @Override
-    public View getLogoView() {
-        return mLogoView;
     }
 
     @Override
@@ -287,4 +312,59 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
     public void onScrollingStopped() {
 
     }
+
+    /**
+     * @return if the app is missing a permission needed to run the app
+     */
+    private boolean approveAllRequiredPermissions() {
+        calledPermissionResult = false;
+        permissionRequested = "";
+
+        // make sure the user has granted us all permissions
+        for (String s : PermissionsHelper.REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, s) != PackageManager.PERMISSION_GRANTED) {
+                permissionRequested = s;
+                new PermissionsHelper.PermissionClickListener(
+                        this,
+                        permissionRequested,
+                        "Please allow HomeFix this permission",
+                        Ids.CODE_GENERIC_PERMISSION,
+                        false).onClick(null);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        calledPermissionResult = true;
+
+        switch (requestCode) {
+
+            case Ids.CODE_GENERIC_PERMISSION:
+                // if we still do not have permission, try again
+                if (!PermissionsHelper.hasPermission(getBaseActivity(), permissionRequested)) {
+                    new PermissionsHelper.PermissionClickListener(
+                            this,
+                            permissionRequested,
+                            "Please allow HomeFix the permission",
+                            Ids.CODE_GENERIC_PERMISSION,
+                            true)
+                            .onClick(null);
+
+                } else {
+                    // else make sure all other permissions have been requested //
+                    approveAllRequiredPermissions();
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onGotThing(CCA cca) {
+
+    }
+
 }
