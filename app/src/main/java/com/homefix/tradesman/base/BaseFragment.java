@@ -176,10 +176,10 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
     }
 
     @Override
-    public void goToApp(boolean isUserNew, View logoView) {
+    public void goToApp() {
         if (getBaseActivity() == null) return;
 
-        getBaseActivity().goToApp(isUserNew, logoView);
+        getBaseActivity().goToApp();
     }
 
     @Override

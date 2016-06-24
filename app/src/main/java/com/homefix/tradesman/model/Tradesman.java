@@ -1,5 +1,6 @@
 package com.homefix.tradesman.model;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +11,7 @@ public class Tradesman extends User {
 
     String type, picture;
     double rating, experience;
-    String[] work_areas;
+    List<String> work_areas;
     Location current_location;
     Map<String, Object> settings;
 
@@ -30,7 +31,7 @@ public class Tradesman extends User {
         return experience;
     }
 
-    public String[] getWork_areas() {
+    public List<String> getWork_areas() {
         return work_areas;
     }
 
@@ -58,7 +59,7 @@ public class Tradesman extends User {
         this.experience = experience;
     }
 
-    public void setWork_areas(String[] work_areas) {
+    public void setWork_areas(List<String> work_areas) {
         this.work_areas = work_areas;
     }
 

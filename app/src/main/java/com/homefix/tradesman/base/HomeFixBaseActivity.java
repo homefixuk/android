@@ -24,8 +24,11 @@ import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
+import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.home.HomeActivity;
+import com.homefix.tradesman.login.LoginActivity;
 import com.homefix.tradesman.model.CCA;
+import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
@@ -279,28 +282,24 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
     }
 
     @Override
-    public void goToApp(boolean isUserNew, View logoView) {
-        Bundle optionsBundle = new Bundle();
-        if (logoView != null) {
-            ActivityOptionsCompat options = ActivityOptionsCompat.
-                    makeSceneTransitionAnimation(this, logoView, "logo");
-            optionsBundle = options.toBundle();
-        }
+    public void goToApp() {
+        // check if user logged in
+        Tradesman tradesman = UserController.getCurrentUser();
 
-        // TODO: check if user from cache
-        Object user = "";
+        Intent i;
 
         // if there is no user
-        if (user == null) {
-            // TODO: go to login activity
+        if (tradesman == null) {
+            // go to login activity
+            i = new Intent(this, LoginActivity.class);
 
         } else {
             // else go to HomeActivity //
-            Intent i = new Intent(this, HomeActivity.class);
+            i = new Intent(this, HomeActivity.class);
             i.putExtra("previousActivity", TAG);
-            startActivity(i);
         }
 
+        if (i != null) startActivity(i);
         finishWithAnimation();
     }
 

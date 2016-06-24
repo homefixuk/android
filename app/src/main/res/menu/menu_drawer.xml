@@ -28,5 +28,10 @@
             android:checked="false"
             android:title="@string/action_help" />
 
+        <item
+            android:id="@+id/logout"
+            android:checked="false"
+            android:title="@string/action_logout" />
+
     </group>
 </menu>

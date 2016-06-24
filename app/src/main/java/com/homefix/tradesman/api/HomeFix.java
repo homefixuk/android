@@ -22,6 +22,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import clojure.lang.Obj;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
@@ -67,16 +68,16 @@ public class HomeFix {
     public interface API {
 
         @POST("/tradesman/login")
-        Observable<Tradesman> login(@QueryMap Map<String, String> params);
+        Observable<Tradesman> login(@QueryMap Map<String, Object> params);
 
         @GET("/tradesman/me")
         Observable<Tradesman> getTradesman(@Query("id") String id);
 
         @POST("/tradesman/me")
-        Observable<Tradesman> updateTradesmanDetails(@Query("id") String id, @QueryMap Map<String, String> params);
+        Observable<Tradesman> updateTradesmanDetails(@Query("id") String id, @QueryMap Map<String, Object> params);
 
         @GET("/tradesman/timeslots")
-        Observable<Timeslot> getTradesmanEvents(@Query("id") String id, @QueryMap Map<String, String> params);
+        Observable<Timeslot> getTradesmanEvents(@Query("id") String id, @QueryMap Map<String, Object> params);
 
         @GET("/cca")
         Observable<CCA> getCCA(@Query("id") String id);

@@ -16,6 +16,6 @@ public interface BaseFragmentView extends BaseView {
 
     void onPause();
 
-    void goToApp(boolean isUserNew, View logoView);
+    void goToApp();
 
 }

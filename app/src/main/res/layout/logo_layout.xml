@@ -18,7 +18,7 @@
         android:layout_below="@+id/logo_img"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/base_padding_triple"
-        android:text="ANDi"
+        android:text="HomeFix"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="@dimen/text_size_extra_large" />
 

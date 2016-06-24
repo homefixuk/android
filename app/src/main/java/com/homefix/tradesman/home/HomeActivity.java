@@ -1,15 +1,19 @@
 package com.homefix.tradesman.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.api.ServiceFactory;
 import com.homefix.tradesman.base.BaseToolbarNavMenuActivity;
+import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.splashscreen.SplashScreenActivity;
 import com.samdroid.common.MyLog;
 
 import java.util.HashMap;
@@ -95,6 +99,17 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        if (item == null) return false;
+
+        String name = item.getTitle().toString();
+
+        if (name.equals(getString(R.string.action_logout))) {
+            UserController.clearCurrentUser();
+            startActivity(new Intent(this, SplashScreenActivity.class));
+            finish();
+            return true;
+        }
+
         return false;
     }
 

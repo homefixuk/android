@@ -39,7 +39,7 @@ public interface BaseActivityView extends BaseView {
 
     void finishWithAnimation();
 
-    void goToApp(boolean isUserNew, View logoView);
+    void goToApp();
 
     void onScrollingStarted();
 

@@ -1,6 +1,8 @@
 package com.homefix.tradesman.api;
 
+import retrofit.ErrorHandler;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 
 public class ServiceFactory {
 
@@ -14,6 +16,12 @@ public class ServiceFactory {
     public static <T> T createRetrofitService(final Class<T> clazz, final String endPoint) {
         final RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(endPoint)
+                .setErrorHandler(new ErrorHandler() {
+                    @Override
+                    public Throwable handleError(RetrofitError cause) {
+                        return new Throwable(cause.getCause());
+                    }
+                })
                 .build();
         T service = restAdapter.create(clazz);
 
