@@ -83,6 +83,9 @@ public class HomeFix {
 
     }
 
+    /**
+     * @return an instance of the API that can be called
+     */
     public static API getAPI() {
         return ServiceFactory.createRetrofitService(HomeFix.API.class, HomeFix.HOST_NAME);
     }

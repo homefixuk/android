@@ -27,8 +27,10 @@ import com.homefix.tradesman.common.PermissionsHelper;
 import com.homefix.tradesman.home.HomeActivity;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import icepick.Icepick;
@@ -128,6 +130,10 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
                         @Override
                         public final void onError(Throwable e) {
                             MyLog.e(TAG, e.getMessage());
+
+                            // if it fails, get the cca from the cache
+                            mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
+                            onGotThing(mCca);
                         }
 
                         @Override
@@ -364,7 +370,9 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
     @Override
     public void onGotThing(CCA cca) {
+        if (cca == null) return;
 
+        CacheUtils.writeObjectFile("my_cca", cca);
     }
 
 }

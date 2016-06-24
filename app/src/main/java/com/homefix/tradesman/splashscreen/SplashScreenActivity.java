@@ -37,4 +37,5 @@ public class SplashScreenActivity extends HomeFixBaseActivity<SplashScreenView, 
         super.onCreate(savedInstanceState);
         checkPermissions = false;
     }
+
 }
