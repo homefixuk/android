@@ -4,24 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
-import android.widget.TextView;
 
-import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.api.ServiceFactory;
 import com.homefix.tradesman.base.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.data.UserController;
-import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.splashscreen.SplashScreenActivity;
-import com.samdroid.common.MyLog;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by samuel on 6/22/2016.
@@ -48,53 +35,6 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        HomeFix.API service = HomeFix.getAPI();
-//
-//        Map<String, String> params = new HashMap<>();
-//        params.put("email", "test@gmail.com");
-//        params.put("password", "doivjfivjfv");
-//        service.login(params)
-//                .subscribeOn(Schedulers.newThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<Tradesman>() {
-//                    @Override
-//                    public final void onCompleted() {
-//                        // do nothing
-//                        MyLog.e("HomeActivity", "onComplete");
-//                    }
-//
-//                    @Override
-//                    public final void onError(Throwable e) {
-//                        MyLog.e("HomeActivity", e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public final void onNext(Tradesman response) {
-//                        MyLog.e("HomeActivity", "Tradesman first name: " + response.getFirst_name());
-//                    }
-//                });
-//
-//        service.getTradesmanEvents("id", params)
-//                .subscribeOn(Schedulers.newThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<Timeslot>() {
-//                    @Override
-//                    public final void onCompleted() {
-//                        // do nothing
-//                        MyLog.e("HomeActivity", "onComplete");
-//                    }
-//
-//                    @Override
-//                    public final void onError(Throwable e) {
-//                        MyLog.e("HomeActivity", e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public final void onNext(Timeslot response) {
-//                        MyLog.e("HomeActivity", "Timeslot start: " + response.getStart());
-//                    }
-//                });
     }
 
     @Override
@@ -104,9 +44,16 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         String name = item.getTitle().toString();
 
         if (name.equals(getString(R.string.action_logout))) {
-            UserController.clearCurrentUser();
-            startActivity(new Intent(this, SplashScreenActivity.class));
-            finish();
+            showConfirmDialog("Are you sure you want to logout?", "LOGOUT", "CANCEL", new ConfirmDialogCallback() {
+
+                @Override
+                public void onPositive() {
+                    UserController.clearCurrentUser(getContext());
+                    startActivity(new Intent(getBaseActivity(), SplashScreenActivity.class));
+                    finish();
+                }
+
+            });
             return true;
         }
 

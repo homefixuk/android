@@ -1,8 +1,11 @@
 package com.homefix.tradesman.api;
 
-import retrofit.ErrorHandler;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceFactory {
 
@@ -14,18 +17,22 @@ public class ServiceFactory {
      * @return retrofit service with defined endpoint
      */
     public static <T> T createRetrofitService(final Class<T> clazz, final String endPoint) {
-        final RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(endPoint)
-                .setErrorHandler(new ErrorHandler() {
-                    @Override
-                    public Throwable handleError(RetrofitError cause) {
-                        return new Throwable(cause.getCause());
-                    }
-                })
+        final Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(endPoint)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(getClient())
                 .build();
-        T service = restAdapter.create(clazz);
 
+        T service = retrofit.create(clazz);
         return service;
+    }
+
+    private static OkHttpClient getClient() {
+        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+        builder.connectTimeout(30, TimeUnit.SECONDS);
+        builder.readTimeout(30, TimeUnit.SECONDS);
+        return builder.build();
     }
 
 }

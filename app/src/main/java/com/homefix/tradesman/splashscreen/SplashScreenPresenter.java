@@ -6,6 +6,7 @@ import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.User;
+import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 
@@ -23,7 +24,7 @@ public class SplashScreenPresenter extends BaseActivityPresenter<SplashScreenVie
         super.onCreate(savedInstanceState);
 
         // load the current user
-        UserController.loadCurrentUser(new OnGotObjectListener<Tradesman>() {
+        UserController.loadCurrentUser(getView().getContext(), new OnGotObjectListener<Tradesman>() {
             @Override
             public void onGotThing(Tradesman user) {
                 if (user == null) MyLog.e("HomeFixApplication", "No Current user found");

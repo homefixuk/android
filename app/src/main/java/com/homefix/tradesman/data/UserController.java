@@ -1,11 +1,19 @@
 package com.homefix.tradesman.data;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.model.Tradesman;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.string.Strings;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -22,46 +30,38 @@ public class UserController {
         return mCurrentUser;
     }
 
-    private synchronized static void setCurrentUser(Tradesman user) {
+    private synchronized static void setCurrentUser(Context context, Tradesman user) {
         mCurrentUser = user;
         CacheUtils.writeObjectFile("current_user", mCurrentUser);
     }
 
-    public static void loadCurrentUser(final OnGotObjectListener<Tradesman> callback) {
-        // first load from cache
-        Tradesman user = CacheUtils.readObjectFile("current_user", Tradesman.class);
-        setCurrentUser(user);
+    public static void loadCurrentUser(final Context context, final OnGotObjectListener<Tradesman> callback) {
+        mCurrentUser = CacheUtils.readObjectFile("current_user", Tradesman.class);
 
-        if (user == null) {
-            if (callback != null) callback.onGotThing(mCurrentUser);
+        if (mCurrentUser == null) {
+            if (callback != null) callback.onGotThing(null);
             return;
         }
 
-        HomeFix.getAPI().getTradesman(mCurrentUser.getId())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Tradesman>() {
-                    @Override
-                    public final void onCompleted() {
-                        MyLog.e("HomeActivity", "[getTradesman] onComplete");
-                    }
+        HomeFix.getAPI().getTradesman(mCurrentUser.getId()).enqueue(new Callback<Tradesman>() {
+            @Override
+            public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
+                Tradesman user = response != null ? response.body() : null;
 
-                    @Override
-                    public final void onError(Throwable e) {
-                        MyLog.e("HomeActivity", e.getMessage());
-                    }
+                // if we got a user from the server, update the one we're storing
+                if (user != null) setCurrentUser(context, user);
 
-                    @Override
-                    public final void onNext(Tradesman user) {
-                        // if we got a user from the server, update the one we're storing
-                        if (user != null) setCurrentUser(user);
+                if (callback != null) callback.onGotThing(getCurrentUser());
+            }
 
-                        if (callback != null) callback.onGotThing(getCurrentUser());
-                    }
-                });
+            @Override
+            public void onFailure(Call<Tradesman> call, Throwable t) {
+                if (MyLog.isIsLogEnabled()) t.printStackTrace();
+            }
+        });
     }
 
-    public static void clearCurrentUser() {
+    public static void clearCurrentUser(Context context) {
         mCurrentUser = null;
         CacheUtils.writeObjectFile("current_user", null);
     }

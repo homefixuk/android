@@ -118,9 +118,4 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
         hideDialog();
     }
 
-    @Override
-    public void goToApp() {
-        getBaseActivity().goToApp();
-    }
-
 }

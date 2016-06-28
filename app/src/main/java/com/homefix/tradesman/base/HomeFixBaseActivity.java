@@ -8,11 +8,9 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -33,13 +31,12 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
-import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import icepick.Icepick;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by samuel on 1/7/2016.
@@ -120,31 +117,27 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
         // make sure we have the CCA
         if (mCca == null) {
-            HomeFix.getAPI().getCCA("id")
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<CCA>() {
-                        @Override
-                        public final void onCompleted() {
-                            // do nothing
-                            MyLog.e(TAG, "[cca] onComplete");
-                        }
+            HomeFix.getAPI().getCCA("id").enqueue(new Callback<CCA>() {
 
-                        @Override
-                        public final void onError(Throwable e) {
-                            MyLog.e(TAG, e.getMessage());
+                @Override
+                public void onResponse(Call<CCA> call, Response<CCA> response) {
+                    mCca = response != null ? response.body() : null;
 
-                            // if it fails, get the cca from the cache
-                            mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
-                            onGotThing(mCca);
-                        }
+                    if (mCca == null) mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
 
-                        @Override
-                        public final void onNext(CCA cca) {
-                            mCca = cca;
-                            onGotThing(mCca);
-                        }
-                    });
+                    onGotThing(mCca);
+                }
+
+                @Override
+                public void onFailure(Call<CCA> call, Throwable t) {
+                    if (MyLog.isIsLogEnabled()) t.printStackTrace();
+
+                    // if it fails, get the cca from the cache
+                    mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
+                    onGotThing(mCca);
+                }
+
+            });
         }
 
         if (checkPermissions && !calledPermissionResult) approveAllRequiredPermissions();
