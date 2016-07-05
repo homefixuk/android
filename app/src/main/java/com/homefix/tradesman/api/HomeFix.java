@@ -1,6 +1,7 @@
 package com.homefix.tradesman.api;
 
 import com.homefix.tradesman.BuildConfig;
+import com.homefix.tradesman.R;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.model.Tradesman;
@@ -34,17 +35,24 @@ import retrofit2.http.QueryMap;
 public class HomeFix {
 
     public final static String HOST_NAME;
+    public final static int API_KEY;
 
     private static final String
             HOST_APIARY_MOCK = "http://private-52b01-homefixtradesman.apiary-mock.com/",
             HOST_SALESFORCE_PROD = "https://fieldexprt-homefix.cs80.force.com/services/apexrest/",
             HOST_SALESFORCE_SANDBOX = "https://fieldexprt-homefix.eu5.force.com/services/apexrest/",
-            HOST_CUSTOM_DEV = "https://dev_api.homefix.co.uk/",
-            HOST_CUSTOM_PROD = "https://prod_api.homefix.co.uk/";
+            HOST_CUSTOM_DEV = "http://ec2-52-90-29-184.compute-1.amazonaws.com/int/",
+            HOST_CUSTOM_PROD = "http://ec2-52-90-29-184.compute-1.amazonaws.com/int/";
 
     public enum REQUEST_TYPE {
 
         GET, POST, PATCH, DELETE
+    }
+
+    public enum ROLE {
+
+        CUST, TRADE
+
     }
 
     // setup the host base
@@ -55,30 +63,49 @@ public class HomeFix {
             else if (BuildConfig.FLAVOR.equals("custom")) HOST_NAME = HOST_CUSTOM_DEV;
             else HOST_NAME = HOST_APIARY_MOCK;
 
+            API_KEY = R.string.apikey_dev;
+
         } else {
             if (BuildConfig.FLAVOR.equals("salesforce")) HOST_NAME = HOST_SALESFORCE_PROD;
             else if (BuildConfig.FLAVOR.equals("apiary_mock")) HOST_NAME = HOST_APIARY_MOCK;
             else if (BuildConfig.FLAVOR.equals("custom")) HOST_NAME = HOST_CUSTOM_PROD;
             else HOST_NAME = HOST_APIARY_MOCK;
+
+            API_KEY = R.string.apikey_prod;
         }
     }
 
     public interface API {
 
-        @POST("/tradesman/login")
-        Call<Tradesman> login(@QueryMap Map<String, Object> params);
+        @POST("/user/signup")
+        Call<HashMap<String, Object>> signup(
+                @Query("apikey") String apikey,
+                @Query("firstName") String firstName,
+                @Query("lastName") String lastName,
+                @Query("email") String email,
+                @Query("password") String password,
+                @Query("role") String role);
+
+        @POST("/user/login")
+        Call<HashMap<String, Object>> login(
+                @Query("apikey") String apikey,
+                @Query("email") String email,
+                @Query("password") String password);
 
         @GET("/tradesman/me")
-        Call<Tradesman> getTradesman(@Query("id") String id);
+        Call<Tradesman> getTradesman(@Query("token") String token);
 
         @POST("/tradesman/me")
-        Call<Tradesman> updateTradesmanDetails(@Query("id") String id, @QueryMap Map<String, Object> params);
+        Call<Tradesman> updateTradesmanDetails(@Query("token") String token, @QueryMap Map<String, Object> params);
 
         @GET("/tradesman/timeslots")
-        Call<Timeslot> getTradesmanEvents(@Query("id") String id, @QueryMap Map<String, Object> params);
+        Call<Timeslot> getTradesmanEvents(@Query("token") String token, @QueryMap Map<String, Object> params);
 
         @GET("/cca")
-        Call<CCA> getCCA(@Query("id") String id);
+        Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
+
+        @POST("/tradesman/location")
+        Call<Timeslot> updateLocation(@Query("token") String token, @QueryMap Map<String, Object> location);
 
     }
 

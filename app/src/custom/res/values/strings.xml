@@ -2,5 +2,7 @@
 <resources>
 
     <string name="app_name">HomeFix Custom</string>
+    <string name="apikey_dev">768e1474ed7607743c4fb1055851f0cb</string>
+    <string name="apikey_prod"></string>
 
 </resources>

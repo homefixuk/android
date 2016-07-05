@@ -1,5 +1,6 @@
 package com.homefix.tradesman.login;
 
+import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.data.UserController;
@@ -10,9 +11,7 @@ import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,52 +43,46 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
 
         getView().showAttemptingLogin();
 
-        final Map<String, Object> params = new HashMap<>();
-        params.put("email", email);
-        params.put("password", password);
+        final Call<HashMap<String, Object>> call = HomeFix.getAPI().login(
+                getView().getContext().getString(HomeFix.API_KEY),
+                email,
+                password);
 
-        final Call<Tradesman> call = HomeFix.getAPI().login(params);
-        call.enqueue(new Callback<Tradesman>() {
+        call.enqueue(new Callback<HashMap<String, Object>>() {
             @Override
-            public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
-                MyLog.e("LoginPresenter", "[login] onComplete");
+            public void onResponse(Call<HashMap<String, Object>> call, Response<HashMap<String, Object>> response) {
+                HashMap<String, Object> results = response != null ? response.body() : null;
 
-                Tradesman tradesman = response != null ? response.body() : null;
-
-                if (tradesman == null) {
-                    MyLog.e("LoginPresenter", "HERE");
-
-                    MyLog.e("LoginPresenter", response.toString());
-                    MyLog.e("LoginPresenter", call.request().toString());
-
+                if (results == null
+                        || !results.containsKey("token")
+                        || results.get("token") == null
+                        || Strings.isEmpty((String) results.get("token"))) {
                     getView().hideAttemptingLogin();
                     getView().showDialog("Sorry, something went wrong with the login. Please try again", false);
                     return;
                 }
 
-                // else cache the current user
-               CacheUtils.writeObjectFile("current_user", tradesman);
+                // cache the token
+                CacheUtils.writeFile("token", (String) results.get("token"));
 
                 // load the current user
-                UserController.loadCurrentUser(getView().getContext(), new OnGotObjectListener<Tradesman>() {
+                UserController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
                     @Override
                     public void onGotThing(Tradesman tradesman) {
-                        MyLog.e("LoginPresenter", "[onGotThing]");
-
                         if (tradesman == null) {
                             getView().hideAttemptingLogin();
                             getView().showDialog("Sorry, something went wrong with the login. Please try again", false);
                             return;
                         }
 
-                        // else we can take the user to the app //
+                        // we can take the user to the app
                         getView().goToApp();
                     }
                 });
             }
 
             @Override
-            public void onFailure(Call<Tradesman> call, Throwable t) {
+            public void onFailure(Call<HashMap<String, Object>> call, Throwable t) {
                 if (MyLog.isIsLogEnabled()) t.printStackTrace();
 
                 getView().hideAttemptingLogin();

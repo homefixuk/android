@@ -1,6 +1,7 @@
 package com.homefix.tradesman.splashscreen;
 
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.HomeFixBaseActivity;
@@ -35,7 +36,8 @@ public class SplashScreenActivity extends HomeFixBaseActivity<SplashScreenView, 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkPermissions = false;
+        checkPermissions = true;
+        checkPermissionsDelay = 2 * 1000;
     }
 
 }

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -218,6 +219,19 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         super.onGotThing(cca);
 
         if (cca != null) setCCANumber(cca.getMobile());
+    }
+
+    protected void replaceFragment(Fragment fragment) {
+        if (fragment == null) return;
+
+        try {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .commit();
+
+        } catch (Exception e) {
+        }
     }
 
 }

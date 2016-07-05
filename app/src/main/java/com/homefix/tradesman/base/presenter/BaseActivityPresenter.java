@@ -46,4 +46,10 @@ public abstract class BaseActivityPresenter<V extends BaseActivityView> extends 
         return isViewAttached() && NetworkManager.hasConnection(getView().getContext());
     }
 
+    /**
+     * Called after activity onResume when all core required permissions have been granted
+     */
+    public void onAllRequiredPermissionsGranted() {
+    }
+
 }

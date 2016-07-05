@@ -114,6 +114,9 @@ dependencies {
         exclude module: 'support'
     }
 
+    // Location https://github.com/mrmans0n/smart-location-lib
+    compile 'io.nlopez.smartlocation:library:3.2.4'
+
     // test
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'

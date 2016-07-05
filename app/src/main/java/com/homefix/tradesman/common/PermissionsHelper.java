@@ -2,6 +2,7 @@ package com.homefix.tradesman.common;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -80,12 +81,12 @@ public class PermissionsHelper {
     }
 
     /**
-     * @param activity
+     * @param context
      * @param permission
      * @return if we have a permission
      */
-    public static boolean hasPermission(Activity activity, String permission) {
-        return ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED;
+    public static boolean hasPermission(Context context, String permission) {
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     /**

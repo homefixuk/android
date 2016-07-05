@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -53,8 +54,10 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
     protected boolean
             checkPermissions = true,
+            checkCCA = false,
             calledPermissionResult = false;
     protected String permissionRequested;
+    protected long checkPermissionsDelay = 0;
 
     protected CCA mCca;
 
@@ -116,8 +119,8 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
         getPresenter().onResume();
 
         // make sure we have the CCA
-        if (mCca == null) {
-            HomeFix.getAPI().getCCA("id").enqueue(new Callback<CCA>() {
+        if (checkCCA && mCca == null) {
+            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(new Callback<CCA>() {
 
                 @Override
                 public void onResponse(Call<CCA> call, Response<CCA> response) {
@@ -140,7 +143,14 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
             });
         }
 
-        if (checkPermissions && !calledPermissionResult) approveAllRequiredPermissions();
+        if (checkPermissions && !calledPermissionResult) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    approveAllRequiredPermissions();
+                }
+            }, checkPermissionsDelay);
+        }
     }
 
     @Override
@@ -276,6 +286,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
     @Override
     public void goToApp() {
+        MyLog.e(TAG, "[goToApp]");
         // check if user logged in
         Tradesman tradesman = UserController.getCurrentUser();
 
@@ -328,11 +339,16 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
                         "Please allow HomeFix this permission",
                         Ids.CODE_GENERIC_PERMISSION,
                         false).onClick(null);
-                return true;
+                return false;
             }
         }
 
-        return false;
+        onAllRequiredPermissionsGranted();
+        return true;
+    }
+
+    protected void onAllRequiredPermissionsGranted() {
+        getPresenter().onAllRequiredPermissionsGranted();
     }
 
     @Override
