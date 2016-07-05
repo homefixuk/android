@@ -51,7 +51,8 @@ public class LogoutTask extends AsyncTask<Void, Void, Boolean> {
             // cancel the location tracking
             HomeFixApplication.startLocationTracking(baseView.getContext());
 
-            SmartLocation.with(baseView.getContext()).activityRecognition().stop();
+            if (baseView.getContext() != null)
+                SmartLocation.with(baseView.getContext()).activityRecognition().stop();
         }
 
         // clear the current user

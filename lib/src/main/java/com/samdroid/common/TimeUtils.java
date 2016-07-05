@@ -1,12 +1,12 @@
 package com.samdroid.common;
 
+import android.annotation.SuppressLint;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import android.annotation.SuppressLint;
 
 public class TimeUtils {
 
@@ -141,6 +141,31 @@ public class TimeUtils {
     }
 
     /**
+     * @param d
+     * @return if a date is before the current day
+     */
+    public static boolean isDayBeforeToday(Date d) {
+        if (d == null) return false;
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(d);
+        return isDayBeforeToday(cal);
+    }
+
+    /**
+     * @param cal
+     * @return if a date is before the current day
+     */
+    public static boolean isDayBeforeToday(Calendar cal) {
+        if (cal == null) return false;
+
+        Calendar today = Calendar.getInstance();
+
+        return cal.get(Calendar.YEAR) <= today.get(Calendar.YEAR)
+                && cal.get(Calendar.DAY_OF_YEAR) < today.get(Calendar.DAY_OF_YEAR);
+    }
+
+    /**
      * @return the hour of the day
      */
     public static int getCurrentHour() {
@@ -168,9 +193,18 @@ public class TimeUtils {
     }
 
     public static Calendar getCalendar(Date date) {
-        Calendar cal = Calendar.getInstance(Locale.US);
+        if (date == null) return null;
+
+        Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         return cal;
+    }
+
+    public static String getMonthNameShort(Calendar cal) {
+        if (cal == null) return "";
+
+        SimpleDateFormat month_date = new SimpleDateFormat("MMM");
+        return month_date.format(cal.getTime());
     }
 
 }

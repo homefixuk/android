@@ -117,6 +117,12 @@ dependencies {
     // Location https://github.com/mrmans0n/smart-location-lib
     compile 'io.nlopez.smartlocation:library:3.2.4'
 
+    // Week-View https://github.com/alamkanak/Android-Week-View
+    compile 'com.github.alamkanak:android-week-view:1.2.6'
+
+    // Calendar https://github.com/SundeepK/CompactCalendarView
+    compile 'com.github.sundeepk:compact-calendar-view:1.8.5'
+
     // test
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'

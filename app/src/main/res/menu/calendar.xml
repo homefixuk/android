@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_today"
+        android:orderInCategory="100"
+        android:title="@string/action_today"
+        app:showAsAction="withText" />
+    <item
+        android:id="@+id/action_choose_day"
+        android:icon="@drawable/chevron_down"
+        android:orderInCategory="101"
+        android:title="@string/action_choose_day"
+        app:showAsAction="withText" />
+    <item
+        android:id="@+id/action_number_days"
+        android:icon="@drawable/chevron_down"
+        android:orderInCategory="102"
+        android:title="@string/action_week_view"
+        app:showAsAction="withText">
+        <menu>
+            <group android:id="@+id/group2">
+                <item
+                    android:id="@+id/action_one_day"
+                    android:title="@string/action_one_day" />
+                <item
+                    android:id="@+id/action_three_days"
+                    android:title="@string/action_three_days" />
+                <item
+                    android:id="@+id/action_seven_days"
+                    android:title="@string/action_seven_days" />
+            </group>
+        </menu>
+    </item>
+</menu>
