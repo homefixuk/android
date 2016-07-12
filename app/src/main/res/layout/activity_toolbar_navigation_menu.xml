@@ -23,6 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:background="?attr/colorPrimary"
+                android:gravity="center_vertical"
                 android:minHeight="?attr/actionBarSize"
                 android:subtitleTextColor="@color/white"
                 android:titleTextColor="@color/white"
@@ -43,6 +44,12 @@
                     android:paddingStart="@dimen/base_padding"
                     android:textAppearance="@style/SingleLineActionBarTheme"
                     android:visibility="visible" />
+
+                <com.samdroid.view.WidthFitImageView
+                    android:id="@+id/title_icon_right"
+                    android:layout_width="@dimen/base_padding_double"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.AppBarLayout>

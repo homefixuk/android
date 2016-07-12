@@ -2,16 +2,16 @@ package com.homefix.tradesman.home;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.calendar.CalendarFragment;
 import com.homefix.tradesman.task.LogoutTask;
-import com.samdroid.string.Strings;
+import com.samdroid.common.TimeUtils;
 
 import java.util.Calendar;
 
@@ -92,11 +92,19 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         return false;
     }
 
+    private void resetActionBarTitle() {
+        setActionbarTitle(R.string.app_name);
+        setTitleIconRight(0);
+        setActionBarTitleClickListener(null);
+        setActionBarTitleTouchListener(null);
+    }
+
     private void showHome() {
         if (homeFragment == null) homeFragment = new HomeFragment();
 
         replaceFragment(homeFragment);
         setCurrentPage(R.string.action_home);
+        resetActionBarTitle();
     }
 
     private void showCalendar() {
@@ -104,16 +112,27 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             calendarFragment = new CalendarFragment<>();
 
             // update the toolbar if the calendar changed visibility
-            calendarFragment.setCalendarToggleListener(new CalendarFragment.CalendarToggleListener() {
+            calendarFragment.addCalendarToggleListener(new CalendarFragment.CalendarToggleListener() {
                 @Override
                 public void onCalendarToggle(boolean isShowing) {
                     supportInvalidateOptionsMenu();
+
+                    setTitleIconRight(isShowing ? R.drawable.ic_chevron_up_white_48dp : R.drawable.ic_chevron_down_white_48dp);
+                    animateTitleIconRight(isShowing ? 180 : -180);
                 }
             });
         }
 
         replaceFragment(calendarFragment);
         setCurrentPage(R.string.action_calendar);
+        setActionbarTitle(TimeUtils.getMonthNameShort());
+        setTitleIconRight(R.drawable.ic_chevron_down_white_48dp);
+        setActionBarTitleClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (calendarFragment != null) calendarFragment.toggleCalendar();
+            }
+        });
     }
 
     @Override
@@ -122,19 +141,8 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.calendar, menu);
 
-            MenuItem showMonth = menu.findItem(R.id.action_choose_day);
-
-            // make sure the icon points down when the calendar is not showing, or up when it is
-            if (calendarFragment == null || !calendarFragment.isShowingMonthView())
-                showMonth.setIcon(ContextCompat.getDrawable(this, R.drawable.chevron_down));
-            else showMonth.setIcon(ContextCompat.getDrawable(this, R.drawable.chevron_up));
-
-//            String month = calendarFragment != null ? calendarFragment.getMonthShowing() : "";
-//            if (Strings.isEmpty(month)) month = "Month";
-//            showMonth.setTitle(month);
-
             MenuItem todayItem = menu.findItem(R.id.action_today);
-            todayItem.setTitle("Today [" + Calendar.getInstance().get(Calendar.DATE) + "]");
+            todayItem.setTitle("Today (" + Calendar.getInstance().get(Calendar.DATE) + ")");
 
             return true;
         }
@@ -144,14 +152,7 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_choose_day) {
-            if (calendarFragment != null) {
-                calendarFragment.toggleCalendar();
-                supportInvalidateOptionsMenu(); // update toolbar
-            }
-            return true;
-
-        } else if (item.getItemId() == R.id.action_today) {
+        if (item.getItemId() == R.id.action_today) {
             if (calendarFragment != null) {
                 calendarFragment.goToToday();
                 supportInvalidateOptionsMenu(); // update toolbar
@@ -166,8 +167,8 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             if (calendarFragment != null) calendarFragment.setNumberDays(3);
             return true;
 
-        } else if (item.getItemId() == R.id.action_seven_days) {
-            if (calendarFragment != null) calendarFragment.setNumberDays(7);
+        } else if (item.getItemId() == R.id.action_five_days) {
+            if (calendarFragment != null) calendarFragment.setNumberDays(5);
             return true;
         }
 

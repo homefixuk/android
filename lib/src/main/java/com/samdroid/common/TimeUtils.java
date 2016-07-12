@@ -200,6 +200,10 @@ public class TimeUtils {
         return cal;
     }
 
+    public static String getMonthNameShort() {
+        return getMonthNameShort(Calendar.getInstance());
+    }
+
     public static String getMonthNameShort(Calendar cal) {
         if (cal == null) return "";
 

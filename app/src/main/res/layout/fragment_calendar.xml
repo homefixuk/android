@@ -21,14 +21,22 @@
         app:textSize="12sp"
         app:todayBackgroundColor="@color/black_10_percent" />
 
+    <View
+        android:id="@+id/cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_60_percent"
+        android:visibility="gone" />
+
     <com.github.sundeepk.compactcalendarview.CompactCalendarView
         android:id="@+id/compactcalendar_view"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:visibility="gone"
         app:compactCalendarBackgroundColor="#64C6F3"
-        app:compactCalendarCurrentDayBackgroundColor="#f8bc6e"
+        app:compactCalendarCurrentDayBackgroundColor="#E6979797"
         app:compactCalendarCurrentSelectedDayBackgroundColor="#284f61"
         app:compactCalendarMultiEventIndicatorColor="#ffffff"
         app:compactCalendarTargetHeight="250dp"

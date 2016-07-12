@@ -3,16 +3,18 @@ package com.homefix.tradesman.base;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.presenter.BaseToolbarActivityPresenter;
 import com.homefix.tradesman.base.view.BaseToolbarActivityView;
-import com.homefix.tradesman.model.CCA;
 import com.samdroid.string.Strings;
 import com.samdroid.view.ScreenUtils;
 
@@ -24,6 +26,7 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
 
     private Toolbar toolbar;
     private TextView mActionBarTitleTxt;
+    private ImageView mActionBarTitleIconRight;
 
     private boolean showToolbar = true;
 
@@ -47,6 +50,7 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         mActionBarTitleTxt = (TextView) findViewById(R.id.toolbar_title_text_override);
+        mActionBarTitleIconRight = (ImageView) findViewById(R.id.title_icon_right);
     }
 
     @Override
@@ -109,7 +113,7 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
         if (mActionBarTitleTxt != null) mActionBarTitleTxt.setText(Strings.returnSafely(title));
     }
 
-    public void setActionbarTitle(int stringResId) {
+    protected void setActionbarTitle(int stringResId) {
         if (mActionBarTitleTxt != null) mActionBarTitleTxt.setText(stringResId);
     }
 
@@ -117,8 +121,32 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
         return toolbar;
     }
 
-    public void onNavigationClickListener() {
+    protected void onNavigationClickListener() {
+    }
 
+    protected void setActionBarTitleClickListener(View.OnClickListener listener) {
+        if (mActionBarTitleTxt == null) return;
+
+        mActionBarTitleTxt.setOnClickListener(listener);
+    }
+
+    protected void setActionBarTitleTouchListener(View.OnTouchListener listener) {
+        if (mActionBarTitleTxt == null) return;
+
+        mActionBarTitleTxt.setOnTouchListener(listener);
+    }
+
+    protected void setTitleIconRight(@DrawableRes int resId) {
+        if (mActionBarTitleIconRight == null) return;
+
+        mActionBarTitleIconRight.setImageResource(resId);
+        mActionBarTitleIconRight.setVisibility(resId > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    protected void animateTitleIconRight(int degrees) {
+        if (mActionBarTitleIconRight == null) return;
+
+        mActionBarTitleIconRight.animate().rotation(degrees).start();
     }
 
 }
