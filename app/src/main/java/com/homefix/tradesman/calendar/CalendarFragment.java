@@ -1,18 +1,22 @@
 package com.homefix.tradesman.calendar;
 
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
+import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.BaseFragment;
 import com.homefix.tradesman.base.HomeFixBaseActivity;
@@ -23,10 +27,13 @@ import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.network.NetworkManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by samuel on 7/5/2016.
@@ -105,36 +112,62 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             }
         });
 
-        // define a listener to receive callbacks when certain events happen.
-        compactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+
+        // Set up a date time interpreter which will show short date values when in week view and
+        // long date values otherwise
+        mView.setDateTimeInterpreter(new DateTimeInterpreter() {
             @Override
-            public void onDayClick(Date dateClicked) {
-                List<Event> events = compactCalendarView.getEvents(dateClicked);
+            public String interpretDate(Calendar date) {
+                SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
+                String weekday = weekdayNameFormat.format(date.getTime());
+                SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
 
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(dateClicked);
-
-                if (mView != null) {
-                    mView.goToDate(cal);
-                    if (compactCalendarView != null) toggleCalendar();
-                }
-
-                notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
+                // All android api level do not have a standard way of getting the first letter of
+                // the week day name. Hence we get the first char programmatically.
+                // Details: http://stackoverflow.com/questions/16959502/get-one-letter-abbreviation-of-week-day-of-a-date-in-java#answer-16959657
+                if (mView.getNumberOfVisibleDays() >= 5)
+                    weekday = String.valueOf(weekday.charAt(0));
+                return weekday.toUpperCase() + format.format(date.getTime());
             }
 
             @Override
-            public void onMonthScroll(Date firstDayOfNewMonth) {
-                mFirstDayOfNewMonth = firstDayOfNewMonth;
-
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(mFirstDayOfNewMonth);
-
-                // scroll the week view underneath to the first of that month
-                if (mView != null) mView.goToDate(cal);
-
-                notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
+            public String interpretTime(int hour) {
+                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
             }
         });
+
+        // define a listener to receive callbacks when certain events happen.
+        compactCalendarView.setListener(
+                new CompactCalendarView.CompactCalendarViewListener() {
+                    @Override
+                    public void onDayClick(Date dateClicked) {
+                        List<Event> events = compactCalendarView.getEvents(dateClicked);
+
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(dateClicked);
+
+                        if (mView != null) {
+                            mView.goToDate(cal);
+                            if (compactCalendarView != null) toggleCalendar();
+                        }
+
+                        notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
+                    }
+
+                    @Override
+                    public void onMonthScroll(Date firstDayOfNewMonth) {
+                        mFirstDayOfNewMonth = firstDayOfNewMonth;
+
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(mFirstDayOfNewMonth);
+
+                        // scroll the week view underneath to the first of that month
+                        if (mView != null) mView.goToDate(cal);
+
+                        notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
+                    }
+                }
+        );
     }
 
     @Override
@@ -144,6 +177,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
     @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
+        if (BuildConfig.FLAVOR.equals("apiary_mock") && newMonth != 6)
+            return new ArrayList<>(); // TODO: remove! This is used while testing with Apiary mock server
+
         // if we have not yet fetched this month and we have a network connection
         if (!monthsFromServer.get(HomeFixCal.getMonthKey(newYear, newMonth), false)
                 && NetworkManager.hasConnection(getContext())) {
@@ -161,11 +197,26 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         // get the events currently stored
         List<Timeslot> timeslots = HomeFixCal.getEvents(newYear, newMonth);
 
-        MyLog.e(TAG, "Month: " + newYear + "/" + newMonth);
-        Timeslot.printList(timeslots);
-
         List<HomefixWeekViewEvent> events = HomefixWeekViewEvent.timeslotToWeekViewEvents(timeslots);
-        VariableUtils.printList(events);
+
+        // add the events to the calendar view
+        if (compactCalendarView != null) {
+            List<Event> calendarEvents = getCalendarMonthEvents(events);
+
+            // remove the calendar events for this month
+            Calendar monthCal = Calendar.getInstance();
+            monthCal.set(newYear, newMonth, 0, 0, 0, 0); // set to beginning of this month
+            int monthLastDay = monthCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+            Date d;
+            for (int i = 1; i <= monthLastDay; i++) {
+                d = monthCal.getTime(); // get the current months date
+                compactCalendarView.removeEvents(d); // remove events for this day
+                monthCal.add(Calendar.DAY_OF_MONTH, 1); // move the calendar on 1 day
+            }
+
+            if (calendarEvents != null) compactCalendarView.addEvents(calendarEvents);
+        }
+
         return events;
     }
 
@@ -188,16 +239,44 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
     }
 
+    /**
+     * Set the number of days to show on the week view
+     *
+     * @param numberDays
+     */
     public void setNumberDays(int numberDays) {
         if (mView == null) return;
 
-        mView.setNumberOfVisibleDays(Math.min(numberDays, 5)); // at most 5
+        numberDays = Math.min(numberDays, 5); // at most 5
 
-        if (numberDays > 3) {
+        mView.setNumberOfVisibleDays(numberDays);
+
+        if (numberDays > 3)
             mView.setHeaderColumnPadding(getResources().getDimensionPixelSize(R.dimen.base_padding));
+
+        // update the view dimensions
+        if (numberDays <= 1) {
+            // Lets change some dimensions to best fit the view.
+            mView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+            mView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+            mView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+
+        } else if (numberDays <= 3) {
+            mView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+            mView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+            mView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+
+        } else {
+            // Lets change some dimensions to best fit the view.
+            mView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
+            mView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+            mView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
         }
     }
 
+    /**
+     * Calendar show/hide listeners
+     */
     public interface CalendarToggleListener {
 
         void onCalendarToggle(boolean isShowing);
@@ -221,6 +300,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         }
     }
 
+    /**
+     * Month change listeners
+     */
     public interface OnMonthChangedListener {
 
         void onMonthChanged(int month);
@@ -244,6 +326,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         }
     }
 
+    /**
+     * Week view cover animations
+     */
     private Animation animationFadeIn, animationFadeOut;
 
     private Animation getAnimationFadeIn() {
@@ -291,6 +376,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         return animationFadeOut;
     }
 
+    /**
+     * Show/hide the calendar
+     */
     public void toggleCalendar() {
         if (compactCalendarView == null) return;
 
@@ -314,12 +402,42 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         notifyCalendarToggleListeners(isShowing);
     }
 
+    /**
+     * @return if the calendar month view is showing
+     */
     public boolean isShowingMonthView() {
         return isShowing;
     }
 
+    /**
+     * @return get the current month being shown in a short 3 letter format
+     */
     public String getMonthShowing() {
         return TimeUtils.getMonthNameShort(TimeUtils.getCalendar(mFirstDayOfNewMonth));
+    }
+
+    /**
+     * @param weekViewEvents
+     * @return converted week view events into calendar events
+     */
+    private List<Event> getCalendarMonthEvents(List<HomefixWeekViewEvent> weekViewEvents) {
+        List<Event> events = new ArrayList<>();
+
+        if (weekViewEvents == null) return events;
+
+        HomefixWeekViewEvent weekViewEvent;
+        for (int i = 0; i < weekViewEvents.size(); i++) {
+            weekViewEvent = weekViewEvents.get(i);
+
+            if (weekViewEvent == null) continue;
+
+            events.add(new Event(
+                    weekViewEvent.getColor(),
+                    weekViewEvent.getStartTime().getTimeInMillis(),
+                    weekViewEvent.getName()));
+        }
+
+        return events;
     }
 
 }

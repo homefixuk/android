@@ -1,5 +1,7 @@
 package com.homefix.tradesman.calendar;
 
+import android.graphics.Color;
+
 import com.alamkanak.weekview.WeekViewEvent;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.model.Timeslot;
@@ -18,6 +20,9 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
 
     Timeslot timeslot;
 
+    public HomefixWeekViewEvent() {
+    }
+
     public HomefixWeekViewEvent(Timeslot timeslot) {
         this.timeslot = timeslot;
 
@@ -27,13 +32,16 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
     private void setup() {
         if (timeslot == null) return;
 
+        setId(timeslot.hashCode());
+
         Calendar cal = Calendar.getInstance();
 
         cal.setTimeInMillis(timeslot.getStart());
-        super.setStartTime(cal);
+        setStartTime(cal);
 
-        cal.setTimeInMillis(timeslot.getEnd());
-        super.setEndTime(cal);
+        Calendar endCal = (Calendar) cal.clone();
+        endCal.setTimeInMillis(timeslot.getEnd());
+        setEndTime(endCal);
 
         // set the name
         Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(timeslot.getType());
@@ -70,38 +78,38 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
         if (isDayBeforeToday) {
             switch (type) {
                 case SERVICE:
-                    return R.color.colorPrimaryLight;
+                    return Color.argb(255, 169, 184, 191); // pale dark primary
 
                 case AVAILABILITY:
-                    return R.color.green; // TODO: change to pale green
+                    return Color.argb(255, 153, 204, 153); // pale green
 
                 case BREAK:
-                    return R.color.brown; // TODO: change to pale brown
+                    return Color.argb(255, 176, 156, 147); // pale brown
 
                 case OWN_SERVICE:
-                    return R.color.colorAccent; // TODO: change to pale colorAccent
+                    return Color.argb(255, 215, 178, 215); // pale purple
 
                 default:
-                    return R.color.black_60_percent; // TODO: change to pale colorAccentDark
+                    return Color.argb(255, 255, 178, 178); // pale red
             }
         }
 
-        // else use fully bold colors
+        // else use fully bold colors //
         switch (type) {
             case SERVICE:
-                return R.color.colorPrimary;
+                return Color.argb(255, 40, 79, 97); // dark primary
 
             case AVAILABILITY:
-                return R.color.green;
+                return Color.argb(255, 0, 128, 0); // green
 
             case BREAK:
-                return R.color.brown;
+                return Color.argb(255, 97, 58, 40); // brown
 
             case OWN_SERVICE:
-                return R.color.red;
+                return Color.argb(255, 124, 0, 124); // purple
 
             default:
-                return R.color.colorAccentDark;
+                return Color.argb(255, 255, 0, 0); // red
         }
     }
 

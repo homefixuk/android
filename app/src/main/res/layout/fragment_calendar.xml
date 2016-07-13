@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         app:columnGap="8dp"
         app:dayBackgroundColor="@color/greyLight"
-        app:eventTextColor="@color/colorPrimaryDark"
+        app:eventTextColor="@color/white"
         app:headerColumnBackground="@color/colorPrimaryDark"
         app:headerColumnPadding="8dp"
         app:headerColumnTextColor="@color/colorPrimary"
@@ -19,7 +19,7 @@
         app:hourHeight="60dp"
         app:noOfVisibleDays="3"
         app:textSize="12sp"
-        app:todayBackgroundColor="@color/black_10_percent" />
+        app:todayBackgroundColor="@color/black_20_percent" />
 
     <View
         android:id="@+id/cover"
@@ -36,8 +36,8 @@
         android:paddingRight="10dp"
         android:visibility="gone"
         app:compactCalendarBackgroundColor="#64C6F3"
-        app:compactCalendarCurrentDayBackgroundColor="#E6979797"
-        app:compactCalendarCurrentSelectedDayBackgroundColor="#284f61"
+        app:compactCalendarCurrentDayBackgroundColor="#80f8bc6e"
+        app:compactCalendarCurrentSelectedDayBackgroundColor="#80FFFFFF"
         app:compactCalendarMultiEventIndicatorColor="#ffffff"
         app:compactCalendarTargetHeight="250dp"
         app:compactCalendarTextColor="#ffffff"

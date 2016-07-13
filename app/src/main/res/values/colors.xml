@@ -2,9 +2,13 @@
 <resources>
     <color name="colorPrimaryLight">#c1e8fa</color>
     <color name="colorPrimary">#64C6F3</color>
+    <color name="colorPrimary_20_percent">#3364C6F3</color>
+    <color name="colorPrimary_50_percent">#8064C6F3</color>
     <color name="colorPrimaryDark">#284f61</color>
 
     <color name="colorAccent">#f8bc6e</color>
+    <color name="colorAccent_50_percent">#80f8bc6e</color>
+    <color name="colorAccent_20_percent">#33f8bc6e</color>
     <color name="colorAccentDark">#ad834d</color>
 
     <color name="greyLight">#b7bfc1</color>

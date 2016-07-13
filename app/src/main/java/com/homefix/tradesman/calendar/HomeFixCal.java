@@ -16,6 +16,7 @@ import com.samdroid.network.NetworkManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class HomeFixCal {
 
     final static private SparseArray<Month> months = new SparseArray<>();
 
-    public static class Month {
+    public static class Month implements Comparator, Comparable {
 
         int year, month;
         List<Timeslot> events;
@@ -94,6 +95,38 @@ public class HomeFixCal {
             return getEvents(dayOfMonth).size();
         }
 
+        @Override
+        public int compare(Object lhs, Object rhs) {
+            if (lhs == null && rhs == null) return 0;
+            if (lhs != null && rhs == null) return -1;
+            if (lhs == null && rhs != null) return 1;
+
+            if (!(lhs instanceof Month) && !(rhs instanceof Month)) return 0;
+            if (lhs instanceof Month && !(rhs instanceof Month)) return -1;
+            if (!(lhs instanceof Month) && rhs instanceof Month) return 1;
+
+            Month m1 = (Month) lhs;
+            Month m2 = (Month) lhs;
+
+            if (m1.year < m2.year) return -1;
+            if (m1.year > m2.year) return 1;
+            if (m1.month < m2.month) return -1;
+            if (m1.month > m2.month) return 1;
+            return 0;
+        }
+
+        @Override
+        public int compareTo(Object another) {
+            return compare(this, another);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || !(o instanceof Month)) return false;
+
+            Month m = (Month) o;
+            return year == m.year && month == m.month;
+        }
     }
 
     public synchronized static SparseArray<Month> getMonths() {
@@ -129,7 +162,7 @@ public class HomeFixCal {
         if (year <= 0 || month < 0 || month > 12 || events == null || events.size() == 0) return;
 
         Month m = new Month(year, month, events);
-        getMonths().append(getMonthKey(year, month), m);
+        getMonths().put(getMonthKey(year, month), m);
 
         // save it to the local cache
         CacheUtils.writeObjectFile("month_" + year + "_" + month, m);
@@ -167,7 +200,7 @@ public class HomeFixCal {
             return;
         }
 
-        // if there is no network connection, load from cache
+        // if there is no network connection, try and load from cache
         if (!NetworkManager.hasConnection(context)) {
             Month m = CacheUtils.readObjectFile("month_" + year + "_" + month, Month.class);
             if (listener != null)
