@@ -121,6 +121,14 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
                     animateTitleIconRight(isShowing ? 180 : -180);
                 }
             });
+
+            calendarFragment.addOnMonthChangedListener(new CalendarFragment.OnMonthChangedListener() {
+                @Override
+                public void onMonthChanged(int month) {
+                    // update the title to the new month
+                    setActionbarTitle(calendarFragment.getMonthShowing());
+                }
+            });
         }
 
         replaceFragment(calendarFragment);

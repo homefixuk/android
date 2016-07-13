@@ -8,14 +8,14 @@ import java.util.List;
 
 public class Service {
 
-    Tradesman tradesman;
-    ServiceType service_type;
-    String status;
-    long request_time, arrival_time, depart_time, estimated_duration;
-    int estimated_cost, actual_duration, actual_cost;
-    String tradesman_notes;
-    String key_location;
-    List<Service> previous_services;
+    private Tradesman tradesman;
+    private ServiceType service_type;
+    private String name, status;
+    private long request_time, arrival_time, depart_time, estimated_duration;
+    private int estimated_cost, actual_duration, actual_cost;
+    private String tradesman_notes;
+    private String key_location;
+    private List<Service> previous_services;
 
     public Tradesman getTradesman() {
         return tradesman;
@@ -23,6 +23,10 @@ public class Service {
 
     public ServiceType getService_type() {
         return service_type;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getStatus() {

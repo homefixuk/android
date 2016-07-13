@@ -2,10 +2,13 @@ package com.homefix.tradesman.calendar;
 
 import com.alamkanak.weekview.WeekViewEvent;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by samuel on 7/5/2016.
@@ -13,78 +16,88 @@ import java.util.Calendar;
 
 public class HomefixWeekViewEvent extends WeekViewEvent {
 
-    public static final int TYPE_HOMEFIX_SERVICE = 0, TYPE_AVAILABILITY = 1, TYPE_BREAK = 2, TYPE_OWN_SERVICE = 3;
+    Timeslot timeslot;
 
-    int type;
-    String description;
+    public HomefixWeekViewEvent(Timeslot timeslot) {
+        this.timeslot = timeslot;
 
-    public HomefixWeekViewEvent() {
-
+        setup();
     }
 
-    public HomefixWeekViewEvent(int type, String description) {
-        this.type = type;
-        this.description = description;
-    }
+    private void setup() {
+        if (timeslot == null) return;
 
-    public HomefixWeekViewEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute, int type, String description) {
-        super(id, name, startYear, startMonth, startDay, startHour, startMinute, endYear, endMonth, endDay, endHour, endMinute);
-        this.type = type;
-        this.description = description;
-        setColor(getTypeColor(type, isEndBeforeToday()));
-    }
+        Calendar cal = Calendar.getInstance();
 
-    public HomefixWeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, int type, String description) {
-        super(id, name, location, startTime, endTime);
-        this.type = type;
-        this.description = description;
-        setColor(getTypeColor(type, isEndBeforeToday()));
-    }
+        cal.setTimeInMillis(timeslot.getStart());
+        super.setStartTime(cal);
 
-    public HomefixWeekViewEvent(long id, String name, Calendar startTime, Calendar endTime, int type, String description) {
-        super(id, name, startTime, endTime);
-        this.type = type;
-        this.description = description;
-        setColor(getTypeColor(type, isEndBeforeToday()));
+        cal.setTimeInMillis(timeslot.getEnd());
+        super.setEndTime(cal);
+
+        // set the name
+        Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(timeslot.getType());
+        switch (type) {
+
+            case AVAILABILITY:
+                setName("Available");
+                break;
+            case BREAK:
+                setName("Break");
+                break;
+            case SERVICE:
+                if (timeslot.getService() != null) setName(timeslot.getService().getName());
+                else setName("Homefix");
+                break;
+            case OWN_SERVICE:
+                setName("Own Job");
+                break;
+
+            default:
+                setName("unknown event");
+                break;
+        }
+
+        setColor(getTypeColor(Timeslot.TYPE.getTypeEnum(timeslot.getType()), isEndBeforeToday()));
     }
 
     public boolean isEndBeforeToday() {
         return TimeUtils.isDayBeforeToday(getEndTime());
     }
 
-    public static int getTypeColor(int type, boolean isDayBeforeToday) {
+    public static int getTypeColor(Timeslot.TYPE type, boolean isDayBeforeToday) {
         // if is before today, use more pale colors
         if (isDayBeforeToday) {
             switch (type) {
-                case TYPE_HOMEFIX_SERVICE:
+                case SERVICE:
                     return R.color.colorPrimaryLight;
 
-                case TYPE_AVAILABILITY:
+                case AVAILABILITY:
                     return R.color.green; // TODO: change to pale green
 
-                case TYPE_BREAK:
+                case BREAK:
                     return R.color.brown; // TODO: change to pale brown
 
-                case TYPE_OWN_SERVICE:
-                    return R.color.colorAccent;
+                case OWN_SERVICE:
+                    return R.color.colorAccent; // TODO: change to pale colorAccent
 
                 default:
-                    return R.color.grey;
+                    return R.color.black_60_percent; // TODO: change to pale colorAccentDark
             }
         }
 
         // else use fully bold colors
         switch (type) {
-            case TYPE_HOMEFIX_SERVICE:
+            case SERVICE:
                 return R.color.colorPrimary;
 
-            case TYPE_AVAILABILITY:
+            case AVAILABILITY:
                 return R.color.green;
 
-            case TYPE_BREAK:
+            case BREAK:
                 return R.color.brown;
 
-            case TYPE_OWN_SERVICE:
+            case OWN_SERVICE:
                 return R.color.red;
 
             default:
@@ -92,21 +105,21 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
         }
     }
 
-    public int getType() {
-        return type;
+    public Timeslot getTimeslot() {
+        return timeslot;
     }
 
-    public void setType(int type) {
-        this.type = type;
-        setColor(getTypeColor(this.type, isEndBeforeToday()));
-    }
+    public static List<HomefixWeekViewEvent> timeslotToWeekViewEvents(List<Timeslot> timeslots) {
+        if (timeslots == null || timeslots.size() == 0) return new ArrayList<>();
 
-    public String getDescription() {
-        return Strings.returnSafely(description);
-    }
+        List<HomefixWeekViewEvent> events = new ArrayList<>();
+        for (int i = 0; i < timeslots.size(); i++) {
+            if (timeslots.get(i) == null) continue;
 
-    public void setDescription(String description) {
-        this.description = description;
+            events.add(new HomefixWeekViewEvent(timeslots.get(i)));
+        }
+
+        return events;
     }
 
 }

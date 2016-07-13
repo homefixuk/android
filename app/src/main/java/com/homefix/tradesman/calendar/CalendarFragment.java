@@ -3,6 +3,7 @@ package com.homefix.tradesman.calendar;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -15,8 +16,12 @@ import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.BaseFragment;
 import com.homefix.tradesman.base.HomeFixBaseActivity;
+import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
+import com.samdroid.common.VariableUtils;
+import com.samdroid.listener.interfaces.OnGetListListener;
+import com.samdroid.network.NetworkManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,11 +34,12 @@ import java.util.List;
 
 public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragment<A, CalendarView, CalendarPresenter> implements CalendarView, WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener {
 
-    View mCover;
-    WeekView mView;
-    CompactCalendarView compactCalendarView;
+    private View mCover;
+    private WeekView mView;
+    private CompactCalendarView compactCalendarView;
     private boolean isShowing = false;
-    private Date mFirstDayOfNewMonth;
+    private Date mFirstDayOfNewMonth = new Date(); // defaults to current day
+    final private SparseBooleanArray monthsFromServer = new SparseBooleanArray();
 
     public CalendarFragment() {
         super(CalendarFragment.class.getSimpleName());
@@ -54,6 +60,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     @Override
     protected void injectDependencies() {
         super.injectDependencies();
+
+        if (getView() == null) return;
 
         mView = (WeekView) getView().findViewById(R.id.week_view);
         mCover = getView().findViewById(R.id.cover);
@@ -89,7 +97,11 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         mView.setScrollListener(new WeekView.ScrollListener() {
             @Override
             public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay) {
-                if (isShowing) toggleCalendar();
+                notifyOnMonthChangedListeners(newFirstVisibleDay.get(Calendar.MONTH));
+
+                // update the calendar view
+                if (compactCalendarView != null)
+                    compactCalendarView.setCurrentDate(newFirstVisibleDay.getTime());
             }
         });
 
@@ -98,25 +110,32 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             @Override
             public void onDayClick(Date dateClicked) {
                 List<Event> events = compactCalendarView.getEvents(dateClicked);
-                MyLog.d(TAG, "Day was clicked: " + dateClicked + " with events " + events);
+
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dateClicked);
 
                 if (mView != null) {
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(dateClicked);
                     mView.goToDate(cal);
-
                     if (compactCalendarView != null) toggleCalendar();
                 }
+
+                notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
             }
 
             @Override
             public void onMonthScroll(Date firstDayOfNewMonth) {
-                MyLog.d(TAG, "Month was scrolled to: " + firstDayOfNewMonth);
                 mFirstDayOfNewMonth = firstDayOfNewMonth;
+
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(mFirstDayOfNewMonth);
+
+                // scroll the week view underneath to the first of that month
+                if (mView != null) mView.goToDate(cal);
+
+                notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
             }
         });
     }
-
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
@@ -124,9 +143,29 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     }
 
     @Override
-    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
-        List<HomefixWeekViewEvent> events = new ArrayList<>();
+    public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
+        // if we have not yet fetched this month and we have a network connection
+        if (!monthsFromServer.get(HomeFixCal.getMonthKey(newYear, newMonth), false)
+                && NetworkManager.hasConnection(getContext())) {
+            monthsFromServer.append(HomeFixCal.getMonthKey(newYear, newMonth), true);
 
+            HomeFixCal.loadMonth(getContext(), newYear, newMonth, new OnGetListListener<Timeslot>() {
+                @Override
+                public void onGetListFinished(List<Timeslot> list) {
+                    // update the week view with the new events
+                    if (mView != null) mView.notifyDatasetChanged();
+                }
+            });
+        }
+
+        // get the events currently stored
+        List<Timeslot> timeslots = HomeFixCal.getEvents(newYear, newMonth);
+
+        MyLog.e(TAG, "Month: " + newYear + "/" + newMonth);
+        Timeslot.printList(timeslots);
+
+        List<HomefixWeekViewEvent> events = HomefixWeekViewEvent.timeslotToWeekViewEvents(timeslots);
+        VariableUtils.printList(events);
         return events;
     }
 
@@ -135,9 +174,18 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
     }
 
+    /**
+     * Update the calendar and week view to go to the current day
+     */
     public void goToToday() {
-        if (mView != null) mView.goToDate(Calendar.getInstance());
-        if (compactCalendarView != null) compactCalendarView.setCurrentDate(new Date());
+        Calendar cal = Calendar.getInstance();
+
+        mFirstDayOfNewMonth = cal.getTime();
+
+        if (mView != null) mView.goToDate(cal);
+        if (compactCalendarView != null) compactCalendarView.setCurrentDate(cal.getTime());
+
+        notifyOnMonthChangedListeners(cal.get(Calendar.MONTH));
     }
 
     public void setNumberDays(int numberDays) {
@@ -168,7 +216,31 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
     private void notifyCalendarToggleListeners(boolean isShowing) {
         for (int i = 0; i < calendarToggleListeners.size(); i++) {
-            calendarToggleListeners.get(i).onCalendarToggle(isShowing);
+            if (calendarToggleListeners.get(i) != null)
+                calendarToggleListeners.get(i).onCalendarToggle(isShowing);
+        }
+    }
+
+    public interface OnMonthChangedListener {
+
+        void onMonthChanged(int month);
+
+    }
+
+    private final List<OnMonthChangedListener> monthChangedListeners = new ArrayList<>();
+
+    public void addOnMonthChangedListener(OnMonthChangedListener listener) {
+        if (listener != null) monthChangedListeners.add(listener);
+    }
+
+    public void removeOnMonthChangedListener(OnMonthChangedListener listener) {
+        if (listener != null) monthChangedListeners.add(listener);
+    }
+
+    private void notifyOnMonthChangedListeners(int month) {
+        for (int i = 0; i < monthChangedListeners.size(); i++) {
+            if (monthChangedListeners.get(i) != null)
+                monthChangedListeners.get(i).onMonthChanged(month);
         }
     }
 
@@ -185,12 +257,10 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-
                 }
 
                 @Override
                 public void onAnimationRepeat(Animation animation) {
-
                 }
             });
         }
@@ -204,17 +274,16 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             animationFadeOut.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-                    mCover.setVisibility(View.VISIBLE);
+                    if (mCover != null) mCover.setVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    mCover.setVisibility(View.GONE);
+                    if (mCover != null) mCover.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onAnimationRepeat(Animation animation) {
-
                 }
             });
         }

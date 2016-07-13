@@ -211,4 +211,33 @@ public class TimeUtils {
         return month_date.format(cal.getTime());
     }
 
+    /**
+     * @param timestamp
+     * @param d
+     * @return if the timestamp is on the date d
+     */
+    public static boolean isOnDate(long timestamp, Date d) {
+        if (timestamp < 0 || d == null) return false;
+
+        Calendar calA = Calendar.getInstance();
+        calA.setTimeInMillis(timestamp);
+
+        return isOnDate(timestamp, calA);
+    }
+
+    /**
+     * @param timestamp
+     * @param c
+     * @return if the timestamp is on the date d
+     */
+    public static boolean isOnDate(long timestamp, Calendar c) {
+        if (timestamp < 0 || c == null) return false;
+
+        Calendar calA = Calendar.getInstance();
+        calA.setTimeInMillis(timestamp);
+
+        return calA.get(Calendar.YEAR) == c.get(Calendar.YEAR)
+                && calA.get(Calendar.DAY_OF_YEAR) == c.get(Calendar.DAY_OF_YEAR);
+    }
+
 }

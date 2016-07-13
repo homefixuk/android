@@ -12,9 +12,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -99,7 +101,7 @@ public class HomeFix {
         Call<Tradesman> updateTradesmanDetails(@Query("token") String token, @QueryMap Map<String, Object> params);
 
         @GET("/tradesman/timeslots")
-        Call<Timeslot> getTradesmanEvents(@Query("token") String token, @QueryMap Map<String, Object> params);
+        Call<List<Timeslot>> getTradesmanEvents(@Query("token") String token, @Query("filter") Map<String, Object> filter);
 
         @GET("/cca")
         Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
