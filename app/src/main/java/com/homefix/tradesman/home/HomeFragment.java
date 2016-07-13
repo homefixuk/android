@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.base.BaseFragment;
-import com.homefix.tradesman.base.HomeFixBaseActivity;
+import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.listener.OnNewLocationListener;
 import com.homefix.tradesman.service.LocationService;
 

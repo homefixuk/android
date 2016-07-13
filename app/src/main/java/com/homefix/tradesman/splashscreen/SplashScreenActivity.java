@@ -1,10 +1,9 @@
 package com.homefix.tradesman.splashscreen;
 
 import android.os.Bundle;
-import android.os.Handler;
 
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.base.HomeFixBaseActivity;
+import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 
 /**
  * Created by samuel on 6/22/2016.

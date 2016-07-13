@@ -1,4 +1,4 @@
-package com.homefix.tradesman.base;
+package com.homefix.tradesman.base.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

@@ -9,7 +9,9 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
@@ -18,18 +20,16 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.base.BaseFragment;
-import com.homefix.tradesman.base.HomeFixBaseActivity;
+import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.model.Timeslot;
-import com.samdroid.common.MyLog;
+import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.TimeUtils;
-import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.network.NetworkManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +39,7 @@ import java.util.Locale;
  * Created by samuel on 7/5/2016.
  */
 
-public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragment<A, CalendarView, CalendarPresenter> implements CalendarView, WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener {
+public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragment<A, CalendarView, CalendarPresenter> implements CalendarView, WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewClickListener {
 
     private View mCover;
     private WeekView mView;
@@ -96,8 +96,13 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         // month every time the month changes on the week view.
         mView.setMonthChangeListener(this);
 
-        // Set long press listener for events.
+        mView.setEmptyViewClickListener(this);
         mView.setEventLongPressListener(this);
+
+        // show the now line
+        mView.setShowNowLine(true);
+        mView.setNowLineColor(Color.argb(255, 200, 0, 0));
+        mView.setNowLineThickness(2);
 
         setNumberDays(3); // default to 3 days showing
 
@@ -111,7 +116,6 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                     compactCalendarView.setCurrentDate(newFirstVisibleDay.getTime());
             }
         });
-
 
         // Set up a date time interpreter which will show short date values when in week view and
         // long date values otherwise
@@ -171,11 +175,6 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     }
 
     @Override
-    public void onEventClick(WeekViewEvent event, RectF eventRect) {
-
-    }
-
-    @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
         if (BuildConfig.FLAVOR.equals("apiary_mock") && newMonth != 6)
             return new ArrayList<>(); // TODO: remove! This is used while testing with Apiary mock server
@@ -221,8 +220,101 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     }
 
     @Override
-    public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
+    public void onEventClick(WeekViewEvent event, RectF eventRect) {
+        if (event == null) return;
 
+        if (event instanceof HomefixWeekViewEvent) {
+            HomefixWeekViewEvent hEvent = (HomefixWeekViewEvent) event;
+
+            if (hEvent.getTimeslot() == null) return;
+
+            switch (Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType())) {
+
+                case AVAILABILITY:
+                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case BREAK:
+                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case SERVICE:
+                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case OWN_SERVICE:
+                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onEmptyViewClicked(Calendar time) {
+        MaterialDialogWrapper.getListDialog(
+                getBaseActivity(),
+                TimeUtils.formatDataFormal(time.getTime()) + " add..",
+                new CharSequence[]{"Availability", "Break", "Your Own Job"},
+                new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        switch (which) {
+
+                            case 0:
+                                Toast.makeText(getContext(), "add availability clicked", Toast.LENGTH_SHORT).show();
+                                break;
+
+                            case 1:
+                                Toast.makeText(getContext(), "add break clicked", Toast.LENGTH_SHORT).show();
+                                break;
+
+                            case 2:
+                                Toast.makeText(getContext(), "add own job clicked", Toast.LENGTH_SHORT).show();
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        if (dialog != null) dialog.dismiss();
+                    }
+                }).show();
+    }
+
+    @Override
+    public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
+        if (event == null) return;
+
+        if (event instanceof HomefixWeekViewEvent) {
+            HomefixWeekViewEvent hEvent = (HomefixWeekViewEvent) event;
+
+            if (hEvent.getTimeslot() == null) return;
+
+            switch (Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType())) {
+
+                case AVAILABILITY:
+                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case BREAK:
+                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case SERVICE:
+                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case OWN_SERVICE:
+                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 
     /**

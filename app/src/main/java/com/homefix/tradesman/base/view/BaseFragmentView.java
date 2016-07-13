@@ -1,8 +1,6 @@
 package com.homefix.tradesman.base.view;
 
-import android.view.View;
-
-import com.homefix.tradesman.base.HomeFixBaseActivity;
+import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 
 /**
  * Created by samuel on 5/31/2016.

@@ -1,4 +1,4 @@
-package com.homefix.tradesman.base;
+package com.homefix.tradesman.base.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.base.view.BaseFragmentView;
 import com.homefix.tradesman.view.MaterialDialogWrapper;

@@ -3,9 +3,8 @@ package com.homefix.tradesman.base.view;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.view.View;
 
-import com.homefix.tradesman.base.HomeFixBaseActivity;
+import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 
 /**
  * Created by samuel on 5/30/2016.

@@ -1,15 +1,13 @@
 package com.homefix.tradesman.login;
 
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.text.InputType;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.base.HomeFixBaseActivity;
+import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.rey.material.widget.EditText;
 import com.samdroid.input.AsteriskPasswordTransformationMethod;
 import com.samdroid.resource.ColourUtils;

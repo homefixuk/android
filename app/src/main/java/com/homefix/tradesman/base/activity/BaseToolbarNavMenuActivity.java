@@ -1,4 +1,4 @@
-package com.homefix.tradesman.base;
+package com.homefix.tradesman.base.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -26,7 +26,6 @@ import com.homefix.tradesman.common.PermissionsHelper;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.User;
-import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
 
 /**

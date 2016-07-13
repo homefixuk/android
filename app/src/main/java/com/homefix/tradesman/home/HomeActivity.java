@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.base.BaseToolbarNavMenuActivity;
+import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.calendar.CalendarFragment;
 import com.homefix.tradesman.task.LogoutTask;
 import com.samdroid.common.TimeUtils;

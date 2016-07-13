@@ -11,10 +11,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
-import com.homefix.tradesman.base.HomeFixBaseActivity;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.base.view.BaseView;
-import com.samdroid.activity.BaseActivity;
 import com.samdroid.string.Strings;
 
 import java.util.Arrays;

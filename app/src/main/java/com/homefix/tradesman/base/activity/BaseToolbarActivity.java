@@ -1,11 +1,11 @@
-package com.homefix.tradesman.base;
+package com.homefix.tradesman.base.activity;
 
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -147,6 +147,23 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
         if (mActionBarTitleIconRight == null) return;
 
         mActionBarTitleIconRight.animate().rotation(degrees).start();
+    }
+
+    /**
+     * Replace the current fragment
+     *
+     * @param fragment
+     */
+    protected void replaceFragment(Fragment fragment) {
+        if (fragment == null) return;
+
+        try {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .commit();
+        } catch (Exception e) {
+        }
     }
 
 }
