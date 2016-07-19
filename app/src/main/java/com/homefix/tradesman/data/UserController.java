@@ -67,12 +67,7 @@ public class UserController {
             }
         };
 
-        if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-            HomeFix.getMockAPI().getTradesman(token).enqueue(callback1);
-
-        } else if (BuildConfig.FLAVOR.equals("custom")) {
-            HomeFix.getAPI().getTradesman(token).enqueue(callback1);
-        }
+        HomeFix.getAPI().getTradesman(token).enqueue(callback1);
     }
 
     public static void clearCurrentUser() {

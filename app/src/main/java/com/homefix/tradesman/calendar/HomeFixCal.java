@@ -356,12 +356,7 @@ public class HomeFixCal {
 
         MyCallback callback = new MyCallback(year, month, listener);
 
-        if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-            HomeFix.getMockAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(callback);
-
-        } else if (BuildConfig.FLAVOR.equals("custom")) {
-            HomeFix.getAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(callback);
-        }
+        HomeFix.getAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(callback);
     }
 
     private static class MyCallback implements Callback<List<Timeslot>> {

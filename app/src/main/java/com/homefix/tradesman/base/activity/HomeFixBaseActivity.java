@@ -36,10 +36,7 @@ import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
-import org.greenrobot.eventbus.EventBus;
-
 import icepick.Icepick;
-import icepick.State;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -148,12 +145,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
             };
 
-            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-                HomeFix.getMockAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(callback);
-
-            } else if (BuildConfig.FLAVOR.equals("custom")) {
-                HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(callback);
-            }
+            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(callback);
         }
 
         if (checkPermissions && !calledPermissionResult) {

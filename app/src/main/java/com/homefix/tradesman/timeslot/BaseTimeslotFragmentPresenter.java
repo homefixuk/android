@@ -76,22 +76,11 @@ public class BaseTimeslotFragmentPresenter extends BaseFragmentPresenter<BaseTim
 
         // if the user was adding a timeslot
         if (timeslot == null) {
-            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-                HomeFix.getMockAPI().addTimeslot(UserController.getToken(), map).enqueue(callback);
-
-            } else if (BuildConfig.FLAVOR.equals("custom")) {
-                HomeFix.getAPI().addTimeslot(UserController.getToken(), map).enqueue(callback);
-            }
+            HomeFix.getAPI().addTimeslot(UserController.getToken(), map).enqueue(callback);
 
         } else {
             // else the user was editing a timeslot //
-
-            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-                HomeFix.getMockAPI().updateTimeslot(UserController.getToken(), timeslot.getObjectId(), map).enqueue(callback);
-
-            } else if (BuildConfig.FLAVOR.equals("custom")) {
-                HomeFix.getAPI().updateTimeslot(UserController.getToken(), timeslot.getObjectId(), map).enqueue(callback);
-            }
+            HomeFix.getAPI().updateTimeslot(UserController.getToken(), timeslot.getObjectId(), map).enqueue(callback);
         }
     }
 
@@ -134,12 +123,7 @@ public class BaseTimeslotFragmentPresenter extends BaseFragmentPresenter<BaseTim
 
         };
 
-        if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-            HomeFix.getMockAPI().deleteTimeslot(UserController.getToken(), timeslot.getObjectId()).enqueue(callback);
-
-        } else if (BuildConfig.FLAVOR.equals("custom")) {
-            HomeFix.getAPI().deleteTimeslot(UserController.getToken(), timeslot.getObjectId()).enqueue(callback);
-        }
+        HomeFix.getAPI().deleteTimeslot(UserController.getToken(), timeslot.getObjectId()).enqueue(callback);
     }
 
 }

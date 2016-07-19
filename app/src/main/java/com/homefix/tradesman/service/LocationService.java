@@ -260,12 +260,7 @@ public class LocationService extends Service {
                 }
             };
 
-            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-                HomeFix.getMockAPI().updateLocation(UserController.getToken(), locationMap).enqueue(callback);
-
-            } else if (BuildConfig.FLAVOR.equals("custom")) {
-                HomeFix.getAPI().updateLocation(UserController.getToken(), locationMap).enqueue(callback);
-            }
+            HomeFix.getAPI().updateLocation(UserController.getToken(), locationMap).enqueue(callback);
         }
 
         notifyListeners(location);

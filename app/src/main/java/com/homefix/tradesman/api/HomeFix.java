@@ -78,154 +78,12 @@ public class HomeFix {
         }
     }
 
-    public interface CUSTOM_API {
-
-        @POST("signup")
-        Call<HashMap<String, Object>> signup(
-                @Query("apikey") String apikey,
-                @Query("firstName") String firstName,
-                @Query("lastName") String lastName,
-                @Query("email") String email,
-                @Query("password") String password,
-                @Query("role") String role);
-
-        @POST("login")
-        Call<HashMap<String, Object>> login(
-                @Query("apikey") String apikey,
-                @Query("email") String email,
-                @Query("password") String password);
-
-        @GET("tradesman/me")
-        Call<Tradesman> getTradesman(@Query("token") String token);
-
-        @POST("tradesman/me")
-        Call<Tradesman> updateTradesmanDetails(@Query("token") String token, @QueryMap Map<String, Object> params);
-
-        @GET("tradesman/timeslots")
-        Call<List<Timeslot>> getTradesmanEvents(@Query("token") String token, @Query("filter") Map<String, Object> filter);
-
-        @GET("cca")
-        Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
-
-        @POST("tradesman/location")
-        Call<Timeslot> updateLocation(@Query("token") String token, @QueryMap Map<String, Object> location);
-
-        @POST("tradesman/timeslot")
-        Call<Timeslot> addTimeslot(@Query("token") String token, @Query("time_slot") TimeslotMap timeslotMap);
-
-        @PATCH("tradesman/timeslot")
-        Call<Timeslot> updateTimeslot(
-                @Query("token") String token,
-                @Query("original_timeslot_id") String original_timeslot_id,
-                @Query("time_slot") TimeslotMap timeslotMap);
-
-        @DELETE("tradesman/timeslot")
-        Call<Map<String, Object>> deleteTimeslot(
-                @Query("token") String token,
-                @Query("original_timeslot_id") String original_timeslot_id);
-
-    }
-
-    public interface MOCK_API {
-
-        @POST("/user/signup")
-        Call<HashMap<String, Object>> signup(
-                @Query("apikey") String apikey,
-                @Query("firstName") String firstName,
-                @Query("lastName") String lastName,
-                @Query("email") String email,
-                @Query("password") String password,
-                @Query("role") String role);
-
-        @POST("/user/login")
-        Call<HashMap<String, Object>> login(
-                @Query("apikey") String apikey,
-                @Query("email") String email,
-                @Query("password") String password);
-
-        @GET("/tradesman/me")
-        Call<Tradesman> getTradesman(@Query("token") String token);
-
-        @POST("/tradesman/me")
-        Call<Tradesman> updateTradesmanDetails(@Query("token") String token, @QueryMap Map<String, Object> params);
-
-        @GET("/tradesman/timeslots")
-        Call<List<Timeslot>> getTradesmanEvents(@Query("token") String token, @Query("filter") Map<String, Object> filter);
-
-        @GET("/cca")
-        Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
-
-        @POST("/tradesman/location")
-        Call<Timeslot> updateLocation(@Query("token") String token, @QueryMap Map<String, Object> location);
-
-        @POST("/tradesman/timeslot")
-        Call<Timeslot> addTimeslot(@Query("token") String token, @Query("time_slot") TimeslotMap timeslotMap);
-
-        @PATCH("/tradesman/timeslot")
-        Call<Timeslot> updateTimeslot(
-                @Query("token") String token,
-                @Query("original_timeslot_id") String original_timeslot_id,
-                @Query("time_slot") TimeslotMap timeslotMap);
-
-        @DELETE("/tradesman/timeslot")
-        Call<Map<String, Object>> deleteTimeslot(
-                @Query("token") String token,
-                @Query("original_timeslot_id") String original_timeslot_id);
-
+    public static API getAPI() {
+        return ServiceFactory.createRetrofitService(API.class, HomeFix.HOST_NAME);
     }
 
     /**
-     * @return an instance of the Mock API that can be called
-     */
-    public static MOCK_API getMockAPI() {
-        return ServiceFactory.createRetrofitService(HomeFix.MOCK_API.class, HomeFix.HOST_NAME);
-    }
-
-    /**
-     * @return an instance of the custom back-end API that can be called
-     */
-    public static CUSTOM_API getAPI() {
-        return ServiceFactory.createRetrofitService(HomeFix.CUSTOM_API.class, HomeFix.HOST_NAME);
-    }
-
-//    public static class API<T> {
-//
-//        public static MOCK_API mockApi;
-//        public static CUSTOM_API customApi;
-//
-//        private void API() {
-//        }
-//
-//        public API<T> getInstance() {
-//            return new API();
-//        }
-//
-//        public void signup(@Query("apikey") String apikey,
-//                           @Query("firstName") String firstName,
-//                           @Query("lastName") String lastName,
-//                           @Query("email") String email,
-//                           @Query("password") String password,
-//                           @Query("role") String role,
-//                           Callback<T> callback) {
-//            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
-//                if (mockApi == null)
-//                    mockApi = ServiceFactory.createRetrofitService(HomeFix.MOCK_API.class, HomeFix.HOST_NAME);
-//
-//
-//                return;
-//            }
-//
-//            if (BuildConfig.FLAVOR.equals("custom")) {
-//                if (customApi == null)
-//                    customApi = ServiceFactory.createRetrofitService(HomeFix.CUSTOM_API.class, HomeFix.HOST_NAME);
-//
-//                return;
-//            }
-//        }
-//    }
-
-    /**
-     * Exception used when errors occur in the calling of the API
+     * Exception used when errors occur in the calling of the com.homefix.tradesman.api.API
      */
     public static class HomeFixAPIException extends Exception {
 
@@ -250,10 +108,10 @@ public class HomeFix {
     }
 
     /**
-     * Call the API in the current thread
+     * Call the com.homefix.tradesman.api.API in the current thread
      *
      * @param requestType GET, POST, DELETE, etc.
-     * @param method      API function to call
+     * @param method      com.homefix.tradesman.api.API function to call
      * @param params      parameters to send in the body
      * @return the JSONObject with the results or error information
      * @throws HomeFixAPIException
@@ -316,10 +174,10 @@ public class HomeFix {
     }
 
     /**
-     * Call the API in the current thread
+     * Call the com.homefix.tradesman.api.API in the current thread
      *
      * @param requestType GET, POST, DELETE, etc.
-     * @param method      API function to call
+     * @param method      com.homefix.tradesman.api.API function to call
      * @param params      parameters to send in the body
      */
     private static void callInBackground(final REQUEST_TYPE requestType, final String method, final Map<String, Object> params, final HomeFixAPIInterface callback) {

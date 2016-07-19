@@ -55,6 +55,30 @@ android {
         preDexLibraries = false
         javaMaxHeapSize "4g"
     }
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java']
+        }
+
+        custom {
+            java {
+                srcDirs = ['src/custom/java']
+            }
+        }
+
+        apiary_mock {
+            java {
+                srcDirs = ['src/apiary_mock/java']
+            }
+        }
+
+        salesforce {
+            java {
+                srcDirs = ['src/salesforce/java']
+            }
+        }
+    }
 }
 
 dependencies {
