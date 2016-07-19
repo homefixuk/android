@@ -1,4 +1,4 @@
-package com.homefix.tradesman.availability;
+package com.homefix.tradesman.timeslot;
 
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
@@ -20,10 +20,13 @@ import retrofit2.Response;
  * Created by samuel on 7/13/2016.
  */
 
-public class AvailabilityPresenter extends BaseFragmentPresenter<AvailabilityView> {
+public class BaseTimeslotFragmentPresenter extends BaseFragmentPresenter<BaseTimeslotView> {
 
-    public AvailabilityPresenter(AvailabilityView availabilityView) {
+    private Timeslot.TYPE mType;
+
+    public BaseTimeslotFragmentPresenter(BaseTimeslotView availabilityView, Timeslot.TYPE type) {
         super(availabilityView);
+        mType = type;
     }
 
     public void save(final Timeslot timeslot, Calendar mStart, Calendar mEnd) {
@@ -46,7 +49,7 @@ public class AvailabilityPresenter extends BaseFragmentPresenter<AvailabilityVie
                     return;
                 }
 
-                MyLog.e(AvailabilityPresenter.class.getSimpleName(), "[onResponse]: " + ts);
+                MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + ts);
 
                 if (timeslot == null) {
                     HomeFixCal.addEvent(ts);
@@ -69,7 +72,7 @@ public class AvailabilityPresenter extends BaseFragmentPresenter<AvailabilityVie
             }
         };
 
-        HomeFix.TimeslotMap map = new HomeFix.TimeslotMap(mStart.getTimeInMillis(), mEnd.getTimeInMillis(), true, Timeslot.TYPE.AVAILABILITY);
+        HomeFix.TimeslotMap map = new HomeFix.TimeslotMap(mStart.getTimeInMillis(), mEnd.getTimeInMillis(), true, mType);
 
         // if the user was adding a timeslot
         if (timeslot == null) {
@@ -112,7 +115,7 @@ public class AvailabilityPresenter extends BaseFragmentPresenter<AvailabilityVie
                     return;
                 }
 
-                MyLog.e(AvailabilityPresenter.class.getSimpleName(), "[onResponse]: " + map);
+                MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
 
                 // remove the original timeslot
                 HomeFixCal.changeEvent(timeslot, null);

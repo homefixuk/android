@@ -42,7 +42,7 @@
             android:name=".login.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".availability.AvailabilityActivity"
+            android:name=".timeslot.TimeslotActivity"
             android:screenOrientation="portrait" />
 
         <service

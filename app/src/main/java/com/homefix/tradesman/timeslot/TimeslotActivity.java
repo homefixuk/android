@@ -1,4 +1,4 @@
-package com.homefix.tradesman.availability;
+package com.homefix.tradesman.timeslot;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
@@ -17,9 +18,8 @@ import com.samdroid.string.Strings;
  * Created by samuel on 7/13/2016.
  */
 
-public class AvailabilityActivity extends BaseCloseActivity {
+public class TimeslotActivity extends BaseCloseActivity {
 
-    private String timeslotKey;
     private boolean hasTimeslot = false;
 
     @Override
@@ -27,9 +27,14 @@ public class AvailabilityActivity extends BaseCloseActivity {
         super.onCreate(savedInstanceState);
 
         Intent i = getIntent();
-        timeslotKey = IntentHelper.getStringSafely(i, "timeslotKey");
+        String timeslotKey = IntentHelper.getStringSafely(i, "timeslotKey");
+        String typeStr = IntentHelper.getStringSafely(i, "type");
 
-        baseFragment = new AvailabilityFragment();
+        Toast.makeText(getContext(), "TypeStr: " + typeStr, Toast.LENGTH_LONG).show();
+
+        Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(typeStr);
+
+        baseFragment = new BaseTimeslotFragment();
 
         // try and get the timeslot from the cache
         Timeslot timeslot = null;
@@ -38,12 +43,19 @@ public class AvailabilityActivity extends BaseCloseActivity {
 
             if (timeslot != null) {
                 hasTimeslot = true;
-                ((AvailabilityFragment) baseFragment).setTimeslot(timeslot);
+                type = Timeslot.TYPE.getTypeEnum(timeslot.getType());
+                ((BaseTimeslotFragment) baseFragment).setTimeslot(timeslot);
                 supportInvalidateOptionsMenu();
             }
         }
 
-        setActionbarTitle((timeslot != null ? "Edit" : "Add") + " Availability");
+        ((BaseTimeslotFragment) baseFragment).setType(type);
+
+        String title = (timeslot != null ? "Edit" : "Add") + " ";
+        if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
+        else if (type == Timeslot.TYPE.BREAK) title += "Break";
+        else title += "Event";
+        setActionbarTitle(title);
 
         // setup and show the fragment
         replaceFragment(baseFragment);
@@ -67,7 +79,7 @@ public class AvailabilityActivity extends BaseCloseActivity {
                 return false;
             }
 
-            ((AvailabilityFragment) baseFragment).onDeleteClicked();
+            ((BaseTimeslotFragment) baseFragment).onDeleteClicked();
             return true;
 
         }

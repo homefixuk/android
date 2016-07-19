@@ -1,4 +1,4 @@
-package com.homefix.tradesman.availability;
+package com.homefix.tradesman.timeslot;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -24,16 +25,18 @@ import java.util.Calendar;
  * Created by samuel on 7/13/2016.
  */
 
-public class AvailabilityFragment extends BaseCloseFragment<AvailabilityActivity, AvailabilityView, AvailabilityPresenter> implements AvailabilityView {
+public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, BaseTimeslotView, BaseTimeslotFragmentPresenter> implements BaseTimeslotView {
 
+    private Timeslot.TYPE mType;
     private boolean isEdit = false, hasMadeChanges = false;
     private Timeslot mTimeslot;
 
+    private ImageView mIcon;
     private TextView mStartDate, mStartTime, mEndDate, mEndTime, mSave;
     private Calendar mStart, mEnd;
 
-    public AvailabilityFragment() {
-        super(AvailabilityFragment.class.getSimpleName());
+    public BaseTimeslotFragment() {
+        super(BaseTimeslotFragment.class.getSimpleName());
     }
 
     @Override
@@ -42,8 +45,8 @@ public class AvailabilityFragment extends BaseCloseFragment<AvailabilityActivity
     }
 
     @Override
-    protected AvailabilityPresenter getPresenter() {
-        if (presenter == null) presenter = new AvailabilityPresenter(this);
+    protected BaseTimeslotFragmentPresenter getPresenter() {
+        if (presenter == null) presenter = new BaseTimeslotFragmentPresenter(this, mType);
 
         return presenter;
     }
@@ -61,6 +64,7 @@ public class AvailabilityFragment extends BaseCloseFragment<AvailabilityActivity
 
         if (view == null) return;
 
+        mIcon = (ImageView) view.findViewById(R.id.icon);
         mStartDate = (TextView) view.findViewById(R.id.start_date);
         mStartTime = (TextView) view.findViewById(R.id.start_time);
         mEndDate = (TextView) view.findViewById(R.id.end_date);
@@ -71,6 +75,12 @@ public class AvailabilityFragment extends BaseCloseFragment<AvailabilityActivity
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (mIcon != null) {
+            if (mType == Timeslot.TYPE.BREAK)
+                mIcon.setImageResource(R.drawable.ic_food_grey600_48dp);
+            else mIcon.setImageResource(R.drawable.ic_av_timer_grey600_48dp);
+        }
 
         mStart = Calendar.getInstance();
         mStart.set(Calendar.MINUTE, 0);
@@ -223,6 +233,16 @@ public class AvailabilityFragment extends BaseCloseFragment<AvailabilityActivity
 
         // set the edit mode if we have a time slot
         isEdit = this.mTimeslot != null;
+
+        if (mTimeslot != null) mType = Timeslot.TYPE.getTypeEnum(mTimeslot.getType());
+    }
+
+    public void setType(Timeslot.TYPE type) {
+        mType = type;
+    }
+
+    public Timeslot.TYPE getType() {
+        return mType;
     }
 
     @Override

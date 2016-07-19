@@ -21,7 +21,7 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.availability.AvailabilityActivity;
+import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
 import com.homefix.tradesman.common.Ids;
@@ -239,17 +239,18 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
             if (hEvent.getTimeslot() == null) return;
 
-            switch (Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType())) {
+            Intent i = null;
+
+            Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType());
+
+            switch (type) {
 
                 case AVAILABILITY:
-                    Intent i = new Intent(getContext(), AvailabilityActivity.class);
-                    i.putExtra("timeslotKey", Timeslot.getSenderReceiver().put(hEvent.getTimeslot()));
-                    startActivity(i);
-                    getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+                    i = new Intent(getContext(), TimeslotActivity.class);
                     break;
 
                 case BREAK:
-                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
+                    i = new Intent(getContext(), TimeslotActivity.class);
                     break;
 
                 case SERVICE:
@@ -263,6 +264,13 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                 default:
                     break;
             }
+
+            if (i != null) {
+                i.putExtra("timeslotKey", Timeslot.getSenderReceiver().put(hEvent.getTimeslot()));
+                i.putExtra("type", type != null ? type.name() : Timeslot.TYPE.NONE.name());
+                startActivity(i);
+                getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+            }
         }
     }
 
@@ -270,22 +278,25 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     public void onEmptyViewClicked(Calendar time) {
         MaterialDialogWrapper.getListDialog(
                 getBaseActivity(),
-                TimeUtils.formatDataFormal(time.getTime()) + " add..",
+                "New...",
                 new CharSequence[]{"Availability", "Break", "Your Own Job"},
                 new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
                         if (dialog != null) dialog.dismiss();
 
+                        Intent i = null;
+
                         switch (which) {
 
                             case 0:
-                                startActivityForResult(new Intent(getContext(), AvailabilityActivity.class), Ids.TIMESLOT_CHANGE);
-                                getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+                                i = new Intent(getContext(), TimeslotActivity.class);
+                                i.putExtra("type", Timeslot.TYPE.AVAILABILITY.name());
                                 break;
 
                             case 1:
-                                Toast.makeText(getContext(), "add break clicked", Toast.LENGTH_SHORT).show();
+                                i = new Intent(getContext(), TimeslotActivity.class);
+                                i.putExtra("type", Timeslot.TYPE.BREAK.name());
                                 break;
 
                             case 2:
@@ -294,6 +305,11 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
                             default:
                                 break;
+                        }
+
+                        if (i != null) {
+                            startActivity(i);
+                            getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
                         }
 
                     }
@@ -336,6 +352,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     /**
      * Update the calendar and week view to go to the current day
      */
+
     public void goToToday() {
         Calendar cal = Calendar.getInstance();
 
