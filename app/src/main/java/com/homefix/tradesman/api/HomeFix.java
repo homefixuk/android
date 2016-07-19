@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -43,7 +44,7 @@ public class HomeFix {
             HOST_APIARY_MOCK = "http://private-52b01-homefixtradesman.apiary-mock.com/",
             HOST_SALESFORCE_PROD = "https://fieldexprt-homefix.cs80.force.com/services/apexrest/",
             HOST_SALESFORCE_SANDBOX = "https://fieldexprt-homefix.eu5.force.com/services/apexrest/",
-            HOST_CUSTOM_DEV = "http://ec2-52-90-29-184.compute-1.amazonaws.com/int/",
+            HOST_CUSTOM_DEV = "http://atlas-jacob.codio.io:3000/api/v1/",
             HOST_CUSTOM_PROD = "http://ec2-52-90-29-184.compute-1.amazonaws.com/int/";
 
     public enum REQUEST_TYPE {
@@ -77,7 +78,41 @@ public class HomeFix {
         }
     }
 
-    public interface API {
+    public interface CUSTOM_API {
+
+        @POST("signup")
+        Call<HashMap<String, Object>> signup(
+                @Query("apikey") String apikey,
+                @Query("firstName") String firstName,
+                @Query("lastName") String lastName,
+                @Query("email") String email,
+                @Query("password") String password,
+                @Query("role") String role);
+
+        @POST("login")
+        Call<HashMap<String, Object>> login(
+                @Query("apikey") String apikey,
+                @Query("email") String email,
+                @Query("password") String password);
+
+        @GET("tradesman/me")
+        Call<Tradesman> getTradesman(@Query("token") String token);
+
+        @POST("tradesman/me")
+        Call<Tradesman> updateTradesmanDetails(@Query("token") String token, @QueryMap Map<String, Object> params);
+
+        @GET("tradesman/timeslots")
+        Call<List<Timeslot>> getTradesmanEvents(@Query("token") String token, @Query("filter") Map<String, Object> filter);
+
+        @GET("cca")
+        Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
+
+        @POST("tradesman/location")
+        Call<Timeslot> updateLocation(@Query("token") String token, @QueryMap Map<String, Object> location);
+
+    }
+
+    public interface MOCK_API {
 
         @POST("/user/signup")
         Call<HashMap<String, Object>> signup(
@@ -112,11 +147,55 @@ public class HomeFix {
     }
 
     /**
-     * @return an instance of the API that can be called
+     * @return an instance of the Mock API that can be called
      */
-    public static API getAPI() {
-        return ServiceFactory.createRetrofitService(HomeFix.API.class, HomeFix.HOST_NAME);
+    public static MOCK_API getMockAPI() {
+        return ServiceFactory.createRetrofitService(HomeFix.MOCK_API.class, HomeFix.HOST_NAME);
     }
+
+
+    /**
+     * @return an instance of the custom back-end API that can be called
+     */
+    public static CUSTOM_API getAPI() {
+        return ServiceFactory.createRetrofitService(HomeFix.CUSTOM_API.class, HomeFix.HOST_NAME);
+    }
+
+//    public static class API<T> {
+//
+//        public static MOCK_API mockApi;
+//        public static CUSTOM_API customApi;
+//
+//        private void API() {
+//        }
+//
+//        public API<T> getInstance() {
+//            return new API();
+//        }
+//
+//        public void signup(@Query("apikey") String apikey,
+//                           @Query("firstName") String firstName,
+//                           @Query("lastName") String lastName,
+//                           @Query("email") String email,
+//                           @Query("password") String password,
+//                           @Query("role") String role,
+//                           Callback<T> callback) {
+//            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
+//                if (mockApi == null)
+//                    mockApi = ServiceFactory.createRetrofitService(HomeFix.MOCK_API.class, HomeFix.HOST_NAME);
+//
+//
+//                return;
+//            }
+//
+//            if (BuildConfig.FLAVOR.equals("custom")) {
+//                if (customApi == null)
+//                    customApi = ServiceFactory.createRetrofitService(HomeFix.CUSTOM_API.class, HomeFix.HOST_NAME);
+//
+//                return;
+//            }
+//        }
+//    }
 
     /**
      * Exception used when errors occur in the calling of the API

@@ -5,13 +5,49 @@
     android:background="@color/transparent"
     android:theme="@style/AppTheme">
 
-    <TextView
-        android:id="@+id/text"
+    <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/base_padding">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="@dimen/base_padding_triple"
+            android:layout_height="@dimen/base_padding_triple"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_av_timer_grey600_48dp" />
+
+        <TextView
+            android:id="@+id/start_time"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/base_padding_triple"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/base_padding"
+            android:layout_marginStart="@dimen/base_padding"
+            android:layout_toEndOf="@+id/icon"
+            android:layout_toRightOf="@+id/icon"
+            android:gravity="start|center_vertical"
+            android:textAppearance="@style/TextTheme" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:padding="@dimen/base_padding"
-        android:textAppearance="@style/TextTheme" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/base_padding"
+        android:background="@drawable/primary_to_dark_color_selector"
+        android:paddingBottom="@dimen/base_padding_double"
+        android:paddingEnd="@dimen/base_padding_quad"
+        android:paddingLeft="@dimen/base_padding_quad"
+        android:paddingRight="@dimen/base_padding_quad"
+        android:paddingStart="@dimen/base_padding_quad"
+        android:paddingTop="@dimen/base_padding_double"
+        android:text="SAVE"
+        android:textAppearance="@style/TextTheme.White.Caps.Large.Bold" />
+
 
 </com.samdroid.layout.MyRelativeLayout>

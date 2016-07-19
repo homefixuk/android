@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
+import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.common.PermissionsHelper;
 import com.homefix.tradesman.data.UserController;
@@ -247,19 +248,24 @@ public class LocationService extends Service {
 
             if (currentActivity != null) locationMap.put("activity", currentActivity.toString());
 
-            HomeFix.getAPI()
-                    .updateLocation(UserController.getToken(), locationMap)
-                    .enqueue(new Callback<Timeslot>() {
-                        @Override
-                        public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-                            MyLog.e(TAG, "[onResponse]: " + response.body());
-                        }
+            Callback<Timeslot> callback = new Callback<Timeslot>() {
+                @Override
+                public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
+                    MyLog.e(TAG, "[onResponse]: " + response.body());
+                }
 
-                        @Override
-                        public void onFailure(Call<Timeslot> call, Throwable t) {
-                            if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
-                        }
-                    });
+                @Override
+                public void onFailure(Call<Timeslot> call, Throwable t) {
+                    if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
+                }
+            };
+
+            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
+                HomeFix.getMockAPI().updateLocation(UserController.getToken(), locationMap).enqueue(callback);
+
+            } else if (BuildConfig.FLAVOR.equals("custom")) {
+                HomeFix.getAPI().updateLocation(UserController.getToken(), locationMap).enqueue(callback);
+            }
         }
 
         notifyListeners(location);

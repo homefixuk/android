@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
@@ -25,6 +26,7 @@ import com.samdroid.view.ScreenUtils;
 public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P extends BaseToolbarActivityPresenter<V>> extends HomeFixBaseActivity<V, P> implements BaseToolbarActivityView {
 
     private Toolbar toolbar;
+    private View mTitleIconHolder;
     private TextView mActionBarTitleTxt;
     private ImageView mActionBarTitleIconRight;
 
@@ -49,8 +51,9 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
         super.injectDependencies();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        mActionBarTitleTxt = (TextView) findViewById(R.id.toolbar_title_text_override);
-        mActionBarTitleIconRight = (ImageView) findViewById(R.id.title_icon_right);
+        mTitleIconHolder = findViewById(R.id.title_and_icon_holder);
+        mActionBarTitleTxt = (TextView) mTitleIconHolder.findViewById(R.id.toolbar_title_text_override);
+        mActionBarTitleIconRight = (ImageView) mTitleIconHolder.findViewById(R.id.title_icon_right);
     }
 
     @Override
@@ -125,15 +128,9 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
     }
 
     protected void setActionBarTitleClickListener(View.OnClickListener listener) {
-        if (mActionBarTitleTxt == null) return;
+        if (mTitleIconHolder == null) return;
 
-        mActionBarTitleTxt.setOnClickListener(listener);
-    }
-
-    protected void setActionBarTitleTouchListener(View.OnTouchListener listener) {
-        if (mActionBarTitleTxt == null) return;
-
-        mActionBarTitleTxt.setOnTouchListener(listener);
+        mTitleIconHolder.setOnClickListener(listener);
     }
 
     protected void setTitleIconRight(@DrawableRes int resId) {

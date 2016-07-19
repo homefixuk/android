@@ -1,5 +1,6 @@
 package com.homefix.tradesman.data;
 
+import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.model.Tradesman;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
@@ -47,7 +48,7 @@ public class UserController {
             return;
         }
 
-        HomeFix.getAPI().getTradesman(token).enqueue(new Callback<Tradesman>() {
+        Callback<Tradesman> callback1 = new Callback<Tradesman>() {
             @Override
             public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
                 Tradesman user = response != null ? response.body() : null;
@@ -64,7 +65,14 @@ public class UserController {
             public void onFailure(Call<Tradesman> call, Throwable t) {
                 if (MyLog.isIsLogEnabled()) t.printStackTrace();
             }
-        });
+        };
+
+        if (BuildConfig.FLAVOR.equals("apiary_mock")) {
+            HomeFix.getMockAPI().getTradesman(token).enqueue(callback1);
+
+        } else if (BuildConfig.FLAVOR.equals("custom")) {
+            HomeFix.getAPI().getTradesman(token).enqueue(callback1);
+        }
     }
 
     public static void clearCurrentUser() {

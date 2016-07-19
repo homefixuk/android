@@ -1,5 +1,8 @@
 package com.homefix.tradesman.login;
 
+import android.os.Bundle;
+
+import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
@@ -7,12 +10,14 @@ import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Tradesman;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.util.HashMap;
 
+import clojure.lang.Var;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,6 +27,46 @@ import retrofit2.Response;
  */
 
 public class LoginPresenter extends BaseActivityPresenter<LoginView> {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Callback<HashMap<String, Object>> callback = new Callback<HashMap<String, Object>>() {
+            @Override
+            public void onResponse(Call<HashMap<String, Object>> call, Response<HashMap<String, Object>> response) {
+                MyLog.e("LoginPresenter", "[onResponse]");
+                VariableUtils.printMap(response.body());
+
+                MyLog.e("LoginPresenter CALL", call.request().toString());
+            }
+
+            @Override
+            public void onFailure(Call<HashMap<String, Object>> call, Throwable t) {
+                MyLog.e("LoginPresenter", "[onFailure]");
+                if (t != null) t.printStackTrace();
+            }
+        };
+
+        if (BuildConfig.FLAVOR.equals("apiary_mock")) {
+            HomeFix.getMockAPI().signup(
+                    getView().getContext().getString(HomeFix.API_KEY),
+                    "Test",
+                    "Plumber",
+                    "testplumber@homefix.co.uk",
+                    "password",
+                    "TRADE").enqueue(callback);
+
+        } else if (BuildConfig.FLAVOR.equals("custom")) {
+            HomeFix.getAPI().signup(
+                    getView().getContext().getString(HomeFix.API_KEY),
+                    "Sam",
+                    "Koch",
+                    "sam@homefix.co.uk",
+                    "password",
+                    "TRADE").enqueue(callback);
+        }
+    }
 
     public void doEmailPasswordLogin(String email, String password) {
         if (!isViewAttached()) return;
@@ -43,15 +88,14 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
 
         getView().showAttemptingLogin();
 
-        final Call<HashMap<String, Object>> call = HomeFix.getAPI().login(
-                getView().getContext().getString(HomeFix.API_KEY),
-                email,
-                password);
-
-        call.enqueue(new Callback<HashMap<String, Object>>() {
+        Callback<HashMap<String, Object>> callback = new Callback<HashMap<String, Object>>() {
             @Override
             public void onResponse(Call<HashMap<String, Object>> call, Response<HashMap<String, Object>> response) {
+                if (!isViewAttached()) return;
+
                 HashMap<String, Object> results = response != null ? response.body() : null;
+
+                VariableUtils.printMap(results);
 
                 if (results == null
                         || !results.containsKey("token")
@@ -85,6 +129,8 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
             public void onFailure(Call<HashMap<String, Object>> call, Throwable t) {
                 if (MyLog.isIsLogEnabled()) t.printStackTrace();
 
+                if (!isViewAttached()) return;
+
                 getView().hideAttemptingLogin();
 
                 if (!NetworkManager.hasConnection(getView().getContext())) {
@@ -95,7 +141,20 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
                 }
             }
 
-        });
+        };
+
+        if (BuildConfig.FLAVOR.equals("apiary_mock")) {
+            HomeFix.getMockAPI().login(
+                    getView().getContext().getString(HomeFix.API_KEY),
+                    email,
+                    password).enqueue(callback);
+
+        } else if (BuildConfig.FLAVOR.equals("custom")) {
+            HomeFix.getAPI().login(
+                    getView().getContext().getString(HomeFix.API_KEY),
+                    email,
+                    password).enqueue(callback);
+        }
     }
 
     public void onContactUsClicked() {

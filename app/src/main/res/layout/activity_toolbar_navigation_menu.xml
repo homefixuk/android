@@ -31,25 +31,33 @@
                 app:contentInsetStart="0dp"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-                <TextView
-                    android:id="@+id/toolbar_title_text_override"
+                <LinearLayout
+                    android:id="@+id/title_and_icon_holder"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|top"
-                    android:gravity="center_vertical"
-                    android:maxLines="2"
-                    android:minHeight="?attr/actionBarSize"
-                    android:paddingEnd="@dimen/base_padding"
-                    android:paddingLeft="@dimen/base_padding"
-                    android:paddingStart="@dimen/base_padding"
-                    android:textAppearance="@style/SingleLineActionBarTheme"
-                    android:visibility="visible" />
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-                <com.samdroid.view.WidthFitImageView
-                    android:id="@+id/title_icon_right"
-                    android:layout_width="@dimen/base_padding_double"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/toolbar_title_text_override"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|top"
+                        android:gravity="center_vertical"
+                        android:maxLines="2"
+                        android:minHeight="?attr/actionBarSize"
+                        android:paddingEnd="@dimen/base_padding"
+                        android:paddingLeft="@dimen/base_padding"
+                        android:paddingStart="@dimen/base_padding"
+                        android:textAppearance="@style/SingleLineActionBarTheme"
+                        android:visibility="visible" />
+
+                    <com.samdroid.view.WidthFitImageView
+                        android:id="@+id/title_icon_right"
+                        android:layout_width="@dimen/base_padding_double"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:visibility="gone" />
+                </LinearLayout>
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.AppBarLayout>

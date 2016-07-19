@@ -1,5 +1,6 @@
 package com.homefix.tradesman.calendar;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -20,8 +21,10 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.availability.AvailabilityActivity;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
+import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.common.SendReceiver;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.TimeUtils;
@@ -136,7 +139,11 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
             @Override
             public String interpretTime(int hour) {
-                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+                String s = hour > 11 ? ((hour == 12) ? "12" : (hour - 12)) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+
+                if (s.equals("0 PM")) s = "12 PM";
+
+                return s;
             }
         });
 
@@ -231,7 +238,10 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             switch (Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType())) {
 
                 case AVAILABILITY:
-                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
+                    Intent i = new Intent(getContext(), AvailabilityActivity.class);
+                    i.putExtra("timeslotKey", Timeslot.getSenderReceiver().put(hEvent.getTimeslot()));
+                    startActivity(i);
+                    getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
                     break;
 
                 case BREAK:

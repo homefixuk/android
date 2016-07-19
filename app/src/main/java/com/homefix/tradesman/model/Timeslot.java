@@ -1,10 +1,12 @@
 package com.homefix.tradesman.model;
 
+import com.homefix.tradesman.common.SendReceiver;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.common.VariableUtils;
 import com.samdroid.string.Strings;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.util.Date;
 import java.util.List;
@@ -102,6 +104,18 @@ public class Timeslot {
 
             MyLog.e("Timeslot", t.getType() + " " + start + " -> " + end);
         }
+    }
+
+
+    ///////////////////////////////////////
+    ///////////////////////////////////////
+    /////////// SenderReceiver ////////////
+    ///////////////////////////////////////
+    ///////////////////////////////////////
+
+    private static final SendReceiver<Timeslot> senderReceiver = new SendReceiver<>(Timeslot.class);
+    public static SendReceiver<Timeslot> getSenderReceiver() {
+        return senderReceiver;
     }
 
 }

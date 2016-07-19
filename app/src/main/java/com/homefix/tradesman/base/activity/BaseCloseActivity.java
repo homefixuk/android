@@ -42,12 +42,22 @@ public class BaseCloseActivity extends BaseToolbarActivity<BaseCloseActivityView
 
         // set the action bar icon to close
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_48dp);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_48dp);
+        }
     }
 
     @Override
     protected void onNavigationClickListener() {
         getPresenter().onCloseClicked();
+    }
+
+    @Override
+    public void finishWithAnimation() {
+        finishWithIntent(null);
+        overridePendingTransition(R.anim.expand_in_from_partial, R.anim.right_slide_out);
     }
 
     @Override

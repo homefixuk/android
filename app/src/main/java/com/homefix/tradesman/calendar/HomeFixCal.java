@@ -2,9 +2,8 @@ package com.homefix.tradesman.calendar;
 
 import android.content.Context;
 import android.util.SparseArray;
-import android.util.SparseBooleanArray;
 
-import com.google.gson.stream.JsonReader;
+import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Timeslot;
@@ -194,7 +193,7 @@ public class HomeFixCal {
         return m.getEvents(cal.get(Calendar.DAY_OF_MONTH));
     }
 
-    public static void loadMonth(Context context, final int year, final int month, final OnGetListListener<Timeslot> listener) {
+    public static void loadMonth(Context context, int year, int month, OnGetListListener<Timeslot> listener) {
         if (year < 0 || month < 0) {
             if (listener != null) listener.onGetListFinished(null);
             return;
@@ -224,25 +223,43 @@ public class HomeFixCal {
         cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH) + 1);
         params.put("end_time", cal.getTimeInMillis());
 
-        HomeFix.getAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(new Callback<List<Timeslot>>() {
+        MyCallback callback = new MyCallback(month, year, listener);
 
-            @Override
-            public void onResponse(Call<List<Timeslot>> call, Response<List<Timeslot>> response) {
-                List<Timeslot> timeslots = response != null ? response.body() : new ArrayList<Timeslot>();
+        if (BuildConfig.FLAVOR.equals("apiary_mock")) {
+            HomeFix.getMockAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(callback);
 
-                addMonth(year, month, timeslots);
-                if (listener != null) listener.onGetListFinished(timeslots);
-            }
+        } else if (BuildConfig.FLAVOR.equals("custom")) {
+            HomeFix.getAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(callback);
+        }
+    }
 
-            @Override
-            public void onFailure(Call<List<Timeslot>> call, Throwable t) {
-                if (MyLog.isIsLogEnabled() && t != null) t.printStackTrace();
-                MyLog.e(TAG, call.toString());
+    private static class MyCallback implements Callback<List<Timeslot>> {
 
-                if (listener != null) listener.onGetListFinished(new ArrayList<Timeslot>());
-            }
+        int month, year;
+        OnGetListListener<Timeslot> listener;
 
-        });
+        public MyCallback(int year, int month, OnGetListListener<Timeslot> listener) {
+            this.month = month;
+            this.year = year;
+            this.listener = listener;
+        }
+
+        @Override
+        public void onResponse(Call<List<Timeslot>> call, Response<List<Timeslot>> response) {
+            List<Timeslot> timeslots = response != null ? response.body() : new ArrayList<Timeslot>();
+
+            addMonth(year, month, timeslots);
+            if (listener != null) listener.onGetListFinished(timeslots);
+        }
+
+        @Override
+        public void onFailure(Call<List<Timeslot>> call, Throwable t) {
+            if (MyLog.isIsLogEnabled() && t != null) t.printStackTrace();
+            MyLog.e(TAG, call.toString());
+
+            if (listener != null) listener.onGetListFinished(new ArrayList<Timeslot>());
+        }
+
     }
 
 }

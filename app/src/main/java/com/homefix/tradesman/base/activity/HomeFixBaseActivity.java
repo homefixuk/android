@@ -17,6 +17,7 @@ import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
@@ -34,7 +35,10 @@ import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
+import org.greenrobot.eventbus.EventBus;
+
 import icepick.Icepick;
+import icepick.State;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -56,10 +60,12 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
             checkPermissions = true,
             checkCCA = false,
             calledPermissionResult = false;
+
     protected String permissionRequested;
+
     protected long checkPermissionsDelay = 0;
 
-    protected CCA mCca;
+    protected static CCA mCca;
 
     public HomeFixBaseActivity(String TAG) {
         this.TAG = TAG;
@@ -86,7 +92,6 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MyLog.e(TAG, "[onCreate]");
         Icepick.restoreInstanceState(this, savedInstanceState);
 
         setContentView(getLayoutId());
@@ -120,7 +125,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
         // make sure we have the CCA
         if (checkCCA && mCca == null) {
-            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(new Callback<CCA>() {
+            Callback<CCA> callback = new Callback<CCA>() {
 
                 @Override
                 public void onResponse(Call<CCA> call, Response<CCA> response) {
@@ -140,7 +145,14 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
                     onGotThing(mCca);
                 }
 
-            });
+            };
+
+            if (BuildConfig.FLAVOR.equals("apiary_mock")) {
+                HomeFix.getMockAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(callback);
+
+            } else if (BuildConfig.FLAVOR.equals("custom")) {
+                HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(callback);
+            }
         }
 
         if (checkPermissions && !calledPermissionResult) {

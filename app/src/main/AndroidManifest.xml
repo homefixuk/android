@@ -41,6 +41,9 @@
         <activity
             android:name=".login.LoginActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".availability.AvailabilityActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.LocationService"

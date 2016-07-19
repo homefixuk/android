@@ -96,7 +96,6 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         setActionbarTitle(R.string.app_name);
         setTitleIconRight(0);
         setActionBarTitleClickListener(null);
-        setActionBarTitleTouchListener(null);
     }
 
     private void showHome() {

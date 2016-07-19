@@ -40,7 +40,7 @@ public class ServiceFactory {
         OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
         builder.connectTimeout(30, TimeUnit.SECONDS);
         builder.readTimeout(30, TimeUnit.SECONDS);
-//        builder.addInterceptor(new LoggingInterceptor());
+        builder.addInterceptor(new LoggingInterceptor());
         return builder.build();
     }
 
