@@ -397,6 +397,13 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             mView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
             mView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
         }
+
+        mView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mView.goToHour(TimeUtils.getCurrentHour());
+            }
+        }, 500);
     }
 
     /**

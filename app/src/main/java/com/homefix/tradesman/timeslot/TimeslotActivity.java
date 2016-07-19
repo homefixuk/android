@@ -30,8 +30,6 @@ public class TimeslotActivity extends BaseCloseActivity {
         String timeslotKey = IntentHelper.getStringSafely(i, "timeslotKey");
         String typeStr = IntentHelper.getStringSafely(i, "type");
 
-        Toast.makeText(getContext(), "TypeStr: " + typeStr, Toast.LENGTH_LONG).show();
-
         Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(typeStr);
 
         baseFragment = new BaseTimeslotFragment();
