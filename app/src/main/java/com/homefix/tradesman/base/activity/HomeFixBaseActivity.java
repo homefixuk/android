@@ -33,6 +33,7 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import org.greenrobot.eventbus.EventBus;
@@ -220,6 +221,16 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
             mBaseDialog.show();
         } catch (Exception e) {
         }
+    }
+
+    @Override
+    public void showErrorDialog() {
+        String message;
+        if (!NetworkManager.hasConnection(getApplicationContext()))
+            message = "Sorry, something went wrong. No internet connection found";
+        else message = "Sorry, somethng went wrong. Please try again.";
+
+        showDialog(message, false);
     }
 
     @Override

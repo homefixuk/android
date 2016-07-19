@@ -16,6 +16,7 @@ import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.base.view.BaseFragmentView;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import icepick.Icepick;
@@ -95,6 +96,16 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
                 }
             }
         });
+    }
+
+    @Override
+    public void showErrorDialog() {
+        String message;
+        if (!NetworkManager.hasConnection(getContext()))
+            message = "Sorry, something went wrong. No internet connection found";
+        else message = "Sorry, somethng went wrong. Please try again.";
+
+        showDialog(message, false);
     }
 
     @Override

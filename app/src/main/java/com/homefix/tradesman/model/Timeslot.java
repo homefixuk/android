@@ -8,6 +8,7 @@ import com.samdroid.string.Strings;
 
 import java.io.Serializable;
 import java.sql.Time;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,9 +38,17 @@ public class Timeslot {
     }
 
     private long start, end, length;
-    private String type;
+    private String objectId, type;
     private Tradesman tradesman;
     private Service service;
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
 
     public long getStart() {
         return start;
@@ -116,6 +125,22 @@ public class Timeslot {
     private static final SendReceiver<Timeslot> senderReceiver = new SendReceiver<>(Timeslot.class);
     public static SendReceiver<Timeslot> getSenderReceiver() {
         return senderReceiver;
+    }
+
+    public static Calendar getStartCalender(Timeslot timeslot) {
+        if (timeslot == null) return null;
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timeslot.getStart());
+        return cal;
+    }
+
+    public static Calendar getEndCalender(Timeslot timeslot) {
+        if (timeslot == null) return null;
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timeslot.getEnd());
+        return cal;
     }
 
 }

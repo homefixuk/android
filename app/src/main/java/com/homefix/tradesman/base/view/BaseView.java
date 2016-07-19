@@ -26,6 +26,8 @@ public interface BaseView extends MvpView {
 
     void hideDialog();
 
+    void showErrorDialog();
+
     void showConfirmDialog(String message, String positiveText, String negative, ConfirmDialogCallback callback);
 
     void updateDialogMessage(String message);

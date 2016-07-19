@@ -24,7 +24,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.availability.AvailabilityActivity;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
-import com.homefix.tradesman.common.SendReceiver;
+import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.TimeUtils;
@@ -50,6 +50,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     private boolean isShowing = false;
     private Date mFirstDayOfNewMonth = new Date(); // defaults to current day
     final private SparseBooleanArray monthsFromServer = new SparseBooleanArray();
+
+    private static boolean needsNotifying = false;
 
     public CalendarFragment() {
         super(CalendarFragment.class.getSimpleName());
@@ -109,6 +111,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
         setNumberDays(3); // default to 3 days showing
 
+        mView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)); // go to the current hour
+
         mView.setScrollListener(new WeekView.ScrollListener() {
             @Override
             public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay) {
@@ -152,7 +156,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                 new CompactCalendarView.CompactCalendarViewListener() {
                     @Override
                     public void onDayClick(Date dateClicked) {
-                        List<Event> events = compactCalendarView.getEvents(dateClicked);
+//                        List<Event> events = compactCalendarView.getEvents(dateClicked);
 
                         Calendar cal = Calendar.getInstance();
                         cal.setTime(dateClicked);
@@ -271,10 +275,13 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                 new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        if (dialog != null) dialog.dismiss();
+
                         switch (which) {
 
                             case 0:
-                                Toast.makeText(getContext(), "add availability clicked", Toast.LENGTH_SHORT).show();
+                                startActivityForResult(new Intent(getContext(), AvailabilityActivity.class), Ids.TIMESLOT_CHANGE);
+                                getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
                                 break;
 
                             case 1:
@@ -289,7 +296,6 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                                 break;
                         }
 
-                        if (dialog != null) dialog.dismiss();
                     }
                 }).show();
     }
@@ -540,6 +546,19 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         }
 
         return events;
+    }
+
+    public static void setNeedsNotifying() {
+        needsNotifying = true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (needsNotifying && mView != null) {
+            mView.notifyDatasetChanged();
+        }
     }
 
 }

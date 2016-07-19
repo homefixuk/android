@@ -10,7 +10,7 @@ public class Ids {
             CODE_CALL_PHONE_PERMISSION = 0,
             CODE_GENERIC_PERMISSION = 1,
             CODE_LOCATION_RECEIVER = 2,
-            CODE_3 = 3,
+            TIMESLOT_CHANGE = 3,
             CODE_4 = 4,
             CODE_5 = 5;
 

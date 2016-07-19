@@ -63,7 +63,10 @@ public class BaseCloseActivity extends BaseToolbarActivity<BaseCloseActivityView
     @Override
     public void tryClose() {
         // if we can close
-        if (baseFragment == null || baseFragment.canClose()) getPresenter().close();
+        if (baseFragment == null || baseFragment.canClose()) {
+            getPresenter().close();
+            return;
+        }
 
         // else call the fragment to handle the user trying to close //
         baseFragment.onCloseClicked();

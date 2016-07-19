@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -26,8 +25,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import retrofit2.Call;
-import retrofit2.Callback;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
@@ -110,6 +110,20 @@ public class HomeFix {
         @POST("tradesman/location")
         Call<Timeslot> updateLocation(@Query("token") String token, @QueryMap Map<String, Object> location);
 
+        @POST("tradesman/timeslot")
+        Call<Timeslot> addTimeslot(@Query("token") String token, @Query("time_slot") TimeslotMap timeslotMap);
+
+        @PATCH("tradesman/timeslot")
+        Call<Timeslot> updateTimeslot(
+                @Query("token") String token,
+                @Query("original_timeslot_id") String original_timeslot_id,
+                @Query("time_slot") TimeslotMap timeslotMap);
+
+        @DELETE("tradesman/timeslot")
+        Call<Map<String, Object>> deleteTimeslot(
+                @Query("token") String token,
+                @Query("original_timeslot_id") String original_timeslot_id);
+
     }
 
     public interface MOCK_API {
@@ -144,6 +158,20 @@ public class HomeFix {
         @POST("/tradesman/location")
         Call<Timeslot> updateLocation(@Query("token") String token, @QueryMap Map<String, Object> location);
 
+        @POST("/tradesman/timeslot")
+        Call<Timeslot> addTimeslot(@Query("token") String token, @Query("time_slot") TimeslotMap timeslotMap);
+
+        @PATCH("/tradesman/timeslot")
+        Call<Timeslot> updateTimeslot(
+                @Query("token") String token,
+                @Query("original_timeslot_id") String original_timeslot_id,
+                @Query("time_slot") TimeslotMap timeslotMap);
+
+        @DELETE("/tradesman/timeslot")
+        Call<Map<String, Object>> deleteTimeslot(
+                @Query("token") String token,
+                @Query("original_timeslot_id") String original_timeslot_id);
+
     }
 
     /**
@@ -152,7 +180,6 @@ public class HomeFix {
     public static MOCK_API getMockAPI() {
         return ServiceFactory.createRetrofitService(HomeFix.MOCK_API.class, HomeFix.HOST_NAME);
     }
-
 
     /**
      * @return an instance of the custom back-end API that can be called
@@ -334,6 +361,16 @@ public class HomeFix {
         params.put("password", password);
 
         callInBackground(REQUEST_TYPE.POST, "tradesman/login", params, callback);
+    }
+
+    public static class TimeslotMap extends HashMap<String, Object> {
+
+        public TimeslotMap(long start_time, long end_time, boolean is_available, Timeslot.TYPE type) {
+            put("start_time", "" + start_time);
+            put("end_time", "" + end_time);
+            put("is_available", is_available);
+            put("type", type.name());
+        }
     }
 
 }

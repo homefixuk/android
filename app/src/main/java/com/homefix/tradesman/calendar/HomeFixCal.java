@@ -35,8 +35,8 @@ public class HomeFixCal {
 
     public static class Month implements Comparator, Comparable {
 
-        int year, month;
-        List<Timeslot> events;
+        private int year, month;
+        private List<Timeslot> events;
 
         public Month(int year, int month, List<Timeslot> events) {
             this.year = year;
@@ -52,8 +52,72 @@ public class HomeFixCal {
             return month;
         }
 
-        public List<Timeslot> getEvents() {
+        public synchronized List<Timeslot> getEvents() {
             return events != null ? events : new ArrayList<Timeslot>();
+        }
+
+        /**
+         * @param timeslot
+         * @return if the time slot was added
+         */
+        public boolean addEvent(Timeslot timeslot) {
+            if (timeslot == null) return false;
+
+            List<Timeslot> evs = getEvents();
+
+            if (evs == null) evs = new ArrayList<>();
+
+            Calendar cal = Timeslot.getStartCalender(timeslot);
+
+            // if it is not in this month
+            if (cal.get(Calendar.YEAR) != year || cal.get(Calendar.MONTH) != month) return false;
+
+            if (evs.size() == 0) {
+                evs.add(timeslot);
+                return true;
+            }
+
+            Timeslot temp;
+            for (int i = 0; i < evs.size(); i++) {
+                temp = evs.get(i);
+
+                if (temp == null) continue;
+
+                // if this time slot is before the one in the loop, add it before it
+                if (timeslot.getStart() <= temp.getStart()) {
+                    evs.add(i, timeslot);
+                    return true;
+                }
+            }
+
+            evs.add(timeslot); // here in case it wasn't added
+            return true;
+        }
+
+        /**
+         * Update an event in the month
+         *
+         * @param original
+         * @param changed
+         *
+         * @return if the changed time slot was added
+         */
+        public boolean updateEvent(Timeslot original, Timeslot changed) {
+            List<Timeslot> evs = getEvents();
+
+            if (evs == null) {
+                if (changed != null) return addEvent(changed);
+                return false;
+            }
+
+            int index = original != null ? evs.indexOf(original) : -1;
+
+            if (index != -1) {
+                evs.remove(original);
+                if (changed != null) return addEvent(changed);
+            }
+
+            return false;
         }
 
         public int getNumberEvents() {
@@ -67,15 +131,17 @@ public class HomeFixCal {
         }
 
         public List<Timeslot> getEvents(int dayOfMonth) {
-            if (events == null || events.size() == 0) return new ArrayList<>();
+            List<Timeslot> evs = getEvents();
+
+            if (evs == null || evs.size() == 0) return new ArrayList<>();
 
             List<Timeslot> e = new ArrayList<>();
 
             Calendar cal = getCalendarStart();
             Timeslot timeslot;
 
-            for (int i = 0; i < events.size(); i++) {
-                timeslot = events.get(i);
+            for (int i = 0; i < evs.size(); i++) {
+                timeslot = evs.get(i);
 
                 if (timeslot == null) continue;
 
@@ -157,14 +223,17 @@ public class HomeFixCal {
         return m.getNumberEvents(day);
     }
 
-    public static void addMonth(int year, int month, List<Timeslot> events) {
-        if (year <= 0 || month < 0 || month > 12 || events == null || events.size() == 0) return;
+    public static Month addMonth(int year, int month, List<Timeslot> events) {
+        if (year <= 0 || month < 0 || month > 12 || events == null)
+            return null;
 
         Month m = new Month(year, month, events);
         getMonths().put(getMonthKey(year, month), m);
 
         // save it to the local cache
         CacheUtils.writeObjectFile("month_" + year + "_" + month, m);
+        CalendarFragment.setNeedsNotifying();
+        return m;
     }
 
     public static List<Timeslot> getEvents(int year, int month) {
@@ -191,6 +260,68 @@ public class HomeFixCal {
         if (m == null) return new ArrayList<>();
 
         return m.getEvents(cal.get(Calendar.DAY_OF_MONTH));
+    }
+
+    public static Month getMonth(Timeslot timeslot) {
+        if (timeslot == null) return null;
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timeslot.getStart());
+        int key = getMonthKey(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH));
+        Month month = getMonths().get(key);
+
+        return month;
+    }
+
+    /**
+     * Add an event time slot to the appropriate month
+     *
+     * @param timeslot
+     * @return the month it was added to, or null if the time slot was null
+     */
+    public static Month addEvent(Timeslot timeslot) {
+        if (timeslot == null) return null;
+
+        Month month = getMonth(timeslot);
+
+        if (month == null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(timeslot.getStart());
+            month = addMonth(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), new ArrayList<Timeslot>());
+            CalendarFragment.setNeedsNotifying();
+        }
+
+        if (month != null) {
+            month.addEvent(timeslot);
+            CalendarFragment.setNeedsNotifying();
+        }
+
+        return month;
+    }
+
+    /**
+     * Update an event time slot
+     *
+     * @param original
+     * @return the month the changed time slot was added to, or null if the time slot was null
+     */
+    public static Month changeEvent(Timeslot original, Timeslot changed) {
+        if (original != null) {
+            Month month = getMonth(original);
+            if (month == null) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(original.getStart());
+                month = addMonth(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), new ArrayList<Timeslot>());
+            }
+
+            if (month != null && month.updateEvent(original, changed)) {
+                CalendarFragment.setNeedsNotifying();
+                return month;
+            }
+        }
+
+        CalendarFragment.setNeedsNotifying();
+        return addEvent(changed);
     }
 
     public static void loadMonth(Context context, int year, int month, OnGetListListener<Timeslot> listener) {
@@ -223,7 +354,7 @@ public class HomeFixCal {
         cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH) + 1);
         params.put("end_time", cal.getTimeInMillis());
 
-        MyCallback callback = new MyCallback(month, year, listener);
+        MyCallback callback = new MyCallback(year, month, listener);
 
         if (BuildConfig.FLAVOR.equals("apiary_mock")) {
             HomeFix.getMockAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(callback);
@@ -235,7 +366,7 @@ public class HomeFixCal {
 
     private static class MyCallback implements Callback<List<Timeslot>> {
 
-        int month, year;
+        int year, month;
         OnGetListListener<Timeslot> listener;
 
         public MyCallback(int year, int month, OnGetListListener<Timeslot> listener) {

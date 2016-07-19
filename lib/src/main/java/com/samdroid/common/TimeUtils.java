@@ -240,4 +240,18 @@ public class TimeUtils {
                 && calA.get(Calendar.DAY_OF_YEAR) == c.get(Calendar.DAY_OF_YEAR);
     }
 
+    public static String getShortDateString(Calendar cal) {
+        if (cal == null) return "";
+
+        SimpleDateFormat format = new SimpleDateFormat("EEE, MMM dd yyyy");
+        return format.format(cal.getTime());
+    }
+
+    public static String getShortTimeString(Calendar cal) {
+        if (cal == null) return "";
+
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        return format.format(cal.getTime());
+    }
+
 }
