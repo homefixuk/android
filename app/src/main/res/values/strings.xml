@@ -20,4 +20,16 @@
     <string name="action_recent">Recent Jobs</string>
     <string name="action_help">Help</string>
     <string name="action_logout">Logout</string>
+
+    <!-- Labels -->
+    <string name="name">Name</string>
+    <string name="select_job_type">Select job type</string>
+    <string name="location">Location</string>
+    <string name="add_location">Add Location</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="add_description">Add Description</string>
+    <string name="description">Description</string>
+
 </resources>

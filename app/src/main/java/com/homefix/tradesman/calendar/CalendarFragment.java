@@ -239,29 +239,23 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
             if (hEvent.getTimeslot() == null) return;
 
-            Intent i = null;
+            Intent i = new Intent(getContext(), TimeslotActivity.class);
 
             Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType());
 
             switch (type) {
 
-                case AVAILABILITY:
-                    i = new Intent(getContext(), TimeslotActivity.class);
-                    break;
-
-                case BREAK:
-                    i = new Intent(getContext(), TimeslotActivity.class);
-                    break;
-
                 case SERVICE:
-                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
+                    i = null;
                     break;
 
+                case AVAILABILITY:
+                case BREAK:
                 case OWN_SERVICE:
-                    Toast.makeText(getContext(), hEvent.getName() + " clicked", Toast.LENGTH_SHORT).show();
                     break;
 
                 default:
+                    i = null;
                     break;
             }
 
@@ -285,25 +279,24 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                     public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
                         if (dialog != null) dialog.dismiss();
 
-                        Intent i = null;
+                        Intent i = new Intent(getContext(), TimeslotActivity.class);
 
                         switch (which) {
 
                             case 0:
-                                i = new Intent(getContext(), TimeslotActivity.class);
                                 i.putExtra("type", Timeslot.TYPE.AVAILABILITY.name());
                                 break;
 
                             case 1:
-                                i = new Intent(getContext(), TimeslotActivity.class);
                                 i.putExtra("type", Timeslot.TYPE.BREAK.name());
                                 break;
 
                             case 2:
-                                Toast.makeText(getContext(), "add own job clicked", Toast.LENGTH_SHORT).show();
+                                i.putExtra("type", Timeslot.TYPE.OWN_SERVICE.name());
                                 break;
 
                             default:
+                                i = null;
                                 break;
                         }
 

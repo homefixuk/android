@@ -8,9 +8,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
+import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.timeslot.own_job.OwnJobFragment;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
 
@@ -21,6 +26,7 @@ import com.samdroid.string.Strings;
 public class TimeslotActivity extends BaseCloseActivity {
 
     private boolean hasTimeslot = false;
+    private Timeslot.TYPE type;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,9 +36,10 @@ public class TimeslotActivity extends BaseCloseActivity {
         String timeslotKey = IntentHelper.getStringSafely(i, "timeslotKey");
         String typeStr = IntentHelper.getStringSafely(i, "type");
 
-        Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(typeStr);
+        type = Timeslot.TYPE.getTypeEnum(typeStr);
 
-        baseFragment = new BaseTimeslotFragment();
+        if (type == Timeslot.TYPE.OWN_SERVICE) baseFragment = new OwnJobFragment();
+        else baseFragment = new BaseTimeslotFragment();
 
         // try and get the timeslot from the cache
         Timeslot timeslot = null;
@@ -52,6 +59,7 @@ public class TimeslotActivity extends BaseCloseActivity {
         String title = (timeslot != null ? "Edit" : "Add") + " ";
         if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
         else if (type == Timeslot.TYPE.BREAK) title += "Break";
+        else if (type == Timeslot.TYPE.OWN_SERVICE) title += "Own Job";
         else title += "Event";
         setActionbarTitle(title);
 
@@ -85,4 +93,12 @@ public class TimeslotActivity extends BaseCloseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Ids.PLACE_PICKER_REQUEST) {
+            baseFragment.onActivityResult(requestCode, resultCode, data);
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

@@ -25,15 +25,15 @@ import java.util.Calendar;
  * Created by samuel on 7/13/2016.
  */
 
-public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, BaseTimeslotView, BaseTimeslotFragmentPresenter> implements BaseTimeslotView {
+public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTimeslotView, P extends BaseTimeslotFragmentPresenter<V>> extends BaseCloseFragment<A, V, P> implements BaseTimeslotView {
 
-    private Timeslot.TYPE mType;
-    private boolean isEdit = false, hasMadeChanges = false;
-    private Timeslot mTimeslot;
+    protected Timeslot.TYPE mType;
+    protected boolean isEdit = false, hasMadeChanges = false;
+    protected Timeslot mTimeslot;
 
-    private ImageView mIcon;
-    private TextView mStartDate, mStartTime, mEndDate, mEndTime, mSave;
-    private Calendar mStart, mEnd;
+    protected ImageView mIcon;
+    protected TextView mStartDateTxt, mStartTimeTxt, mEndDateTxt, mEndTimeTxt, mSaveTxt;
+    protected Calendar mStartCal, mEndCal;
 
     public BaseTimeslotFragment() {
         super(BaseTimeslotFragment.class.getSimpleName());
@@ -45,15 +45,15 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
     }
 
     @Override
-    protected BaseTimeslotFragmentPresenter getPresenter() {
-        if (presenter == null) presenter = new BaseTimeslotFragmentPresenter(this, mType);
+    protected P getPresenter() {
+        if (presenter == null) presenter = (P) new BaseTimeslotFragmentPresenter(this, mType);
 
         return presenter;
     }
 
     @Override
     protected int getLayoutRes() {
-        return R.layout.fragment_availability;
+        return R.layout.fragment_timeslot;
     }
 
     @Override
@@ -65,11 +65,11 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
         if (view == null) return;
 
         mIcon = (ImageView) view.findViewById(R.id.icon);
-        mStartDate = (TextView) view.findViewById(R.id.start_date);
-        mStartTime = (TextView) view.findViewById(R.id.start_time);
-        mEndDate = (TextView) view.findViewById(R.id.end_date);
-        mEndTime = (TextView) view.findViewById(R.id.end_time);
-        mSave = (TextView) view.findViewById(R.id.save);
+        mStartDateTxt = (TextView) view.findViewById(R.id.start_date);
+        mStartTimeTxt = (TextView) view.findViewById(R.id.start_time);
+        mEndDateTxt = (TextView) view.findViewById(R.id.end_date);
+        mEndTimeTxt = (TextView) view.findViewById(R.id.end_time);
+        mSaveTxt = (TextView) view.findViewById(R.id.save);
     }
 
     @Override
@@ -82,15 +82,15 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
             else mIcon.setImageResource(R.drawable.ic_av_timer_grey600_48dp);
         }
 
-        mStart = Calendar.getInstance();
-        mStart.set(Calendar.MINUTE, 0);
-        mStart.set(Calendar.SECOND, 0);
-        mStart.set(Calendar.MILLISECOND, 0);
+        mStartCal = Calendar.getInstance();
+        mStartCal.set(Calendar.MINUTE, 0);
+        mStartCal.set(Calendar.SECOND, 0);
+        mStartCal.set(Calendar.MILLISECOND, 0);
 
-        mEnd = Calendar.getInstance();
-        mEnd.set(Calendar.MINUTE, 0);
-        mEnd.set(Calendar.SECOND, 0);
-        mEnd.set(Calendar.MILLISECOND, 0);
+        mEndCal = Calendar.getInstance();
+        mEndCal.set(Calendar.MINUTE, 0);
+        mEndCal.set(Calendar.SECOND, 0);
+        mEndCal.set(Calendar.MILLISECOND, 0);
 
         if (mTimeslot != null) {
             // make sure if there is a time slot that it is an availability one
@@ -100,20 +100,20 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
                 return;
             }
 
-            mStart.setTimeInMillis(mTimeslot.getStart());
-            mEnd.setTimeInMillis(mTimeslot.getEnd());
+            mStartCal.setTimeInMillis(mTimeslot.getStart());
+            mEndCal.setTimeInMillis(mTimeslot.getEnd());
 
         } else {
-            mEnd.add(Calendar.MINUTE, 30);
+            mEndCal.add(Calendar.MINUTE, 30);
         }
 
-        setStartTime(mStart);
-        setEndTime(mEnd);
+        setStartTime(mStartCal);
+        setEndTime(mEndCal);
 
         hasMadeChanges = false;
 
-        if (mStartDate != null) {
-            mStartDate.setOnClickListener(new View.OnClickListener() {
+        if (mStartDateTxt != null) {
+            mStartDateTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new DatePickerDialog(
@@ -122,7 +122,7 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
 
                                 @Override
                                 public void onDateSet(android.widget.DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                    Calendar calNew = (Calendar) mStart.clone();
+                                    Calendar calNew = (Calendar) mStartCal.clone();
                                     calNew.set(Calendar.YEAR, year);
                                     calNew.set(Calendar.MONTH, monthOfYear);
                                     calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -130,17 +130,17 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
                                 }
 
                             },
-                            mStart.get(Calendar.YEAR),
-                            mStart.get(Calendar.MONTH),
-                            mStart.get(Calendar.DAY_OF_MONTH)
+                            mStartCal.get(Calendar.YEAR),
+                            mStartCal.get(Calendar.MONTH),
+                            mStartCal.get(Calendar.DAY_OF_MONTH)
 
                     ).show();
                 }
             });
         }
 
-        if (mStartTime != null) {
-            mStartTime.setOnClickListener(new View.OnClickListener() {
+        if (mStartTimeTxt != null) {
+            mStartTimeTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new TimePickerDialog(
@@ -149,23 +149,23 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
 
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    Calendar calNew = (Calendar) mStart.clone();
+                                    Calendar calNew = (Calendar) mStartCal.clone();
                                     calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                     calNew.set(Calendar.MINUTE, minute);
                                     setStartTime(calNew);
                                 }
 
                             },
-                            mStart.get(Calendar.HOUR_OF_DAY),
-                            mStart.get(Calendar.MINUTE),
+                            mStartCal.get(Calendar.HOUR_OF_DAY),
+                            mStartCal.get(Calendar.MINUTE),
                             true)
                             .show();
                 }
             });
         }
 
-        if (mEndDate != null) {
-            mEndDate.setOnClickListener(new View.OnClickListener() {
+        if (mEndDateTxt != null) {
+            mEndDateTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new DatePickerDialog(
@@ -174,7 +174,7 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
 
                                 @Override
                                 public void onDateSet(android.widget.DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                    Calendar calNew = (Calendar) mEnd.clone();
+                                    Calendar calNew = (Calendar) mEndCal.clone();
                                     calNew.set(Calendar.YEAR, year);
                                     calNew.set(Calendar.MONTH, monthOfYear);
                                     calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -182,17 +182,17 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
                                 }
 
                             },
-                            mEnd.get(Calendar.YEAR),
-                            mEnd.get(Calendar.MONTH),
-                            mEnd.get(Calendar.DAY_OF_MONTH)
+                            mEndCal.get(Calendar.YEAR),
+                            mEndCal.get(Calendar.MONTH),
+                            mEndCal.get(Calendar.DAY_OF_MONTH)
 
                     ).show();
                 }
             });
         }
 
-        if (mEndTime != null) {
-            mEndTime.setOnClickListener(new View.OnClickListener() {
+        if (mEndTimeTxt != null) {
+            mEndTimeTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new TimePickerDialog(
@@ -201,24 +201,24 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
 
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    Calendar calNew = (Calendar) mEnd.clone();
+                                    Calendar calNew = (Calendar) mEndCal.clone();
                                     calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                     calNew.set(Calendar.MINUTE, minute);
                                     setEndTime(calNew);
                                 }
 
                             },
-                            mEnd.get(Calendar.HOUR_OF_DAY),
-                            mEnd.get(Calendar.MINUTE),
+                            mEndCal.get(Calendar.HOUR_OF_DAY),
+                            mEndCal.get(Calendar.MINUTE),
                             true)
                             .show();
                 }
             });
         }
 
-        if (mSave != null) {
-            mSave.setText(isEdit ? "SAVE" : "ADD");
-            mSave.setOnClickListener(new View.OnClickListener() {
+        if (mSaveTxt != null) {
+            mSaveTxt.setText(isEdit ? "SAVE" : "ADD");
+            mSaveTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     saveCliked();
@@ -253,46 +253,46 @@ public class BaseTimeslotFragment extends BaseCloseFragment<TimeslotActivity, Ba
     @Override
     public void setStartTime(Calendar startTime) {
         // if the newly selected start date is after the start date
-        if (startTime.getTimeInMillis() > mEnd.getTimeInMillis()) {
+        if (startTime.getTimeInMillis() > mEndCal.getTimeInMillis()) {
             getBaseActivity().showDialog("End date cannot be before start date", false);
             return;
         }
 
-        mStart = startTime;
+        mStartCal = startTime;
         hasMadeChanges = true;
 
-        if (mStartDate != null) mStartDate.setText(TimeUtils.getShortDateString(mStart));
-        if (mStartTime != null) mStartTime.setText(TimeUtils.getShortTimeString(mStart));
+        if (mStartDateTxt != null) mStartDateTxt.setText(TimeUtils.getShortDateString(mStartCal));
+        if (mStartTimeTxt != null) mStartTimeTxt.setText(TimeUtils.getShortTimeString(mStartCal));
     }
 
     @Override
     public void setEndTime(Calendar endTime) {
         // if the newly selected end date is before the start date
-        if (endTime.getTimeInMillis() < mStart.getTimeInMillis()) {
+        if (endTime.getTimeInMillis() < mStartCal.getTimeInMillis()) {
             getBaseActivity().showDialog("End date cannot be before start date", false);
             return;
         }
 
-        mEnd = endTime;
+        mEndCal = endTime;
         hasMadeChanges = true;
 
-        if (mEndDate != null) mEndDate.setText(TimeUtils.getShortDateString(mEnd));
-        if (mEndTime != null) mEndTime.setText(TimeUtils.getShortTimeString(mEnd));
+        if (mEndDateTxt != null) mEndDateTxt.setText(TimeUtils.getShortDateString(mEndCal));
+        if (mEndTimeTxt != null) mEndTimeTxt.setText(TimeUtils.getShortTimeString(mEndCal));
     }
 
     @Override
     public Calendar getStartTime() {
-        return mStart;
+        return mStartCal;
     }
 
     @Override
     public Calendar getEndTime() {
-        return mEnd;
+        return mEndCal;
     }
 
     @Override
     public void saveCliked() {
-        getPresenter().save(mTimeslot, mStart, mEnd);
+        getPresenter().save(mTimeslot, mStartCal, mEndCal);
     }
 
     @Override

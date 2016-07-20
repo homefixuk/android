@@ -1,6 +1,7 @@
 package com.homefix.tradesman.api;
 
 import com.homefix.tradesman.model.CCA;
+import com.homefix.tradesman.model.ServiceType;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.model.Tradesman;
 
@@ -65,4 +66,8 @@ public interface API {
     Call<Map<String, Object>> deleteTimeslot(
             @Query("token") String token,
             @Query("original_timeslot_id") String original_timeslot_id);
+
+    @GET("/service/types")
+    Call<List<ServiceType>> getServiceTypes(@Query("token") String token);
+
 }

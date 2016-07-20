@@ -72,4 +72,8 @@ public class BaseCloseActivity extends BaseToolbarActivity<BaseCloseActivityView
         baseFragment.onCloseClicked();
     }
 
+    @Override
+    public void onBackPressed() {
+        tryClose();
+    }
 }

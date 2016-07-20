@@ -59,6 +59,10 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"
             tools:replace="android:value" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBHerbEX1B6f_PTNtIwFwJ4CRtoTHcWC9g" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.homefix.tradesman.home;
+package com.homefix.tradesman.home.home_fragment;
 
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 

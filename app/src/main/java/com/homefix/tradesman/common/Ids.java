@@ -11,7 +11,7 @@ public class Ids {
             CODE_GENERIC_PERMISSION = 1,
             CODE_LOCATION_RECEIVER = 2,
             TIMESLOT_CHANGE = 3,
-            CODE_4 = 4,
+            PLACE_PICKER_REQUEST = 4,
             CODE_5 = 5;
 
 

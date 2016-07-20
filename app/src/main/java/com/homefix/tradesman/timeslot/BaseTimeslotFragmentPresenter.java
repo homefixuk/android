@@ -1,6 +1,5 @@
 package com.homefix.tradesman.timeslot;
 
-import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.calendar.HomeFixCal;
@@ -20,11 +19,11 @@ import retrofit2.Response;
  * Created by samuel on 7/13/2016.
  */
 
-public class BaseTimeslotFragmentPresenter extends BaseFragmentPresenter<BaseTimeslotView> {
+public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends BaseFragmentPresenter<V> {
 
     private Timeslot.TYPE mType;
 
-    public BaseTimeslotFragmentPresenter(BaseTimeslotView availabilityView, Timeslot.TYPE type) {
+    public BaseTimeslotFragmentPresenter(V availabilityView, Timeslot.TYPE type) {
         super(availabilityView);
         mType = type;
     }
@@ -117,6 +116,8 @@ public class BaseTimeslotFragmentPresenter extends BaseFragmentPresenter<BaseTim
                 if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
 
                 if (!isViewAttached()) return;
+
+                // TODO: check error contents
 
                 getView().showErrorDialog();
             }
