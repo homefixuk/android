@@ -26,6 +26,7 @@ import com.homefix.tradesman.common.PermissionsHelper;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.User;
+import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
 
 /**
@@ -177,9 +178,7 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
                     return;
                 }
 
-                // open the dialer
-                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", ccaPhoneNumber, null));
-                startActivity(intent);
+                IntentHelper.callPhoneNumber(getContext(), ccaPhoneNumber);
             }
         });
     }
@@ -204,9 +203,8 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
                             Ids.CODE_CALL_PHONE_PERMISSION,
                             true).onClick(null);
                 } else {
-                    // else we just got the permission, so open the dialer
-                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", ccaPhoneNumber, null));
-                    startActivity(intent);
+                    // else we just got the permission, so open the dialer //
+                    IntentHelper.callPhoneNumber(getContext(), ccaPhoneNumber);
                 }
                 break;
 

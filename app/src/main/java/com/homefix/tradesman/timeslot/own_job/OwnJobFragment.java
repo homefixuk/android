@@ -35,6 +35,7 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
+import com.samdroid.view.ViewUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -110,18 +111,18 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             country = property.getCountry();
 
             mJobTypeTxt.setText(service.getService_type().getName());
-            mLocationTxt.setText(getReadableStringFormat("<br/>"));
             mPersonNameTxt.setText(customer.getName());
             mPersonEmailTxt.setText(customer.getEmail());
             mPersonPhoneNumberTxt.setText(customer.getMobile());
             mCustomerPropertyType.setText(customerProperty.getType());
             mDescriptionTxt.setText(service.getTradesman_notes());
+            updateLocationText();
         }
 
-        mPersonEmailTxt.setEnabled(isEdit);
-        mPersonEmailTxt.setEnabled(isEdit);
-        mPersonPhoneNumberTxt.setEnabled(isEdit);
-        mDescriptionTxt.setEnabled(isEdit);
+        ViewUtils.setEditTextEditable(mPersonNameTxt, isEdit);
+        ViewUtils.setEditTextEditable(mPersonEmailTxt, isEdit);
+        ViewUtils.setEditTextEditable(mPersonPhoneNumberTxt, isEdit);
+        ViewUtils.setEditTextEditable(mDescriptionTxt, isEdit);
 
         // if not in edit mode
         if (!isEdit) {
@@ -177,7 +178,7 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
                         return;
                     }
 
-
+                    IntentHelper.callPhoneNumber(getContext(), phone);
                 }
             };
             mPhoneIcon.setOnClickListener(phoneClickListener);
@@ -247,8 +248,6 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
                 MaterialDialogWrapper.getListDialog(getActivity(), "Users relation to property", new CharSequence[]{"owner", "tenant", "manager"}, new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                        if (dialog != null) dialog.dismiss();
-
                         mCustomerPropertyType.setText(text);
                     }
                 }).show();

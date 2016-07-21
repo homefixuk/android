@@ -3,11 +3,8 @@ package com.homefix.tradesman.model;
 import com.homefix.tradesman.common.SendReceiver;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
-import com.samdroid.common.VariableUtils;
 import com.samdroid.string.Strings;
 
-import java.io.Serializable;
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +17,7 @@ public class Timeslot {
 
     public enum TYPE {
 
-        NONE, AVAILABILITY, BREAK, SERVICE, OWN_SERVICE;
+        NONE, AVAILABILITY, BREAK, SERVICE, OWN_JOB;
 
         public boolean equals(String type) {
             if (Strings.isEmpty(type)) return false;
@@ -29,10 +26,14 @@ public class Timeslot {
         }
 
         public static TYPE getTypeEnum(String type) {
-            if (Strings.isEmpty(type)) return TYPE.NONE;
+            if (Strings.isEmpty(type)) return NONE;
 
             type = type.toUpperCase();
-            return TYPE.valueOf(type);
+            try {
+                return TYPE.valueOf(type);
+            } catch (Exception e) {
+                return NONE;
+            }
         }
 
     }
@@ -123,6 +124,7 @@ public class Timeslot {
     ///////////////////////////////////////
 
     private static final SendReceiver<Timeslot> senderReceiver = new SendReceiver<>(Timeslot.class);
+
     public static SendReceiver<Timeslot> getSenderReceiver() {
         return senderReceiver;
     }

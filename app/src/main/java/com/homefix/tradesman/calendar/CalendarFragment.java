@@ -24,7 +24,6 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
-import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.TimeUtils;
@@ -251,7 +250,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
                 case AVAILABILITY:
                 case BREAK:
-                case OWN_SERVICE:
+                case OWN_JOB:
                     break;
 
                 default:
@@ -292,7 +291,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                                 break;
 
                             case 2:
-                                i.putExtra("type", Timeslot.TYPE.OWN_SERVICE.name());
+                                i.putExtra("type", Timeslot.TYPE.OWN_JOB.name());
                                 break;
 
                             default:
@@ -332,7 +331,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                     Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
                     break;
 
-                case OWN_SERVICE:
+                case OWN_JOB:
                     Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
                     break;
 

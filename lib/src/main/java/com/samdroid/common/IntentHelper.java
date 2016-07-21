@@ -1,13 +1,18 @@
 package com.samdroid.common;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.samdroid.string.Strings;
+
+import java.util.Locale;
 
 public class IntentHelper {
 
@@ -37,7 +42,23 @@ public class IntentHelper {
      * @param longitude
      */
     public static void googleMapsDirections(Context context, double latitude, double longitude) {
-        googleMapsDirections(context, latitude + "," + longitude);
+        if (context == null) return;
+
+        String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", latitude, longitude, latitude + "," + longitude);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        try {
+            context.startActivity(intent);
+
+        } catch (ActivityNotFoundException ex) {
+            try {
+                Intent unrestrictedIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                context.startActivity(unrestrictedIntent);
+
+            } catch (ActivityNotFoundException innerEx) {
+                Toast.makeText(context, "Please install a maps application", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     /**
@@ -49,10 +70,22 @@ public class IntentHelper {
     public static void googleMapsDirections(Context context, String locationName) {
         if (context == null) return;
 
-        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Strings.returnSafely(locationName));
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
-        context.startActivity(mapIntent);
+        String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%s", locationName);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+
+        try {
+            context.startActivity(intent);
+
+        } catch (ActivityNotFoundException ex) {
+            try {
+                Intent unrestrictedIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                context.startActivity(unrestrictedIntent);
+
+            } catch (ActivityNotFoundException innerEx) {
+                Toast.makeText(context, "Please install a maps or internet browser application", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     /**
@@ -65,6 +98,14 @@ public class IntentHelper {
             return "";
 
         return Strings.returnSafely(intent.getStringExtra(extraName));
+    }
+
+    public static void callPhoneNumber(Context context, String num) {
+        if (context == null) return;
+
+        // open the dialer
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", num, null));
+        context.startActivity(intent);
     }
 
 }

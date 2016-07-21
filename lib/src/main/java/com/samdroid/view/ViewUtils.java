@@ -215,4 +215,19 @@ public class ViewUtils {
         }, milliseconds);
     }
 
+    public static void setEditTextEditable(EditText editText, boolean isEditable) {
+        if (editText == null) return;
+
+        if (!isEditable) {
+            editText.setFocusable(false);
+            editText.setFocusableInTouchMode(false);
+            editText.setClickable(false);
+
+        } else {
+            editText.setFocusable(true);
+            editText.setFocusableInTouchMode(true);
+            editText.setClickable(true);
+        }
+    }
+
 }

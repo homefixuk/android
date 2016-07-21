@@ -2,7 +2,6 @@ package com.homefix.tradesman.timeslot.own_job;
 
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.BaseTimeslotFragmentPresenter;
-import com.homefix.tradesman.timeslot.BaseTimeslotView;
 
 import java.util.Calendar;
 
@@ -13,7 +12,7 @@ import java.util.Calendar;
 public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
 
     public OwnJobPresenter(OwnJobView view) {
-        super(view, Timeslot.TYPE.OWN_SERVICE);
+        super(view, Timeslot.TYPE.OWN_JOB);
     }
 
     public void addNewJob(Calendar start, Calendar end) {

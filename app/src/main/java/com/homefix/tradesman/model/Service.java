@@ -11,12 +11,13 @@ public class Service {
     private ServiceSet service_set;
     private Tradesman tradesman;
     private ServiceType service_type;
-    private String name, status;
+    private String id, status;
     private long request_time, arrival_time, depart_time, estimated_duration;
     private int estimated_cost, actual_duration, actual_cost;
     private String tradesman_notes;
     private String key_location;
     private List<Service> previous_services;
+    private boolean is_own_job;
 
     public ServiceSet getService_set() {
         return service_set;
@@ -31,7 +32,7 @@ public class Service {
     }
 
     public String getName() {
-        return name;
+        return id;
     }
 
     public String getStatus() {
@@ -128,5 +129,9 @@ public class Service {
 
     public void setPrevious_services(List<Service> previous_services) {
         this.previous_services = previous_services;
+    }
+
+    public boolean is_own_job() {
+        return is_own_job;
     }
 }

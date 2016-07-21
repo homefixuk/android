@@ -6,11 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.common.Ids;
@@ -38,7 +34,7 @@ public class TimeslotActivity extends BaseCloseActivity {
 
         type = Timeslot.TYPE.getTypeEnum(typeStr);
 
-        if (type == Timeslot.TYPE.OWN_SERVICE) baseFragment = new OwnJobFragment();
+        if (type == Timeslot.TYPE.OWN_JOB) baseFragment = new OwnJobFragment();
         else baseFragment = new BaseTimeslotFragment();
 
         // try and get the timeslot from the cache
@@ -59,7 +55,7 @@ public class TimeslotActivity extends BaseCloseActivity {
         String title = (timeslot != null ? "Edit" : "Add") + " ";
         if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
         else if (type == Timeslot.TYPE.BREAK) title += "Break";
-        else if (type == Timeslot.TYPE.OWN_SERVICE) {
+        else if (type == Timeslot.TYPE.OWN_JOB) {
             String timeslotName = timeslot != null && timeslot.getService() != null ? Strings.returnSafely(timeslot.getService().getName()) : "";
             title += Strings.isEmpty(timeslotName) ? "Own Job" : timeslotName;
         } else title += "Event";
