@@ -17,6 +17,7 @@
     <string name="action_today">Today</string>
     <string name="action_options">Options</string>
     <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
     <string name="action_recent">Recent Jobs</string>
     <string name="action_help">Help</string>
     <string name="action_logout">Logout</string>
@@ -27,6 +28,9 @@
     <string name="location">Location</string>
     <string name="add_location">Add Location</string>
     <string name="email">Email</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="property_type">Person\'s property relationship</string>
     <string name="phone_number">Phone Number</string>
     <string name="mobile_number">Mobile Number</string>
     <string name="add_description">Add Description</string>

@@ -11,16 +11,25 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TimePicker;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.MaterialDialog.ListCallback;
 import com.homefix.tradesman.R;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import clojure.lang.Obj;
 
 public class MaterialDialogWrapper {
 
@@ -221,6 +230,104 @@ public class MaterialDialogWrapper {
 
         public void onChangeCancelled(Object original);
 
+    }
+
+    /**
+     * Multi input dialog. Pass in a map with the fields you want the user to input, the callback
+     * will return the hashmap with the updated (or same if the user cancels) values
+     *
+     * @param activity
+     * @param positiveTxt
+     * @param keys
+     * @param defaults
+     * @param callback
+     * @return
+     */
+    @SuppressLint("InflateParams")
+    public static MaterialDialog getMultiInputDialog(
+            final Activity activity,
+            final String positiveTxt,
+            final List<String> keys,
+            final List<String> defaults,
+            final OnGotObjectListener<HashMap<String, String>> callback) {
+
+        LayoutInflater inflater = activity.getLayoutInflater();
+
+        View view = inflater.inflate(R.layout.empty_vertical_scroll_view, null, false);
+        final LinearLayout content = (LinearLayout) view.findViewById(R.id.content);
+
+        EditText firstEdtTxt = null;
+
+        final HashMap<String, String> defaultMaps = new HashMap<>();
+
+        for (int i = 0; i < keys.size(); i++) {
+            String key = Strings.returnSafely(keys.get(i));
+
+            if (Strings.isEmpty(key)) continue;
+
+            // set the current content
+            EditText edtTxt = (EditText) inflater.inflate(R.layout.edit_text_padded, null);
+            edtTxt.setHint(Strings.returnSafely(key));
+
+            String value = Strings.returnSafely(defaults.get(i));
+
+            edtTxt.setText(value);
+            edtTxt.setTag(key);
+
+            defaultMaps.put(key, value);
+
+            if (firstEdtTxt == null) firstEdtTxt = edtTxt;
+
+            content.addView(edtTxt);
+        }
+
+        final EditText finalFirstEdtTxt = firstEdtTxt;
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(activity)
+                .customView(view, true)
+                .positiveText(positiveTxt)
+                .positiveColorRes(R.color.black)
+                .negativeText("CANCEL")
+                .negativeColorRes(R.color.black)
+                .showListener(new OnShowListener() {
+
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        finalFirstEdtTxt.setSelection(finalFirstEdtTxt.getText().length());
+                        finalFirstEdtTxt.requestFocus();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        HashMap<String, String> results = new HashMap<>();
+
+                        int childCount = content.getChildCount();
+                        EditText editText;
+                        String key;
+                        for (int i = 0; i < childCount; i++) {
+                            editText = (EditText) content.getChildAt(i);
+                            key = (String) editText.getTag();
+                            results.put(key, editText.getText().toString());
+                        }
+
+                        if (dialog != null) dialog.dismiss();
+
+                        if (callback != null) callback.onGotThing(results);
+                    }
+
+                }).onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        if (dialog != null) dialog.dismiss();
+                        if (callback != null) callback.onGotThing(defaultMaps);
+                    }
+
+                })
+                .autoDismiss(true)
+                .cancelable(false);
+
+        return builder.build();
     }
 
     @SuppressLint("InflateParams")

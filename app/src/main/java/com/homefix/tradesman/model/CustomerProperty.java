@@ -4,19 +4,23 @@ package com.homefix.tradesman.model;
  * Created by samuel on 6/15/2016.
  */
 
-public class PropertyUser {
+public class CustomerProperty {
 
     Property property;
-    User user;
+    Customer customer;
     String type;
     long from, until;
+
+    public CustomerProperty() {
+        super();
+    }
 
     public Property getProperty() {
         return property;
     }
 
-    public User getUser() {
-        return user;
+    public Customer getCustomer() {
+        return customer;
     }
 
     public String getType() {
@@ -30,4 +34,5 @@ public class PropertyUser {
     public long getUntil() {
         return until;
     }
+
 }

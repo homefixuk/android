@@ -59,27 +59,37 @@ public class TimeslotActivity extends BaseCloseActivity {
         String title = (timeslot != null ? "Edit" : "Add") + " ";
         if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
         else if (type == Timeslot.TYPE.BREAK) title += "Break";
-        else if (type == Timeslot.TYPE.OWN_SERVICE) title += "Own Job";
-        else title += "Event";
+        else if (type == Timeslot.TYPE.OWN_SERVICE) {
+            String timeslotName = timeslot != null && timeslot.getService() != null ? Strings.returnSafely(timeslot.getService().getName()) : "";
+            title += Strings.isEmpty(timeslotName) ? "Own Job" : timeslotName;
+        } else title += "Event";
         setActionbarTitle(title);
 
-        // setup and show the fragment
+        // setup and show the fragmentg
         replaceFragment(baseFragment);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!hasTimeslot) return super.onCreateOptionsMenu(menu);
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.timeslot, menu);
+
+        MenuItem itemOptions = menu.findItem(R.id.action_options);
+        MenuItem itemEdit = menu.findItem(R.id.action_edit);
+
+        if (itemEdit != null) itemEdit.setVisible(hasTimeslot && !((BaseTimeslotFragment) baseFragment).isEditing());
+        if (itemOptions != null) itemOptions.setVisible(hasTimeslot);
 
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_delete) {
+        if (item.getItemId() == R.id.action_edit) {
+            ((BaseTimeslotFragment) baseFragment).setEditing(true);
+            supportInvalidateOptionsMenu();
+
+        } else if (item.getItemId() == R.id.action_delete) {
             if (baseFragment == null) {
                 showErrorDialog();
                 return false;

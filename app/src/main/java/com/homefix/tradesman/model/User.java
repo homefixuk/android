@@ -8,7 +8,7 @@ import com.samdroid.string.Strings;
 
 public class User {
 
-    String id, first_name, last_name, email, mobile;
+    String id, first_name, last_name, email, mobile, role;
     String shipping_number_or_name, shipping_street, shipping_city, shipping_state, shipping_postal_code, shipping_country;
     String billing_name_or_number, billing_street, billing_city, billing_state, billing_postal_code, billing_country;
 
@@ -82,5 +82,9 @@ public class User {
 
     public String getBilling_country() {
         return billing_country;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

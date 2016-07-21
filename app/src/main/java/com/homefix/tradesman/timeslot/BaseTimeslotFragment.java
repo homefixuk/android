@@ -76,6 +76,22 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // if there is no timeslot to make changes to, we are in edit mode for the new timeslot
+        if (mTimeslot == null) isEdit = true;
+
+        setupView();
+    }
+
+    public boolean isEditing() {
+        return isEdit;
+    }
+
+    public void setEditing(boolean edit) {
+        isEdit = edit;
+        setupView();
+    }
+
+    protected void setupView() {
         if (mIcon != null) {
             if (mType == Timeslot.TYPE.BREAK)
                 mIcon.setImageResource(R.drawable.ic_food_grey600_48dp);
@@ -93,13 +109,6 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         mEndCal.set(Calendar.MILLISECOND, 0);
 
         if (mTimeslot != null) {
-            // make sure if there is a time slot that it is an availability one
-            if (Timeslot.TYPE.getTypeEnum(mTimeslot.getType()) != Timeslot.TYPE.AVAILABILITY) {
-                Toast.makeText(getContext(), "Sorry, unable to edit this timeslot.", Toast.LENGTH_SHORT).show();
-                getBaseActivity().finishWithAnimation();
-                return;
-            }
-
             mStartCal.setTimeInMillis(mTimeslot.getStart());
             mEndCal.setTimeInMillis(mTimeslot.getEnd());
 
@@ -112,6 +121,25 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
 
         hasMadeChanges = false;
 
+        // if not in edit mode
+        if (!isEdit) {
+            mStartDateTxt.setOnClickListener(null);
+            mStartTimeTxt.setOnClickListener(null);
+            mEndDateTxt.setOnClickListener(null);
+            mEndTimeTxt.setOnClickListener(null);
+
+            mSaveTxt.setText("DONE");
+            mSaveTxt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getBaseActivity().tryClose();
+                }
+            });
+
+            return;
+        }
+
+        // if in edit mode
         if (mStartDateTxt != null) {
             mStartDateTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -228,11 +256,8 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     @Override
-    public void setTimeslot(Timeslot mTimeslot) {
-        this.mTimeslot = mTimeslot;
-
-        // set the edit mode if we have a time slot
-        isEdit = this.mTimeslot != null;
+    public void setTimeslot(Timeslot timeslot) {
+        this.mTimeslot = timeslot;
 
         if (mTimeslot != null) mType = Timeslot.TYPE.getTypeEnum(mTimeslot.getType());
     }
@@ -299,7 +324,10 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     public void onSaveComplete(Timeslot timeslot) {
         hideDialog();
 
-        getBaseActivity().finishWithAnimation();
+        hasMadeChanges = false;
+        isEdit = false;
+        getBaseActivity().supportInvalidateOptionsMenu();
+        setupView();
     }
 
     @Override
@@ -344,4 +372,5 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                     }
                 }).show();
     }
+
 }

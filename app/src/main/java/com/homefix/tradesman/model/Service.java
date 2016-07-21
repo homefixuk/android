@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Service {
 
+    private ServiceSet service_set;
     private Tradesman tradesman;
     private ServiceType service_type;
     private String name, status;
@@ -16,6 +17,10 @@ public class Service {
     private String tradesman_notes;
     private String key_location;
     private List<Service> previous_services;
+
+    public ServiceSet getService_set() {
+        return service_set;
+    }
 
     public Tradesman getTradesman() {
         return tradesman;
