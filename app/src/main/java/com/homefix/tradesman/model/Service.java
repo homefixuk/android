@@ -10,7 +10,7 @@ public class Service {
 
     private ServiceSet service_set;
     private Tradesman tradesman;
-    private ServiceType service_type;
+    private Problem problem;
     private String id, status;
     private long request_time, arrival_time, depart_time, estimated_duration;
     private int estimated_cost, actual_duration, actual_cost;
@@ -27,11 +27,11 @@ public class Service {
         return tradesman;
     }
 
-    public ServiceType getService_type() {
-        return service_type;
+    public Problem getProblem() {
+        return problem;
     }
 
-    public String getName() {
+    public String getId() {
         return id;
     }
 
@@ -83,8 +83,8 @@ public class Service {
         this.tradesman = tradesman;
     }
 
-    public void setService_type(ServiceType service_type) {
-        this.service_type = service_type;
+    public void setProblem(Problem problem) {
+        this.problem = problem;
     }
 
     public void setStatus(String status) {

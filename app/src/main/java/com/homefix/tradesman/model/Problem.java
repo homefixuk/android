@@ -2,7 +2,6 @@ package com.homefix.tradesman.model;
 
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.data.UserController;
-import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import retrofit2.Response;
  * Created by samuel on 6/15/2016.
  */
 
-public class ServiceType {
+public class Problem {
 
     String name, description;
     long time;
@@ -46,41 +45,41 @@ public class ServiceType {
     }
 
 
-    final private static List<ServiceType> mServiceTypes = new ArrayList<>();
+    final private static List<Problem> M_PROBLEMs = new ArrayList<>();
 
     public static void loadServiceTypes() {
         if (!UserController.hasToken()) {
-            MyLog.e("ServiceType", "[loadServiceTypes] no user token");
+            MyLog.e("Problem", "[loadServiceTypes] no user token");
             return;
         }
 
         // get the service types from the server
-        HomeFix.getAPI().getServiceTypes(UserController.getToken()).enqueue(new Callback<List<ServiceType>>() {
+        HomeFix.getAPI().getServiceTypes(UserController.getToken()).enqueue(new Callback<List<Problem>>() {
 
             @Override
-            public void onResponse(Call<List<ServiceType>> call, Response<List<ServiceType>> response) {
+            public void onResponse(Call<List<Problem>> call, Response<List<Problem>> response) {
                 // store them in the static list
-                getServiceTypes().clear();
-                getServiceTypes().addAll(response.body());
+                getProblemTypes().clear();
+                getProblemTypes().addAll(response.body());
             }
 
             @Override
-            public void onFailure(Call<List<ServiceType>> call, Throwable t) {
-                MyLog.e("ServiceType", "[loadServiceTypes => onFailure]");
+            public void onFailure(Call<List<Problem>> call, Throwable t) {
+                MyLog.e("Problem", "[loadServiceTypes => onFailure]");
                 if (MyLog.isIsLogEnabled() && t != null) t.printStackTrace();
             }
 
         });
     }
 
-    public synchronized static List<ServiceType> getServiceTypes() {
-        return mServiceTypes;
+    public synchronized static List<Problem> getProblemTypes() {
+        return M_PROBLEMs;
     }
 
-    public static List<String> getServiceTypeNames() {
+    public static List<String> getProblemTypeNames() {
         List<String> names = new ArrayList<>();
 
-        List<ServiceType> types = getServiceTypes();
+        List<Problem> types = getProblemTypes();
 
         for (int i = 0, len = types.size(); i < len; i++) names.add(types.get(i).getName());
 

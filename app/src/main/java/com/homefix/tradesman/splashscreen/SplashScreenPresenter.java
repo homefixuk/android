@@ -3,10 +3,8 @@ package com.homefix.tradesman.splashscreen;
 import android.content.Intent;
 
 import com.homefix.tradesman.HomeFixApplication;
-import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.data.UserController;
-import com.homefix.tradesman.model.ServiceType;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.service.LocationService;
 import com.samdroid.common.MyLog;

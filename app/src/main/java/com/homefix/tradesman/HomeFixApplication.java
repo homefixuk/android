@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.multidex.MultiDexApplication;
 
-import com.homefix.tradesman.model.ServiceType;
+import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.service.LocationService;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
@@ -45,6 +45,6 @@ public class HomeFixApplication extends MultiDexApplication {
 
     public static void setupAppAfterLogin() {
 
-        ServiceType.loadServiceTypes();
+        Problem.loadServiceTypes();
     }
 }

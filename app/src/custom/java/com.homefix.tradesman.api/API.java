@@ -1,6 +1,7 @@
 package com.homefix.tradesman.api;
 
 import com.homefix.tradesman.model.CCA;
+import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceType;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.model.Tradesman;
@@ -69,5 +70,24 @@ public interface API {
 
     @GET("service/types")
     Call<List<ServiceType>> getServiceTypes(@Query("token") String token);
+
+    @POST("/service")
+    Call<Service> createService(
+            @Query("token") String token,
+            @Query("customer_name") String customer_name,
+            @Query("customer_email") String customer_email,
+            @Query("customer_phone") String customer_phone,
+            @Query("customer_property_relationship") String customer_property_relationship,
+            @Query("address_line_1") String address_line_1,
+            @Query("address_line_2") String address_line_2,
+            @Query("address_line_3") String address_line_3,
+            @Query("postcode") String postcode,
+            @Query("country") String country,
+            @Query("latitude") String latitude,
+            @Query("longitude") String longitude,
+            @Query("problem_name") String problem_name,
+            @Query("start_time") String start_time,
+            @Query("end_time") String end_time,
+            @Query("tradesman_notes") String tradesman_note);
 
 }

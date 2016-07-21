@@ -23,7 +23,7 @@ public interface BaseTimeslotView extends BaseFragmentView {
 
     Calendar getEndTime();
 
-    void saveCliked();
+    void saveClicked();
 
     void onSaveComplete(Timeslot timeslot);
 

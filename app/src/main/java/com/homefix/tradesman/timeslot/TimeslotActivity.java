@@ -56,7 +56,7 @@ public class TimeslotActivity extends BaseCloseActivity {
         if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
         else if (type == Timeslot.TYPE.BREAK) title += "Break";
         else if (type == Timeslot.TYPE.OWN_JOB) {
-            String timeslotName = timeslot != null && timeslot.getService() != null ? Strings.returnSafely(timeslot.getService().getName()) : "";
+            String timeslotName = timeslot != null && timeslot.getService() != null ? Strings.returnSafely(timeslot.getService().getId()) : "";
             title += Strings.isEmpty(timeslotName) ? "Own Job" : timeslotName;
         } else title += "Event";
         setActionbarTitle(title);

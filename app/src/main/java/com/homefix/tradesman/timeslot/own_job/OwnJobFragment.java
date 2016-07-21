@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
 import android.text.Html;
 import android.view.View;
@@ -26,9 +24,9 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
+import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
-import com.homefix.tradesman.model.ServiceType;
 import com.homefix.tradesman.timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
@@ -110,7 +108,7 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             postcode = property.getPostcode();
             country = property.getCountry();
 
-            mJobTypeTxt.setText(service.getService_type().getName());
+            mJobTypeTxt.setText(service.getProblem().getName());
             mPersonNameTxt.setText(customer.getName());
             mPersonEmailTxt.setText(customer.getEmail());
             mPersonPhoneNumberTxt.setText(customer.getMobile());
@@ -139,7 +137,7 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
                     if (latitude != null && longitude != null)
                         IntentHelper.googleMapsDirections(getActivity(), latitude, longitude);
                     else
-                        IntentHelper.googleMapsDirections(getActivity(), getReadableStringFormat(","));
+                        IntentHelper.googleMapsDirections(getActivity(), getReadableLocationString(","));
                 }
             };
             mLocationTxt.setOnClickListener(directionsClickListener);
@@ -213,7 +211,7 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             @Override
             public void onClick(View v) {
                 // show list of service type names
-                List<String> namesList = ServiceType.getServiceTypeNames();
+                List<String> namesList = Problem.getProblemTypeNames();
                 CharSequence[] array = namesList.toArray(new String[namesList.size()]);
 
                 MaterialDialogWrapper.getListDialog(getActivity(), "Select service type", array, new MaterialDialog.ListCallback() {
@@ -258,8 +256,27 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
     }
 
     @Override
-    public void saveCliked() {
-        // TODO: call save function in presenter
+    public void saveClicked() {
+        if (mTimeslot == null) {
+            getPresenter().addNewJob(
+                    mStartCal,
+                    mEndCal,
+                    mJobTypeTxt.getText().toString(),
+                    addressLine1,
+                    addressLine2,
+                    addressLine3,
+                    postcode,
+                    country,
+                    latitude,
+                    longitude,
+                    mPersonNameTxt.getText().toString(),
+                    mPersonEmailTxt.getText().toString(),
+                    mPersonPhoneNumberTxt.getText().toString(),
+                    mCustomerPropertyType.getText().toString(),
+                    mDescriptionTxt.getText().toString());
+
+            return;
+        }
     }
 
     /**
@@ -320,7 +337,7 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
 
                     @Override
                     public void run() {
-                        Address address = getAddress(getContext(), getReadableStringFormat(","));
+                        Address address = getAddress(getContext(), getReadableLocationString(","));
                         if (address != null) {
                             latitude = address.getLatitude();
                             longitude = address.getLongitude();
@@ -340,10 +357,10 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
         if (!Strings.isEmpty(addressLine2)) addressLine2 = addressLine2.replace(postcode, "");
         if (!Strings.isEmpty(addressLine3)) addressLine3 = addressLine3.replace(postcode, "");
 
-        mLocationTxt.setText(Html.fromHtml(getReadableStringFormat("<br/>")));
+        mLocationTxt.setText(Html.fromHtml(getReadableLocationString("<br/>")));
     }
 
-    protected String getReadableStringFormat(String delimiter) {
+    protected String getReadableLocationString(String delimiter) {
         String s = "";
 
         delimiter = Strings.returnSafely(delimiter);
@@ -421,6 +438,11 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * @param context
+     * @param place
+     * @return the Address object from the place
+     */
     public static Address getAddress(final Context context, final Place place) {
         if (place == null) return null;
 
@@ -443,6 +465,11 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             return null;
     }
 
+    /**
+     * @param context
+     * @param locationName
+     * @return the Address object from the location
+     */
     public static Address getAddress(final Context context, final String locationName) {
         if (Strings.isEmpty(locationName)) return null;
 

@@ -52,11 +52,12 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
                 setName("Break");
                 break;
             case SERVICE:
-                if (timeslot.getService() != null) setName(timeslot.getService().getName());
+                if (timeslot.getService() != null) setName(timeslot.getService().getId());
                 else setName("Homefix");
                 break;
             case OWN_JOB:
-                setName("Own Job");
+                if (timeslot.getService() != null) setName(timeslot.getService().getId());
+                else setName("Own Job");
                 break;
 
             default:

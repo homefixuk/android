@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -249,7 +248,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
             mSaveTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    saveCliked();
+                    saveClicked();
                 }
             });
         }
@@ -316,7 +315,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     @Override
-    public void saveCliked() {
+    public void saveClicked() {
         getPresenter().save(mTimeslot, mStartCal, mEndCal);
     }
 
