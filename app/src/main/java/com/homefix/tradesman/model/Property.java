@@ -18,27 +18,27 @@ public class Property {
     }
 
     public String getAddress_line_1() {
-        return address_line_1;
+        return Strings.returnSafely(address_line_1);
     }
 
     public String getAddress_line_2() {
-        return address_line_2;
+        return Strings.returnSafely(address_line_2);
     }
 
     public String getAddress_line_3() {
-        return address_line_3;
+        return Strings.returnSafely(address_line_3);
     }
 
     public String getCountry() {
-        return country;
+        return Strings.returnSafely(country);
     }
 
     public String getPostcode() {
-        return postcode;
+        return Strings.returnSafely(postcode);
     }
 
     public String getPhone() {
-        return phone;
+        return Strings.returnSafely(phone);
     }
 
     public int getNumber_tennants() {

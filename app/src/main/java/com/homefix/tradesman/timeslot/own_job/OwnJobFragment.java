@@ -105,25 +105,31 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             Service service = mTimeslot.getService();
 
             if (service != null) {
-
                 CustomerProperty customerProperty = service.getService_set().getCustomer_property();
-                Customer customer = customerProperty.getCustomer();
-                Property property = customerProperty.getProperty();
 
-                addressLine1 = property.getAddress_line_1();
-                addressLine2 = property.getAddress_line_2();
-                addressLine3 = property.getAddress_line_3();
-                postcode = property.getPostcode();
-                country = property.getCountry();
-
-                Problem problem = service.getProblem();
-                mJobTypeTxt.setText(problem != null ? problem.getName() : "");
-
-                if (customer != null) {
-                    mPersonNameTxt.setText(customer.getName());
-                    mPersonEmailTxt.setText(customer.getEmail());
-                    mPersonPhoneNumberTxt.setText(customer.getMobile());
+                if (customerProperty != null) {
                     mCustomerPropertyType.setText(customerProperty.getType());
+
+                    Property property = customerProperty.getProperty();
+                    if (property != null) {
+                        addressLine1 = property.getAddress_line_1();
+                        addressLine2 = property.getAddress_line_2();
+                        addressLine3 = property.getAddress_line_3();
+                        postcode = property.getPostcode();
+                        country = property.getCountry();
+                        latitude = property.getLatitude();
+                        longitude = property.getLongitude();
+                    }
+
+                    Customer customer = customerProperty.getCustomer();
+                    if (customer != null) {
+                        mPersonNameTxt.setText(customer.getName());
+                        mPersonEmailTxt.setText(customer.getEmail());
+                        mPersonPhoneNumberTxt.setText(customer.getMobile());
+                    }
+
+                    Problem problem = service.getProblem();
+                    mJobTypeTxt.setText(problem != null ? problem.getName() : "");
                 }
 
                 mDescriptionTxt.setText(service.getTradesman_notes());
@@ -353,6 +359,7 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
     /**
      * Show the google place picker activity
      */
+
     private void showPlacePicker() {
         try {
             PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();

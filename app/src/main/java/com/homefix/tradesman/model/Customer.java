@@ -1,5 +1,6 @@
 package com.homefix.tradesman.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +21,8 @@ public class Customer extends User {
     }
 
     public List<Tradesman> getPreferredTradesman() {
+        if (preferredTradesman == null) preferredTradesman = new ArrayList<>();
+
         return preferredTradesman;
     }
 }

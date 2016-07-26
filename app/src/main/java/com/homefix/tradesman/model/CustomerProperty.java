@@ -1,5 +1,7 @@
 package com.homefix.tradesman.model;
 
+import com.samdroid.string.Strings;
+
 /**
  * Created by samuel on 6/15/2016.
  */
@@ -24,7 +26,7 @@ public class CustomerProperty {
     }
 
     public String getType() {
-        return type;
+        return Strings.returnSafely(type);
     }
 
     public long getFrom() {

@@ -13,7 +13,7 @@ public class User {
     String billing_name_or_number, billing_street, billing_city, billing_state, billing_postal_code, billing_country;
 
     public String getId() {
-        return id;
+        return Strings.returnSafely(id);
     }
 
     public String getName() {
@@ -21,70 +21,70 @@ public class User {
     }
 
     public String getFirst_name() {
-        return first_name;
+        return Strings.returnSafely(first_name);
     }
 
     public String getLast_name() {
-        return last_name;
+        return Strings.returnSafely(last_name);
     }
 
     public String getEmail() {
-        return email;
+        return Strings.returnSafely(email);
     }
 
     public String getMobile() {
-        return mobile;
+        return Strings.returnSafely(mobile);
     }
 
     public String getShipping_number_or_name() {
-        return shipping_number_or_name;
+        return Strings.returnSafely(shipping_number_or_name);
     }
 
     public String getShipping_street() {
-        return shipping_street;
+        return Strings.returnSafely(shipping_street);
     }
 
     public String getShipping_city() {
-        return shipping_city;
+        return Strings.returnSafely(shipping_city);
     }
 
     public String getShipping_state() {
-        return shipping_state;
+        return Strings.returnSafely(shipping_state);
     }
 
     public String getShipping_postal_code() {
-        return shipping_postal_code;
+        return Strings.returnSafely(shipping_postal_code);
     }
 
     public String getShipping_country() {
-        return shipping_country;
+        return Strings.returnSafely(shipping_country);
     }
 
     public String getBilling_name_or_number() {
-        return billing_name_or_number;
+        return Strings.returnSafely(billing_name_or_number);
     }
 
     public String getBilling_street() {
-        return billing_street;
+        return Strings.returnSafely(billing_street);
     }
 
     public String getBilling_city() {
-        return billing_city;
+        return Strings.returnSafely(billing_city);
     }
 
     public String getBilling_state() {
-        return billing_state;
+        return Strings.returnSafely(billing_state);
     }
 
     public String getBilling_postal_code() {
-        return billing_postal_code;
+        return Strings.returnSafely(billing_postal_code);
     }
 
     public String getBilling_country() {
-        return billing_country;
+        return Strings.returnSafely(billing_country);
     }
 
     public String getRole() {
-        return role;
+        return Strings.returnSafely(role);
     }
 }

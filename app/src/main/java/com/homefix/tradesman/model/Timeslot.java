@@ -48,7 +48,7 @@ public class Timeslot {
     private Service service;
 
     public String getObjectId() {
-        return objectId;
+        return Strings.returnSafely(objectId);
     }
 
     public void setObjectId(String objectId) {
@@ -68,7 +68,7 @@ public class Timeslot {
     }
 
     public String getType() {
-        return type;
+        return Strings.returnSafely(type);
     }
 
     public Tradesman getTradesman() {

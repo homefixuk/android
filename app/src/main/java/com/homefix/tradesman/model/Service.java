@@ -1,5 +1,8 @@
 package com.homefix.tradesman.model;
 
+import com.samdroid.string.Strings;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +21,8 @@ public class Service {
     private String key_location;
     private List<Service> previous_services;
     private boolean is_own_job;
+    private String incomplete_reason, actual_diagnosis, work_completed_description;
+    private List<Part> parts_used;
 
     public ServiceSet getService_set() {
         return service_set;
@@ -32,11 +37,11 @@ public class Service {
     }
 
     public String getId() {
-        return id;
+        return Strings.returnSafely(id);
     }
 
     public String getStatus() {
-        return status;
+        return Strings.returnSafely(status);
     }
 
     public long getRequest_time() {
@@ -68,14 +73,16 @@ public class Service {
     }
 
     public String getTradesman_notes() {
-        return tradesman_notes;
+        return Strings.returnSafely(tradesman_notes);
     }
 
     public String getKey_location() {
-        return key_location;
+        return Strings.returnSafely(key_location);
     }
 
     public List<Service> getPrevious_services() {
+        if (previous_services == null) previous_services = new ArrayList<>();
+
         return previous_services;
     }
 
@@ -133,5 +140,23 @@ public class Service {
 
     public boolean is_own_job() {
         return is_own_job;
+    }
+
+    public String getIncomplete_reason() {
+        return Strings.returnSafely(incomplete_reason);
+    }
+
+    public String getActual_diagnosis() {
+        return Strings.returnSafely(actual_diagnosis);
+    }
+
+    public String getWork_completed_description() {
+        return Strings.returnSafely(work_completed_description);
+    }
+
+    public List<Part> getParts_used() {
+        if (parts_used == null) parts_used = new ArrayList<>();
+
+        return parts_used;
     }
 }

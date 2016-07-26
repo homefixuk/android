@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import clojure.lang.Obj;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -89,5 +90,11 @@ public interface API {
             @Query("start_time") double start_time,
             @Query("end_time") double end_time,
             @Query("tradesman_notes") String tradesman_note);
+
+    @PATCH("/service")
+    Call<Service> updateService(
+            @Query("id") String timeslotId,
+            @Query("token") String token,
+            @Query("changes") Map<String, Object> changes);
 
 }

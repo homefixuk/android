@@ -1,5 +1,9 @@
 package com.homefix.tradesman.model;
 
+import com.samdroid.string.Strings;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,11 +20,11 @@ public class Tradesman extends User {
     Map<String, Object> settings;
 
     public String getType() {
-        return type;
+        return Strings.returnSafely(type);
     }
 
     public String getPicture() {
-        return picture;
+        return Strings.returnSafely(picture);
     }
 
     public double getRating() {
@@ -32,6 +36,8 @@ public class Tradesman extends User {
     }
 
     public List<String> getWork_areas() {
+        if (work_areas == null) work_areas = new ArrayList<>();
+
         return work_areas;
     }
 
@@ -40,6 +46,8 @@ public class Tradesman extends User {
     }
 
     public Map<String, Object> getSettings() {
+        if (settings == null) settings = new HashMap<>();
+
         return settings;
     }
 

@@ -3,6 +3,7 @@ package com.homefix.tradesman.model;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.data.UserController;
 import com.samdroid.common.MyLog;
+import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,19 +18,20 @@ import retrofit2.Response;
 
 public class Problem {
 
-    String name, description;
-    long time;
+    private String name, description;
+    private long time;
+    private List<Part> potential_parts;
 
     public Problem() {
 
     }
 
     public String getName() {
-        return name;
+        return Strings.returnSafely(name);
     }
 
     public String getDescription() {
-        return description;
+        return Strings.returnSafely(description);
     }
 
     public void setName(String name) {
@@ -42,6 +44,12 @@ public class Problem {
 
     public long getTime() {
         return time;
+    }
+
+    public List<Part> getPotential_parts() {
+        if (potential_parts == null) potential_parts = new ArrayList<>();
+
+        return potential_parts;
     }
 
     public void setTime(long time) {

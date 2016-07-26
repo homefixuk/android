@@ -1,5 +1,7 @@
 package com.homefix.tradesman.model;
 
+import com.samdroid.string.Strings;
+
 /**
  * Created by samuel on 6/15/2016.
  */
@@ -24,6 +26,6 @@ public class TradesmanReview {
     }
 
     public String getReview() {
-        return review;
+        return Strings.returnSafely(review);
     }
 }
