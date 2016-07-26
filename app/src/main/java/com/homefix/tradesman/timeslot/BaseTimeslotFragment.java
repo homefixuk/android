@@ -88,9 +88,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     public void setEditing(boolean edit) {
         isEdit = edit;
         setupView();
+        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
     }
 
-    protected void setupView() {
+    public void setupView() {
         if (mIcon != null) {
             if (mType == Timeslot.TYPE.BREAK)
                 mIcon.setImageResource(R.drawable.ic_food_grey600_48dp);

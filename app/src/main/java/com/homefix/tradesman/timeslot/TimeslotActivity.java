@@ -3,6 +3,7 @@ package com.homefix.tradesman.timeslot;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -61,7 +62,7 @@ public class TimeslotActivity extends BaseCloseActivity {
         } else title += "Event";
         setActionbarTitle(title);
 
-        // setup and show the fragmentg
+        // setup and show the fragment
         replaceFragment(baseFragment);
     }
 
@@ -73,7 +74,11 @@ public class TimeslotActivity extends BaseCloseActivity {
         MenuItem itemOptions = menu.findItem(R.id.action_options);
         MenuItem itemEdit = menu.findItem(R.id.action_edit);
 
-        if (itemEdit != null) itemEdit.setVisible(hasTimeslot && !((BaseTimeslotFragment) baseFragment).isEditing());
+        if (itemEdit != null) {
+            boolean isEditing = baseFragment != null && ((BaseTimeslotFragment) baseFragment).isEditing();
+            itemEdit.setIcon(ContextCompat.getDrawable(getContext(), isEditing ? R.drawable.ic_check_white_48dp : R.drawable.ic_pencil_white_48dp));
+            itemEdit.setTitle(isEditing ? "Save" : "Edit");
+        }
         if (itemOptions != null) itemOptions.setVisible(hasTimeslot);
 
         return true;
@@ -82,8 +87,13 @@ public class TimeslotActivity extends BaseCloseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_edit) {
-            ((BaseTimeslotFragment) baseFragment).setEditing(true);
-            supportInvalidateOptionsMenu();
+            if (((BaseTimeslotFragment) baseFragment).isEditing()) {
+                // if in edit mode, the save button is clicked
+                ((BaseTimeslotFragment) baseFragment).saveClicked();
+            } else {
+                // else go into edit mode //
+                ((BaseTimeslotFragment) baseFragment).setEditing(true);
+            }
 
         } else if (item.getItemId() == R.id.action_delete) {
             if (baseFragment == null) {

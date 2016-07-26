@@ -146,6 +146,9 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (mCurrentPage == R.string.action_calendar) {
+            // update the title
+            if (calendarFragment != null) setActionbarTitle(calendarFragment.getMonthShowing());
+
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.calendar, menu);
 

@@ -36,6 +36,10 @@ public class Timeslot {
             }
         }
 
+        public String getName() {
+            return name().toLowerCase();
+        }
+
     }
 
     private long start, end, length;

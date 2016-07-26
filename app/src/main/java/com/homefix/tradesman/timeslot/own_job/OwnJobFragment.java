@@ -6,6 +6,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.view.View;
 import android.widget.EditText;
@@ -31,6 +32,8 @@ import com.homefix.tradesman.timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.IntentHelper;
+import com.samdroid.listener.BackgroundColourOnTouchListener;
+import com.samdroid.listener.BackgroundViewColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 import com.samdroid.view.ViewUtils;
@@ -48,6 +51,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJobView, OwnJobPresenter> implements OwnJobView {
 
+    protected View mLocationBar;
     protected TextView mJobTypeTxt, mLocationTxt, mCustomerPropertyType;
     protected ImageView mLocationIcon, mEmailIcon, mPhoneIcon;
     protected EditText mPersonNameTxt, mPersonEmailTxt, mPersonPhoneNumberTxt, mDescriptionTxt;
@@ -79,42 +83,52 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
         if (view == null) return;
 
         mJobTypeTxt = (TextView) view.findViewById(R.id.job_type_txt);
-        mLocationTxt = (TextView) view.findViewById(R.id.location_txt);
+        mLocationBar = view.findViewById(R.id.location_bar);
+        mLocationTxt = (TextView) mLocationBar.findViewById(R.id.location_txt);
         mPersonNameTxt = (EditText) view.findViewById(R.id.person_name_txt);
         mPersonEmailTxt = (EditText) view.findViewById(R.id.person_email_txt);
         mPersonPhoneNumberTxt = (EditText) view.findViewById(R.id.person_phone_number_txt);
         mCustomerPropertyType = (TextView) view.findViewById(R.id.property_type_txt);
         mDescriptionTxt = (EditText) view.findViewById(R.id.description_txt);
 
-        mLocationIcon = (ImageView) view.findViewById(R.id.location_icon);
+        mLocationIcon = (ImageView) mLocationBar.findViewById(R.id.location_icon);
         mEmailIcon = (ImageView) view.findViewById(R.id.email_icon);
         mPhoneIcon = (ImageView) view.findViewById(R.id.phone_icon);
     }
 
     @Override
-    protected void setupView() {
+    public void setupView() {
         super.setupView();
 
         if (mTimeslot != null) {
             // setup values from Timeslot
             Service service = mTimeslot.getService();
-            CustomerProperty customerProperty = service.getService_set().getCustomer_property();
-            Customer customer = customerProperty.getCustomer();
-            Property property = customerProperty.getProperty();
 
-            addressLine1 = property.getAddress_line_1();
-            addressLine2 = property.getAddress_line_2();
-            addressLine3 = property.getAddress_line_3();
-            postcode = property.getPostcode();
-            country = property.getCountry();
+            if (service != null) {
 
-            mJobTypeTxt.setText(service.getProblem().getName());
-            mPersonNameTxt.setText(customer.getName());
-            mPersonEmailTxt.setText(customer.getEmail());
-            mPersonPhoneNumberTxt.setText(customer.getMobile());
-            mCustomerPropertyType.setText(customerProperty.getType());
-            mDescriptionTxt.setText(service.getTradesman_notes());
-            updateLocationText();
+                CustomerProperty customerProperty = service.getService_set().getCustomer_property();
+                Customer customer = customerProperty.getCustomer();
+                Property property = customerProperty.getProperty();
+
+                addressLine1 = property.getAddress_line_1();
+                addressLine2 = property.getAddress_line_2();
+                addressLine3 = property.getAddress_line_3();
+                postcode = property.getPostcode();
+                country = property.getCountry();
+
+                Problem problem = service.getProblem();
+                mJobTypeTxt.setText(problem != null ? problem.getName() : "");
+
+                if (customer != null) {
+                    mPersonNameTxt.setText(customer.getName());
+                    mPersonEmailTxt.setText(customer.getEmail());
+                    mPersonPhoneNumberTxt.setText(customer.getMobile());
+                    mCustomerPropertyType.setText(customerProperty.getType());
+                }
+
+                mDescriptionTxt.setText(service.getTradesman_notes());
+                updateLocationText();
+            }
         }
 
         ViewUtils.setEditTextEditable(mPersonNameTxt, isEdit);
@@ -140,9 +154,8 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
                         IntentHelper.googleMapsDirections(getActivity(), getReadableLocationString(","));
                 }
             };
-            mLocationTxt.setOnClickListener(directionsClickListener);
-            mLocationIcon.setOnClickListener(directionsClickListener);
-            mLocationTxt.setOnLongClickListener(null);
+            mLocationBar.setOnClickListener(directionsClickListener);
+            mLocationBar.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark));
 
             // setup email
             View.OnClickListener emailClickListener = new View.OnClickListener() {
@@ -166,6 +179,13 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             mEmailIcon.setOnClickListener(emailClickListener);
             mPersonEmailTxt.setOnClickListener(emailClickListener);
 
+            BackgroundViewColourOnTouchListener listener = new BackgroundViewColourOnTouchListener(
+                    mPersonEmailTxt,
+                    ContextCompat.getColor(getContext(), R.color.transparent),
+                    ContextCompat.getColor(getContext(), R.color.colorAccentDark));
+            mPersonEmailTxt.setOnTouchListener(listener);
+            mEmailIcon.setOnTouchListener(listener);
+
             View.OnClickListener phoneClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -182,12 +202,20 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             mPhoneIcon.setOnClickListener(phoneClickListener);
             mPersonPhoneNumberTxt.setOnClickListener(phoneClickListener);
 
+            BackgroundViewColourOnTouchListener phoneListener = new BackgroundViewColourOnTouchListener(
+                    mPersonPhoneNumberTxt,
+                    ContextCompat.getColor(getContext(), R.color.transparent),
+                    ContextCompat.getColor(getContext(), R.color.colorAccentDark));
+            mPersonPhoneNumberTxt.setOnTouchListener(phoneListener);
+            mPhoneIcon.setOnTouchListener(phoneListener);
+
             mCustomerPropertyType.setOnClickListener(null);
 
             mSaveTxt.setText("DONE");
             mSaveTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     getBaseActivity().tryClose();
                 }
             });
@@ -195,17 +223,19 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             return;
         }
 
-        // if in edit mode
+        // else in edit mode //
 
         // hide action buttons from non-edit mode (directions, email, phone)
-        mLocationIcon.setImageResource(R.drawable.ic_map_marker_grey600_48dp);
-        mLocationIcon.setOnClickListener(null);
         mEmailIcon.setVisibility(View.GONE);
         mEmailIcon.setOnClickListener(null);
+        mEmailIcon.setOnTouchListener(null);
         mPersonEmailTxt.setOnClickListener(null);
+        mPersonEmailTxt.setOnTouchListener(null);
         mPersonPhoneNumberTxt.setOnClickListener(null);
+        mPersonPhoneNumberTxt.setOnTouchListener(null);
         mPhoneIcon.setVisibility(View.GONE);
         mPhoneIcon.setOnClickListener(null);
+        mPhoneIcon.setOnTouchListener(null);
 
         mJobTypeTxt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,13 +256,15 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
             }
         });
 
-        mLocationTxt.setOnClickListener(new View.OnClickListener() {
+        mLocationIcon.setImageResource(R.drawable.ic_map_marker_grey600_48dp);
+        mLocationBar.setOnTouchListener(null);
+        mLocationBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPlacePicker();
             }
         });
-        mLocationTxt.setOnLongClickListener(new View.OnLongClickListener() {
+        mLocationBar.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 showManualLocationInput();
@@ -253,10 +285,30 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
         });
 
         mSaveTxt.setText(mTimeslot != null ? "UPDATE" : "CREATE");
+        mSaveTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveClicked();
+            }
+        });
     }
 
     @Override
     public void saveClicked() {
+        // if the user has not made any changes
+        if (!hasMadeChanges) {
+            if (mTimeslot == null) {
+                Toast.makeText(getContext(), "Job is empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // go back into viewing mode
+            setEditing(false);
+            setupView();
+            return;
+        }
+
+        // if the user is creating a new job
         if (mTimeslot == null) {
             getPresenter().addNewJob(
                     mStartCal,
@@ -277,6 +329,25 @@ public class OwnJobFragment extends BaseTimeslotFragment<TimeslotActivity, OwnJo
 
             return;
         }
+
+        // else they are updating an already existing job //
+        getPresenter().updateJob(
+                mTimeslot,
+                mStartCal,
+                mEndCal,
+                mJobTypeTxt.getText().toString(),
+                addressLine1,
+                addressLine2,
+                addressLine3,
+                postcode,
+                country,
+                latitude,
+                longitude,
+                mPersonNameTxt.getText().toString(),
+                mPersonEmailTxt.getText().toString(),
+                mPersonPhoneNumberTxt.getText().toString(),
+                mCustomerPropertyType.getText().toString(),
+                mDescriptionTxt.getText().toString());
     }
 
     /**

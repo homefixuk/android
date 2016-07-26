@@ -1,10 +1,15 @@
 package com.homefix.tradesman.timeslot;
 
+import android.support.annotation.NonNull;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.calendar.HomeFixCal;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.MyLog;
 import com.samdroid.network.NetworkManager;
 
@@ -91,40 +96,57 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
             return;
         }
 
-        getView().showDialog("Deleting timeslot...", true);
+        MaterialDialogWrapper.getNegativeConfirmationDialog(
+                getView().getBaseActivity(),
+                "Are you sure you want to delete this event?",
+                "DELETE",
+                "CANCEL",
+                new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        getView().showDialog("Deleting timeslot...", true);
 
-        Callback<Map<String, Object>> callback = new Callback<Map<String, Object>>() {
-            @Override
-            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                Map<String, Object> map = response.body();
+                        Callback<Map<String, Object>> callback = new Callback<Map<String, Object>>() {
+                            @Override
+                            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                                Map<String, Object> map = response.body();
 
-                if (map == null || !(boolean) map.get("success")) {
-                    onFailure(call, null);
-                    return;
-                }
+                                if (map == null || !(boolean) map.get("success")) {
+                                    onFailure(call, null);
+                                    return;
+                                }
 
-                MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
+                                MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
 
-                // remove the original timeslot
-                HomeFixCal.changeEvent(timeslot, null);
+                                // remove the original timeslot
+                                HomeFixCal.changeEvent(timeslot, null);
 
-                getView().onDeleteComplete();
-            }
+                                getView().onDeleteComplete();
+                            }
 
-            @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
+                            @Override
+                            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                                if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
 
-                if (!isViewAttached()) return;
+                                if (!isViewAttached()) return;
 
-                // TODO: check error contents
+                                // TODO: check error contents
 
-                getView().showErrorDialog();
-            }
+                                getView().showErrorDialog();
+                            }
 
-        };
+                        };
 
-        HomeFix.getAPI().deleteTimeslot(UserController.getToken(), timeslot.getObjectId()).enqueue(callback);
+                        HomeFix.getAPI().deleteTimeslot(UserController.getToken(), timeslot.getObjectId()).enqueue(callback);
+
+                    }
+
+                }, new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                }).show();
     }
 
 }

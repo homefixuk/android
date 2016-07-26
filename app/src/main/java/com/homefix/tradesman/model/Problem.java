@@ -20,6 +20,10 @@ public class Problem {
     String name, description;
     long time;
 
+    public Problem() {
+
+    }
+
     public String getName() {
         return name;
     }
@@ -43,7 +47,6 @@ public class Problem {
     public void setTime(long time) {
         this.time = time;
     }
-
 
     final private static List<Problem> M_PROBLEMs = new ArrayList<>();
 

@@ -21,10 +21,10 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
@@ -115,11 +115,11 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         mView.setScrollListener(new WeekView.ScrollListener() {
             @Override
             public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay) {
-                notifyOnMonthChangedListeners(newFirstVisibleDay.get(Calendar.MONTH));
-
                 // update the calendar view
                 if (compactCalendarView != null)
                     compactCalendarView.setCurrentDate(newFirstVisibleDay.getTime());
+
+                notifyOnMonthChangedListeners(newFirstVisibleDay.get(Calendar.MONTH));
             }
         });
 
@@ -537,7 +537,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
      * @return get the current month being shown in a short 3 letter format
      */
     public String getMonthShowing() {
-        return TimeUtils.getMonthNameShort(TimeUtils.getCalendar(mFirstDayOfNewMonth));
+        return TimeUtils.getMonthNameShort(mView != null ? mView.getFirstVisibleDay() : TimeUtils.getCalendar(mFirstDayOfNewMonth));
     }
 
     /**

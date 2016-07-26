@@ -11,6 +11,12 @@ import java.util.Calendar;
 
 public interface BaseTimeslotView extends BaseFragmentView {
 
+    void setupView();
+
+    boolean isEditing();
+
+    void setEditing(boolean editing);
+
     void setTimeslot(Timeslot timeslot);
 
     Timeslot getTimeslot();

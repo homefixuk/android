@@ -122,16 +122,16 @@ public class MaterialDialogWrapper {
             String message,
             String confirm,
             String other,
-            MaterialDialog.SingleButtonCallback onPositive,
-            MaterialDialog.SingleButtonCallback onNegative) {
+            MaterialDialog.SingleButtonCallback onConfirmNegative,
+            MaterialDialog.SingleButtonCallback onOther) {
         return new MaterialDialog.Builder(context)
                 .content(message)
                 .positiveText(confirm)
                 .negativeText(other)
                 .positiveColorRes(R.color.colorAccent)
                 .negativeColorRes(R.color.black)
-                .onPositive(onPositive)
-                .onNegative(onNegative);
+                .onPositive(onConfirmNegative)
+                .onNegative(onOther);
     }
 
     /**
