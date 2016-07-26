@@ -36,6 +36,12 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
     public void save(final Timeslot timeslot, Calendar mStart, Calendar mEnd) {
         if (!isViewAttached()) return;
 
+        // if the user has made no changes
+        if (!getView().hasMadeChanges()) {
+            getView().onSaveComplete(timeslot);
+            return;
+        }
+
         if (mStart == null || mEnd == null || !NetworkManager.hasConnection(getView().getContext())) {
             getView().showErrorDialog();
             return;

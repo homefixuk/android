@@ -17,6 +17,8 @@ public interface BaseTimeslotView extends BaseFragmentView {
 
     void setEditing(boolean editing);
 
+    boolean hasMadeChanges();
+
     void setTimeslot(Timeslot timeslot);
 
     Timeslot getTimeslot();

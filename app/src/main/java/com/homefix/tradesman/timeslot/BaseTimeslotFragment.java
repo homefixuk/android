@@ -292,6 +292,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     @Override
+    public boolean hasMadeChanges() {
+        return hasMadeChanges;
+    }
+
+    @Override
     public void setEndTime(Calendar endTime) {
         // if the newly selected end date is before the start date
         if (endTime.getTimeInMillis() < mStartCal.getTimeInMillis()) {
