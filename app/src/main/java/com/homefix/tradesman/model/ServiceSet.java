@@ -1,6 +1,10 @@
 package com.homefix.tradesman.model;
 
+import com.homefix.tradesman.common.SendReceiver;
 import com.samdroid.string.Strings;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by samuel on 6/15/2016.
@@ -12,8 +16,12 @@ public class ServiceSet {
     long created_at, resolved_at;
     String customer_description;
     int number_services;
-    double total_cost;
-    long total_work_time;
+    double total_cost, amount_paid;
+    private List<Payment> payments;
+    private List<Charge> charges;
+
+    public ServiceSet() {
+    }
 
     public CustomerProperty getCustomer_property() {
         return customer_property;
@@ -39,7 +47,30 @@ public class ServiceSet {
         return total_cost;
     }
 
-    public long getTotal_work_time() {
-        return total_work_time;
+    public double getAmount_paid() {
+        return amount_paid;
     }
+
+    public double getAmountRemaining() {
+        return total_cost - amount_paid;
+    }
+
+    public List<Payment> getPayments() {
+        if (payments == null) payments = new ArrayList<>();
+
+        return payments;
+    }
+
+    public List<Charge> getCharges() {
+        if (charges == null) charges = new ArrayList<>();
+
+        return charges;
+    }
+
+    private static final SendReceiver<ServiceSet> senderReceiver = new SendReceiver<>(ServiceSet.class);
+
+    public static SendReceiver<ServiceSet> getSenderReceiver() {
+        return senderReceiver;
+    }
+
 }

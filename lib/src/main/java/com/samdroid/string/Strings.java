@@ -1,5 +1,10 @@
 package com.samdroid.string;
 
+import android.content.Context;
+import android.util.Patterns;
+
+import com.samdroid.math.MathUtils;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,11 +17,6 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import android.content.Context;
-import android.util.Patterns;
-
-import com.samdroid.math.MathUtils;
 
 /**
  * Strings class with utility functions on Strings
@@ -828,6 +828,51 @@ public class Strings {
         }
     }
 
+    public static String priceWithDecimal(Double price) {
+        if (price == null) return "0.00";
+
+        DecimalFormat formatter = new DecimalFormat("###,###,###.00");
+        return formatter.format(price);
+    }
+
+    public static String priceWithoutDecimal(Double price) {
+        if (price == null) return "0";
+
+        DecimalFormat formatter = new DecimalFormat("###,###,###.##");
+        return formatter.format(price);
+    }
+
+    public static String priceToString(Double price) {
+        if (price == null) return "0";
+
+        String toShow = priceWithoutDecimal(price);
+        if (toShow.indexOf(".") > 0) {
+            return priceWithDecimal(price);
+        } else {
+            return priceWithoutDecimal(price);
+        }
+    }
+
+    public static double parseDouble(String s) {
+        if (Strings.isEmpty(s)) return 0d;
+
+        try {
+            return Double.valueOf(s);
+        } catch (Exception e) {
+            return 0d;
+        }
+    }
+
+    public static int parseInteger(String s) {
+        if (Strings.isEmpty(s)) return 0;
+
+        try {
+            return Integer.valueOf(s);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     /**
      * @param raised
      * @param cost
@@ -842,7 +887,7 @@ public class Strings {
      * @return the URLs contained in the text
      */
     public static ArrayList<String> getLinksInText(String text) {
-        ArrayList<String> links = new ArrayList<String>();
+        ArrayList<String> links = new ArrayList<>();
 
         String regex = "\\(?\\b(http://|www[.])[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
         Pattern p = Pattern.compile(regex);

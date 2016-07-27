@@ -9,11 +9,10 @@ import com.samdroid.string.Strings;
 public class Part {
 
     Service service;
-    String name, description, installation_info, image, source;
-    double cost;
+    String name, from, description, installation_info, image, source;
+    double cost, with_vat;
 
     public Part() {
-
     }
 
     public String getName() {
@@ -42,5 +41,13 @@ public class Part {
 
     public double getCost() {
         return cost;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public double getWith_vat() {
+        return with_vat;
     }
 }

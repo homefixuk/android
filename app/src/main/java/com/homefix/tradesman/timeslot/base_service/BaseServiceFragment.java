@@ -151,6 +151,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             };
             mLocationBar.setOnClickListener(directionsClickListener);
             mLocationBar.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark));
+            mLocationBar.setOnLongClickListener(null);
 
             // setup email
             View.OnClickListener emailClickListener = new View.OnClickListener() {

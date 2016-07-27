@@ -1,5 +1,6 @@
 package com.homefix.tradesman.model;
 
+import com.homefix.tradesman.common.SendReceiver;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
@@ -159,4 +160,11 @@ public class Service {
 
         return parts_used;
     }
+
+    private static final SendReceiver<Service> senderReceiver = new SendReceiver<>(Service.class);
+
+    public static SendReceiver<Service> getSenderReceiver() {
+        return senderReceiver;
+    }
+
 }

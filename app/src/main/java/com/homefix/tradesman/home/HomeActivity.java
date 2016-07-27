@@ -152,8 +152,11 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.calendar, menu);
 
-            MenuItem todayItem = menu.findItem(R.id.action_today);
-            todayItem.setTitle("Today (" + Calendar.getInstance().get(Calendar.DATE) + ")");
+            if (menu != null) {
+                MenuItem todayItem = menu.findItem(R.id.action_today);
+                if (todayItem != null)
+                    todayItem.setTitle("Today (" + Calendar.getInstance().get(Calendar.DATE) + ")");
+            }
 
             return true;
         }

@@ -1,16 +1,23 @@
 package com.homefix.tradesman.api;
 
+import com.homefix.tradesman.model.Activity;
+import com.homefix.tradesman.model.Attachment;
 import com.homefix.tradesman.model.CCA;
+import com.homefix.tradesman.model.Charge;
+import com.homefix.tradesman.model.Payment;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Service;
+import com.homefix.tradesman.model.ServiceStatusFlow;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.model.Tradesman;
+import com.homefix.tradesman.model.TradesmanFinances;
+import com.homefix.tradesman.model.TradesmanNotification;
+import com.homefix.tradesman.model.TradesmanReview;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import clojure.lang.Obj;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -40,23 +47,51 @@ public interface API {
             @Query("email") String email,
             @Query("password") String password);
 
+    @DELETE("/user/logout")
+    Call<HashMap<String, Object>> logout(@Query("token") String token);
+
     @GET("/tradesman/me")
     Call<Tradesman> getTradesman(@Query("token") String token);
 
+    @GET("/tradesman/me/private")
+    Call<Tradesman> getTradesmanPrivate(
+            @Query("apikey") String apikey,
+            @Query("token") String token);
+
     @POST("/tradesman/me")
-    Call<Tradesman> updateTradesmanDetails(@Query("token") String token, @QueryMap Map<String, Object> params);
-
-    @GET("/tradesman/timeslots")
-    Call<List<Timeslot>> getTradesmanEvents(@Query("token") String token, @Query("filter") Map<String, Object> filter);
-
-    @GET("/cca")
-    Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
+    Call<Tradesman> updateTradesmanDetails(
+            @Query("token") String token,
+            @QueryMap Map<String, Object> params);
 
     @POST("/tradesman/location")
-    Call<Timeslot> updateLocation(@Query("token") String token, @QueryMap Map<String, Object> location);
+    Call<Timeslot> updateLocation(
+            @Query("token") String token,
+            @QueryMap Map<String, Object> location);
+
+    @GET("/tradesman/notifications")
+    Call<List<TradesmanNotification>> getTradesmanNotifications(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
+
+    @GET("/tradesman/finance")
+    Call<TradesmanFinances> getTradesmanFinances(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
+
+    @GET("/tradesman/reviews")
+    Call<List<TradesmanReview>> getTradesmanReviews(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
+
+    @GET("/tradesman/timeslots")
+    Call<List<Timeslot>> getTradesmanEvents(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
 
     @POST("/tradesman/timeslot")
-    Call<Timeslot> addTimeslot(@Query("token") String token, @Query("time_slot") HomeFix.TimeslotMap timeslotMap);
+    Call<Timeslot> addTimeslot(
+            @Query("token") String token,
+            @Query("time_slot") HomeFix.TimeslotMap timeslotMap);
 
     @PATCH("/tradesman/timeslot")
     Call<Timeslot> updateTimeslot(
@@ -69,8 +104,10 @@ public interface API {
             @Query("token") String token,
             @Query("original_timeslot_id") String original_timeslot_id);
 
-    @GET("/service/types")
-    Call<List<Problem>> getServiceTypes(@Query("token") String token);
+    @GET("/service")
+    Call<Service> getService(
+            @Query("token") String token,
+            @Query("id") String id);
 
     @POST("/service")
     Call<Service> createService(
@@ -96,5 +133,87 @@ public interface API {
             @Query("id") String timeslotId,
             @Query("token") String token,
             @Query("changes") Map<String, Object> changes);
+
+    // TODO: add Part calls
+
+    @GET("/service/current")
+    Call<Service> getCurrentService(@Query("token") String token);
+
+    @GET("/service/next")
+    Call<Service> getNextService(@Query("token") String token);
+
+    @GET("/service/types")
+    Call<List<Problem>> getServiceTypes(@Query("token") String token);
+
+    @GET("/service/statuses")
+    Call<List<ServiceStatusFlow>> getServiceStatusFlow(@Query("token") String token);
+
+    @GET("/services")
+    Call<List<Service>> getServices(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
+
+    @GET("/activities/tradesman")
+    Call<List<Activity>> getTradesmanActivities(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
+
+    @GET("/activities/service")
+    Call<List<Activity>> getServiceActivities(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
+
+    @GET("/attachment")
+    Call<Attachment> getServiceAttachment(
+            @Query("token") String token,
+            @Query("id") String id);
+
+    @POST("/attachment")
+    Call<Service> createServiceAttachment(
+            @Query("token") String token,
+            @Query("service_id") String service_id,
+            @Query("type") String type,
+            @Query("text") String text,
+            @Query("file") String fileUrl);
+
+    @GET("/attachments")
+    Call<List<Attachment>> getServiceAttachments(
+            @Query("token") String token,
+            @Query("filter") Map<String, Object> filter);
+
+    @GET("/cca")
+    Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
+
+    @POST("/service/charge")
+    Call<Charge> addCharge(
+            @Query("token") String token,
+            @Query("charge") Charge charge);
+
+    @PATCH("/service/charge")
+    Call<Charge> updateCharge(
+            @Query("token") String token,
+            @Query("original_charge_id") String original_charge_id,
+            @Query("charge") Charge charge);
+
+    @DELETE("/service/charge")
+    Call<Map<String, Object>> deleteCharge(
+            @Query("token") String token,
+            @Query("original_charge_id") String original_charge_id);
+
+    @POST("/service/payment")
+    Call<Charge> addPayment(
+            @Query("token") String token,
+            @Query("payment") Payment payment);
+
+    @PATCH("/service/payment")
+    Call<Charge> updatePayment(
+            @Query("token") String token,
+            @Query("original_payment_id") String original_payment_id,
+            @Query("payment") Payment payment);
+
+    @DELETE("/service/payment")
+    Call<Map<String, Object>> deletePayment(
+            @Query("token") String token,
+            @Query("original_payment_id") String original_payment_id);
 
 }

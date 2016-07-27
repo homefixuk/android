@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.homefix.tradesman.timeslot.own_job.charges.AddChargeView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/name_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_padding">
+
+        <ImageView
+            android:id="@+id/name_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/base_padding_triple"
+            android:layout_alignBottom="@+id/name_hidden_txt"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/name_hidden_txt"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_rename_box_grey600_48dp" />
+
+        <EditText
+            android:id="@+id/name_hidden_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/name_icon"
+            android:layout_toRightOf="@+id/name_icon"
+            android:gravity="start|center_vertical"
+            android:hint="@string/name_or_description"
+            android:padding="@dimen/base_padding"
+            android:textAppearance="@style/TextTheme.Large"
+            android:visibility="invisible" />
+
+        <EditText
+            android:id="@+id/name_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/name_icon"
+            android:layout_toRightOf="@+id/name_icon"
+            android:gravity="start|center_vertical"
+            android:hint="@string/name_or_description"
+            android:padding="@dimen/base_padding"
+            android:textAppearance="@style/TextTheme.Large" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/quantity_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_padding">
+
+        <ImageView
+            android:id="@+id/quantity_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/base_padding_triple"
+            android:layout_alignBottom="@+id/quantity_txt"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/quantity_txt"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_counter_grey600_48dp" />
+
+        <EditText
+            android:id="@+id/quantity_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/quantity_icon"
+            android:layout_toRightOf="@+id/quantity_icon"
+            android:gravity="start|center_vertical"
+            android:hint="@string/quantity"
+            android:inputType="number"
+            android:padding="@dimen/base_padding"
+            android:textAppearance="@style/TextTheme.Large" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/amount_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_padding">
+
+        <ImageView
+            android:id="@+id/amount_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/base_padding_triple"
+            android:layout_alignBottom="@+id/amount_txt"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/amount_txt"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_currency_gbp_grey600_48dp" />
+
+        <TextView
+            android:id="@+id/charge_vat_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:padding="@dimen/base_padding"
+            android:textAppearance="@style/TextTheme.Large" />
+
+        <EditText
+            android:id="@+id/amount_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/amount_icon"
+            android:layout_toLeftOf="@id/charge_vat_txt"
+            android:layout_toRightOf="@+id/amount_icon"
+            android:layout_toStartOf="@id/charge_vat_txt"
+            android:gravity="start|center_vertical"
+            android:hint="@string/amount"
+            android:padding="@dimen/base_padding"
+            android:textAppearance="@style/TextTheme.Large" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/markup_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_padding">
+
+        <ImageView
+            android:id="@+id/markup_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/base_padding_quad"
+            android:layout_alignBottom="@+id/markup_txt"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/markup_txt"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_percent_grey600_48dp" />
+
+        <TextView
+            android:id="@+id/markup_before_vat_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:padding="@dimen/base_padding"
+            android:textAppearance="@style/TextTheme.Large" />
+
+        <EditText
+            android:id="@+id/markup_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/markup_icon"
+            android:layout_toLeftOf="@id/markup_before_vat_txt"
+            android:layout_toRightOf="@+id/markup_icon"
+            android:layout_toStartOf="@id/markup_before_vat_txt"
+            android:gravity="start|center_vertical"
+            android:hint="@string/amount"
+            android:padding="@dimen/base_padding"
+            android:textAppearance="@style/TextTheme.Large" />
+    </RelativeLayout>
+
+</com.homefix.tradesman.timeslot.own_job.charges.AddChargeView>
