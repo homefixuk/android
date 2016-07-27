@@ -1,4 +1,4 @@
-package com.homefix.tradesman.timeslot;
+package com.homefix.tradesman.timeslot.base_timeslot;
 
 import com.homefix.tradesman.base.view.BaseFragmentView;
 import com.homefix.tradesman.model.Timeslot;

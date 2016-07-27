@@ -1,4 +1,4 @@
-package com.homefix.tradesman.timeslot;
+package com.homefix.tradesman.timeslot.base_timeslot;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -15,6 +15,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.TimeUtils;
 

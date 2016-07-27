@@ -9,10 +9,10 @@ import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
-import com.homefix.tradesman.timeslot.BaseTimeslotFragmentPresenter;
+import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
+import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
 import com.samdroid.string.Strings;
 
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +25,9 @@ import retrofit2.Response;
  * Created by samuel on 7/19/2016.
  */
 
-public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
+public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceView> {
 
-    public OwnJobPresenter(OwnJobView view) {
+    public OwnJobPresenter(BaseServiceView view) {
         super(view, Timeslot.TYPE.OWN_JOB);
     }
 

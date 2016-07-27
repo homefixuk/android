@@ -12,6 +12,8 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
+import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.own_job.OwnJobFragment;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
@@ -87,6 +89,11 @@ public class TimeslotActivity extends BaseCloseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_edit) {
+            if (baseFragment == null) {
+                showErrorDialog();
+                return false;
+            }
+
             if (((BaseTimeslotFragment) baseFragment).isEditing()) {
                 // if in edit mode, the save button is clicked
                 ((BaseTimeslotFragment) baseFragment).saveClicked();
@@ -111,7 +118,7 @@ public class TimeslotActivity extends BaseCloseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Ids.PLACE_PICKER_REQUEST) {
+        if (requestCode == Ids.PLACE_PICKER_REQUEST && baseFragment != null) {
             baseFragment.onActivityResult(requestCode, resultCode, data);
         }
 
