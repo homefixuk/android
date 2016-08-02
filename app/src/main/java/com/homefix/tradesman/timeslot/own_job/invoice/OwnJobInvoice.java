@@ -26,11 +26,20 @@ import java.util.Date;
 public class OwnJobInvoice extends BasePdf {
 
     private Service service;
+    private String customerFirstName, customerEmail;
 
     public OwnJobInvoice(Service service) {
-        super("Service_Invoice_" + service.getId() + "_" + System.currentTimeMillis(), "Homefix Invoice: " + service.getId(), "");
+        super("Service_Invoice_" + service.getId() + "_" + System.currentTimeMillis(), "Homefix Invoice: " + service.getId(), "Homefix Invoice: " + service.getId());
 
         this.service = service;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public String getCustomerFirstName() {
+        return customerFirstName;
     }
 
     @Override
@@ -62,6 +71,9 @@ public class OwnJobInvoice extends BasePdf {
             Customer customer = customerProperty.getCustomer();
             Property property = customerProperty.getProperty();
             if (customer != null) {
+                customerFirstName = customer.getFirst_name();
+                if (Strings.isEmpty(customerFirstName)) customerFirstName = customer.getName();
+
                 if (!Strings.isEmpty(customer.getName()))
                     pCustomer.add(new Paragraph(customer.getName(), subGrayFont));
             }
@@ -82,8 +94,10 @@ public class OwnJobInvoice extends BasePdf {
             if (customer != null) {
                 if (!Strings.isEmpty(customer.getMobile()))
                     pCustomer.add(new Paragraph(customer.getMobile(), subGrayFont));
-                if (!Strings.isEmpty(customer.getEmail()))
+                if (!Strings.isEmpty(customer.getEmail())) {
+                    customerEmail = customer.getEmail();
                     pCustomer.add(new Paragraph(customer.getEmail(), subGrayFont));
+                }
             }
         }
         document.add(pCustomer);

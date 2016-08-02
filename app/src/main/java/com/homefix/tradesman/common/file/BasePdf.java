@@ -52,6 +52,18 @@ public abstract class BasePdf {
         this.subject = subject;
     }
 
+    public File getFile() {
+        return myFile;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
     public boolean generate() {
         try {
             File pdfFolder;

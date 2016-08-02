@@ -1,6 +1,5 @@
 package com.samdroid.common;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -12,6 +11,7 @@ import android.widget.Toast;
 
 import com.samdroid.string.Strings;
 
+import java.io.File;
 import java.util.Locale;
 
 public class IntentHelper {
@@ -106,6 +106,21 @@ public class IntentHelper {
         // open the dialer
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", num, null));
         context.startActivity(intent);
+    }
+
+    public static void openEmailWithAttachment(Context context, String toEmail, String subject, String content, String filePath) {
+        Intent email = new Intent(Intent.ACTION_SEND);
+        email.putExtra(Intent.EXTRA_EMAIL, new String[]{toEmail});
+        email.putExtra(Intent.EXTRA_SUBJECT, subject);
+        email.putExtra(Intent.EXTRA_TEXT, content);
+
+        File file = new File(filePath);
+        Uri uri = Uri.fromFile(file);
+        email.putExtra(Intent.EXTRA_STREAM, uri);
+        email.setType("application/pdf");
+        email.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        context.startActivity(email);
     }
 
 }
