@@ -105,8 +105,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
         // show the now line
         mView.setShowNowLine(true);
-        mView.setNowLineColor(Color.argb(255, 200, 0, 0));
-        mView.setNowLineThickness(2);
+        mView.setNowLineColor(Color.argb(255, 255, 255, 0));
+        mView.setNowLineThickness(5);
 
         setNumberDays(3); // default to 3 days showing
 
@@ -368,8 +368,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
         mView.setNumberOfVisibleDays(numberDays);
 
-        if (numberDays > 3)
-            mView.setHeaderColumnPadding(getResources().getDimensionPixelSize(R.dimen.base_padding));
+//        if (numberDays > 3)
+//            mView.setHeaderColumnPadding(getResources().getDimensionPixelSize(R.dimen.base_padding_half));
 
         // update the view dimensions
         if (numberDays <= 1) {
@@ -389,6 +389,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             mView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
             mView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
         }
+
+        mView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
 
         mView.postDelayed(new Runnable() {
             @Override
