@@ -80,6 +80,14 @@ public class AddChargeView extends LinearLayout {
         });
     }
 
+    public void setNameError(String error) {
+        TextView txt = (TextView) findViewById(R.id.name_txt);
+
+        if (txt == null) return;
+
+        txt.setError(Strings.returnSafely(error));
+    }
+
     public void setQuantity(double quantity) {
         if (charge != null) charge.setQuantity(quantity);
 
@@ -105,6 +113,14 @@ public class AddChargeView extends LinearLayout {
                 if (charge != null) charge.setQuantity(Strings.parseDouble(s.toString()));
             }
         });
+    }
+
+    public void setQuantityError(String error) {
+        TextView txt = (TextView) findViewById(R.id.quantity_txt);
+
+        if (txt == null) return;
+
+        txt.setError(Strings.returnSafely(error));
     }
 
     public void setAmount(double amount) {
@@ -141,7 +157,7 @@ public class AddChargeView extends LinearLayout {
 
         if (txt == null) return;
 
-        String s = Strings.setStringColour(String.format("%s VAT", chargeVAT ? "with" : "w/o"), chargeVAT ? ColorUtils.green : ColorUtils.red);
+        String s = Strings.setStringColour(String.format("%s VAT", chargeVAT ? "+ 20%" : "No"), chargeVAT ? ColorUtils.green : ColorUtils.red);
 
         txt.setText(Html.fromHtml(s));
 

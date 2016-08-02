@@ -13,11 +13,11 @@ import java.util.Map;
 
 public class Tradesman extends User {
 
-    String type, picture;
-    double rating, experience;
-    List<String> work_areas;
-    Location current_location;
-    Map<String, Object> settings;
+    private String type, picture;
+    private double rating, experience, standard_hourly_rate;
+    private List<String> work_areas;
+    private Location current_location;
+    private Map<String, Object> settings;
 
     public String getType() {
         return Strings.returnSafely(type);
@@ -49,6 +49,14 @@ public class Tradesman extends User {
         if (settings == null) settings = new HashMap<>();
 
         return settings;
+    }
+
+    public double getStandard_hourly_rate() {
+        return standard_hourly_rate;
+    }
+
+    public void setStandard_hourly_rate(double standard_hourly_rate) {
+        this.standard_hourly_rate = standard_hourly_rate;
     }
 
     public void setType(String type) {

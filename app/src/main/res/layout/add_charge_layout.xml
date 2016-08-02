@@ -30,6 +30,7 @@
             android:layout_toRightOf="@+id/name_icon"
             android:gravity="start|center_vertical"
             android:hint="@string/name_or_description"
+            android:inputType="number"
             android:padding="@dimen/base_padding"
             android:textAppearance="@style/TextTheme.Large"
             android:visibility="invisible" />
@@ -42,6 +43,7 @@
             android:layout_toRightOf="@+id/name_icon"
             android:gravity="start|center_vertical"
             android:hint="@string/name_or_description"
+            android:maxLines="4"
             android:padding="@dimen/base_padding"
             android:textAppearance="@style/TextTheme.Large" />
     </RelativeLayout>
@@ -73,6 +75,7 @@
             android:gravity="start|center_vertical"
             android:hint="@string/quantity"
             android:inputType="number"
+            android:lines="1"
             android:padding="@dimen/base_padding"
             android:textAppearance="@style/TextTheme.Large" />
     </RelativeLayout>
@@ -115,6 +118,7 @@
             android:layout_toStartOf="@id/charge_vat_txt"
             android:gravity="start|center_vertical"
             android:hint="@string/amount"
+            android:lines="1"
             android:padding="@dimen/base_padding"
             android:textAppearance="@style/TextTheme.Large" />
     </RelativeLayout>
@@ -157,6 +161,7 @@
             android:layout_toStartOf="@id/markup_before_vat_txt"
             android:gravity="start|center_vertical"
             android:hint="@string/amount"
+            android:lines="1"
             android:padding="@dimen/base_padding"
             android:textAppearance="@style/TextTheme.Large" />
     </RelativeLayout>

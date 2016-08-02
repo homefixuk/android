@@ -53,13 +53,18 @@ public interface API {
     @GET("tradesman/me")
     Call<Tradesman> getTradesman(@Query("token") String token);
 
+    @PATCH("tradesman/me")
+    Call<Tradesman> updateTradesmanDetails(
+            @Query("token") String token,
+            @QueryMap Map<String, Object> params);
+
     @GET("tradesman/me/private")
     Call<Tradesman> getTradesmanPrivate(
             @Query("apikey") String apikey,
             @Query("token") String token);
 
-    @POST("tradesman/me")
-    Call<Tradesman> updateTradesmanDetails(
+    @PATCH("tradesman/me/private")
+    Call<Tradesman> updateTradesmanPrivateDetails(
             @Query("token") String token,
             @QueryMap Map<String, Object> params);
 

@@ -217,8 +217,9 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         builder.onPositive(new MaterialDialog.SingleButtonCallback() {
             @Override
             public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
-                addOrEditCharge(isEmpty ? null : finalCharge, view.getCharge());
-                dialog.dismiss();
+                if (addOrEditCharge(view, isEmpty ? null : finalCharge, view.getCharge())) {
+                    dialog.dismiss();
+                }
             }
         });
         builder.onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -235,8 +236,20 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         builder.show();
     }
 
-    private void addOrEditCharge(final Charge originalCharge, final Charge newCharge) {
-        if (newCharge == null) return;
+    private boolean addOrEditCharge(AddChargeView view, final Charge originalCharge, final Charge newCharge) {
+        if (view == null || newCharge == null) return false;
+
+        // make sure there's a valid name or description
+        if (Strings.isEmpty(newCharge.getDescription())) {
+            view.setNameError("Please enter a name or description");
+            return false;
+        }
+
+        // make sure the quantity is valid
+        if (newCharge.getQuantity() <= 0) {
+            view.setQuantityError("Please enter a positive quantity");
+            return false;
+        }
 
         // show loading dialog
         showDialog((originalCharge == null ? "Adding" : "Updating") + " Charge...", true);
@@ -271,6 +284,8 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         } else {
             HomeFix.getAPI().updateCharge(UserController.getToken(), originalCharge.getId(), newCharge).enqueue(callback);
         }
+
+        return true;
     }
 
     private void updateChargeInAdapter(Charge originalCharge, Charge newCharge) {
