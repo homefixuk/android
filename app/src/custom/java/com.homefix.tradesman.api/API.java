@@ -206,12 +206,12 @@ public interface API {
             @Query("original_charge_id") String original_charge_id);
 
     @POST("service/payment")
-    Call<Charge> addPayment(
+    Call<Payment> addPayment(
             @Query("token") String token,
             @Query("payment") Payment payment);
 
     @PATCH("service/payment")
-    Call<Charge> updatePayment(
+    Call<Payment> updatePayment(
             @Query("token") String token,
             @Query("original_payment_id") String original_payment_id,
             @Query("payment") Payment payment);

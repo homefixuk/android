@@ -12,6 +12,7 @@ import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.own_job.charges.ChargesActivity;
+import com.homefix.tradesman.timeslot.own_job.payments.PaymentsActivity;
 import com.samdroid.common.ColorUtils;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.string.Strings;
@@ -65,14 +66,28 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
             Service service = mTimeslot.getService();
             ServiceSet serviceSet = service != null ? service.getService_set() : null;
 
-            if (serviceSet != null && mChargesTxt != null) {
-                double amountRemaining = serviceSet.getAmountRemaining();
-                String s = "£" + Strings.priceToString(serviceSet.getTotal_cost());
-                if (amountRemaining <= 0)
-                    s += " [" + Strings.setStringColour("paid", ColorUtils.green) + "]";
-                else
-                    s += " (" + Strings.setStringColour("£" + Strings.priceToString(amountRemaining) + " due", ColorUtils.red) + ")";
-                mChargesTxt.setText(Html.fromHtml(s));
+            if (serviceSet != null) {
+                if (mChargesTxt != null) {
+                    mChargesTxt.setText(Html.fromHtml("£" + Strings.priceToString(serviceSet.getTotal_cost()) + " total"));
+                }
+
+                if (mPaymentsTxt != null) {
+                    double amountRemaining = serviceSet.getAmountRemaining();
+                    double amountPaid = serviceSet.getAmount_paid();
+                    String s = "";
+
+                    if (amountRemaining > 0) {
+                        s += Strings.setStringColour("£" + Strings.priceToString(amountRemaining) + " due", ColorUtils.red);
+                    }
+
+                    if (amountPaid > 0) {
+                        if (amountRemaining > 0) s += " ";
+                        s += Strings.setStringColour("(£" + Strings.priceToString(amountPaid) + " paid)", ColorUtils.green);
+                    }
+
+                    mPaymentsTxt.setText(Html.fromHtml(s));
+                }
+
             }
         }
 
@@ -83,19 +98,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
             mChargesBar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Service service = mTimeslot != null ? mTimeslot.getService() : null;
-
-                    if (service == null) return;
-
-                    // add the service to the cache
-                    String serviceKey = "" + mTimeslot.getService().hashCode();
-                    Service.getSenderReceiver().put(serviceKey, mTimeslot.getService());
-
-                    // start the ChargesActivity
-                    Intent i = new Intent(getContext(), ChargesActivity.class);
-                    i.putExtra("serviceKey", serviceKey);
-                    startActivity(i);
-                    getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+                    goToActivitySendingService(ChargesActivity.class);
                 }
             });
         }
@@ -115,7 +118,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
             mPaymentsBar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO
+                    goToActivitySendingService(PaymentsActivity.class);
                 }
             });
         }
@@ -144,6 +147,22 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                 }
             });
         }
+    }
+
+    private void goToActivitySendingService(Class activityClass) {
+        Service service = mTimeslot != null ? mTimeslot.getService() : null;
+
+        if (service == null) return;
+
+        // add the service to the cache
+        String serviceKey = "" + mTimeslot.getService().hashCode();
+        Service.getSenderReceiver().put(serviceKey, mTimeslot.getService());
+
+        // start the ChargesActivity
+        Intent i = new Intent(getContext(), activityClass);
+        i.putExtra("serviceKey", serviceKey);
+        startActivity(i);
+        getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
     }
 
     @Override

@@ -47,6 +47,9 @@
         <activity
             android:name=".timeslot.own_job.charges.ChargesActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".timeslot.own_job.payments.PaymentsActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.LocationService"

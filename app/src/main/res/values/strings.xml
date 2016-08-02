@@ -41,9 +41,22 @@
     <string name="customer_invoice">Customer Invoice</string>
     <string name="payments">Payments</string>
     <string name="total">Total</string>
+    <string name="total_cost">Total Cost</string>
+    <string name="owed">Owed</string>
+    <string name="paid">Paid</string>
+    <string name="balance">Balance</string>
+    <string name="remaining">Remaining</string>
     <string name="quantity">Quantity</string>
     <string name="amount">Amount</string>
     <string name="markup">Markup</string>
-    <string name="markup_hint">Markup (0-100\%)</string>
+    <string name="markup_hint">Markup\/Discount (0-100\%)</string>
+
+    <string-array name="payment_types">
+        <item>cash</item>
+        <item>credit_card</item>
+        <item>debit_card</item>
+        <item>cheque</item>
+        <item>bank_transfer</item>
+    </string-array>
 
 </resources>

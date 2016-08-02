@@ -8,6 +8,7 @@ import com.samdroid.string.Strings;
 
 public class Payment {
 
+    private String id;
     private ServiceSet serviceSet;
     private double amount;
     private String type; // cash/cheque/bank_transfer/card/stripe/etc.
@@ -15,8 +16,20 @@ public class Payment {
     public Payment() {
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public ServiceSet getServiceSet() {
         return serviceSet;
+    }
+
+    public void setServiceSet(ServiceSet serviceSet) {
+        this.serviceSet = serviceSet;
     }
 
     public double getAmount() {

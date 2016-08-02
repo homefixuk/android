@@ -118,6 +118,7 @@
             android:layout_toStartOf="@id/charge_vat_txt"
             android:gravity="start|center_vertical"
             android:hint="@string/amount"
+            android:inputType="numberDecimal|numberSigned"
             android:lines="1"
             android:padding="@dimen/base_padding"
             android:textAppearance="@style/TextTheme.Large" />
@@ -160,7 +161,8 @@
             android:layout_toRightOf="@+id/markup_icon"
             android:layout_toStartOf="@id/markup_before_vat_txt"
             android:gravity="start|center_vertical"
-            android:hint="@string/amount"
+            android:hint="@string/markup_hint"
+            android:inputType="numberDecimal|numberSigned"
             android:lines="1"
             android:padding="@dimen/base_padding"
             android:textAppearance="@style/TextTheme.Large" />

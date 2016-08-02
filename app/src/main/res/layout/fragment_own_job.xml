@@ -391,6 +391,52 @@
             android:background="@color/light_grey" />
 
         <RelativeLayout
+            android:id="@+id/payments_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/base_padding">
+
+            <ImageView
+                android:id="@+id/payments_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/base_padding_triple"
+                android:layout_alignBottom="@+id/payments_txt"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignTop="@+id/payments_txt"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_credit_card_plus_grey600_48dp" />
+
+            <TextView
+                android:id="@+id/payments_lbl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/payments_icon"
+                android:layout_toRightOf="@+id/payments_icon"
+                android:gravity="start|center_vertical"
+                android:padding="@dimen/base_padding"
+                android:text="@string/payments"
+                android:textAppearance="@style/TextTheme.Large" />
+
+            <TextView
+                android:id="@+id/payments_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:gravity="end|center_vertical"
+                android:padding="@dimen/base_padding"
+                android:textAppearance="@style/TextTheme.Large" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey" />
+
+        <RelativeLayout
             android:id="@+id/invoice_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -417,41 +463,6 @@
                 android:gravity="start|center_vertical"
                 android:padding="@dimen/base_padding"
                 android:text="@string/customer_invoice"
-                android:textAppearance="@style/TextTheme.Large" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/light_grey" />
-
-        <RelativeLayout
-            android:id="@+id/payments_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/base_padding">
-
-            <ImageView
-                android:id="@+id/payments_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/base_padding_triple"
-                android:layout_alignBottom="@+id/payments_txt"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignTop="@+id/payments_txt"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_credit_card_plus_grey600_48dp" />
-
-            <TextView
-                android:id="@+id/payments_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/payments_icon"
-                android:layout_toRightOf="@+id/payments_icon"
-                android:gravity="start|center_vertical"
-                android:padding="@dimen/base_padding"
-                android:text="@string/payments"
                 android:textAppearance="@style/TextTheme.Large" />
         </RelativeLayout>
 
