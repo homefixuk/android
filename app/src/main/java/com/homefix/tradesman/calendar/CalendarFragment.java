@@ -186,7 +186,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
     @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
-        if (BuildConfig.FLAVOR.equals("apiary_mock") && newMonth != 6)
+        if (BuildConfig.FLAVOR.equals("apiary_mock") && newMonth != 7)
             return new ArrayList<>(); // TODO: remove! This is used while testing with Apiary mock server
 
         // if we have not yet fetched this month and we have a network connection

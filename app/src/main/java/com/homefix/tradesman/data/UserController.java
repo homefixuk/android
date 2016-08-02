@@ -1,8 +1,10 @@
 package com.homefix.tradesman.data;
 
-import com.homefix.tradesman.BuildConfig;
+import android.content.Context;
+
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.model.Tradesman;
+import com.homefix.tradesman.model.TradesmanPrivate;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -20,6 +22,7 @@ public class UserController {
 
     private static String token = null;
     private static Tradesman mCurrentUser = null;
+    private static TradesmanPrivate mTradesmanPrivate;
     private static long lastUpdateTime = 0, refreshTime = 1000 * 60 * 10;
 
     public synchronized static Tradesman getCurrentUser() {
@@ -29,6 +32,15 @@ public class UserController {
     private synchronized static void setCurrentUser(Tradesman user) {
         mCurrentUser = user;
         CacheUtils.writeObjectFile("current_user", mCurrentUser);
+    }
+
+    public synchronized static TradesmanPrivate getCurrentTradesmanPrivate() {
+        return mTradesmanPrivate;
+    }
+
+    private synchronized static void setTradesmanPrivate(TradesmanPrivate tradesmanPrivate) {
+        mTradesmanPrivate = tradesmanPrivate;
+        CacheUtils.writeObjectFile("tradesman_private", mTradesmanPrivate);
     }
 
     public static void loadCurrentUser(boolean forceUpdate, final OnGotObjectListener<Tradesman> callback) {
@@ -64,7 +76,10 @@ public class UserController {
             @Override
             public void onFailure(Call<Tradesman> call, Throwable t) {
                 if (MyLog.isIsLogEnabled()) t.printStackTrace();
+
+                if (callback != null) callback.onGotThing(getCurrentUser());
             }
+
         };
 
         HomeFix.getAPI().getTradesman(token).enqueue(callback1);
@@ -72,7 +87,9 @@ public class UserController {
 
     public static void clearCurrentUser() {
         mCurrentUser = null;
+        mTradesmanPrivate = null;
         CacheUtils.writeObjectFile("current_user", null);
+        CacheUtils.writeObjectFile("tradesman_private", null);
         CacheUtils.writeFile("token", "");
     }
 
@@ -82,6 +99,38 @@ public class UserController {
 
     public static boolean hasToken() {
         return !Strings.isEmpty(token);
+    }
+
+    public static void loadTradesmanPrivate(Context context, final OnGotObjectListener<TradesmanPrivate> callback) {
+        mTradesmanPrivate = CacheUtils.readObjectFile("tradesman_private", TradesmanPrivate.class);
+
+        if (mCurrentUser == null && Strings.isEmpty(token)) {
+            if (callback != null) callback.onGotThing(mTradesmanPrivate);
+            return;
+        }
+
+        String API_KEY = context != null ? context.getString(HomeFix.API_KEY) : "";
+
+        Callback<TradesmanPrivate> callback1 = new Callback<TradesmanPrivate>() {
+            @Override
+            public void onResponse(Call<TradesmanPrivate> call, Response<TradesmanPrivate> response) {
+                TradesmanPrivate tradesmanPrivate = response != null ? response.body() : null;
+
+                // if we got a user from the server, update the one we're storing
+                if (tradesmanPrivate != null) setTradesmanPrivate(tradesmanPrivate);
+
+                if (callback != null) callback.onGotThing(getCurrentTradesmanPrivate());
+            }
+
+            @Override
+            public void onFailure(Call<TradesmanPrivate> call, Throwable t) {
+                if (MyLog.isIsLogEnabled()) t.printStackTrace();
+
+                if (callback != null) callback.onGotThing(getCurrentTradesmanPrivate());
+            }
+        };
+
+        HomeFix.getAPI().getTradesmanPrivate(API_KEY, token).enqueue(callback1);
     }
 
 }

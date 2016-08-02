@@ -12,6 +12,7 @@ import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.own_job.charges.ChargesActivity;
+import com.homefix.tradesman.timeslot.own_job.invoice.OwnJobInvoice;
 import com.homefix.tradesman.timeslot.own_job.payments.PaymentsActivity;
 import com.samdroid.common.ColorUtils;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
@@ -108,7 +109,9 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
             mInvoiceBar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO
+                    OwnJobInvoice invoice = new OwnJobInvoice(mTimeslot != null ? mTimeslot.getService() : null);
+                    invoice.generate();
+                    invoice.view(getContext());
                 }
             });
         }

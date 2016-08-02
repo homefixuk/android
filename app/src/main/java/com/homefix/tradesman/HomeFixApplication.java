@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.multidex.MultiDexApplication;
 
+import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Problem;
+import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.service.LocationService;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 
 /**
  * Created by samuel on 6/15/2016.
@@ -43,8 +46,14 @@ public class HomeFixApplication extends MultiDexApplication {
         context.stopService(i);
     }
 
-    public static void setupAppAfterLogin() {
-
+    public static void setupAppAfterLogin(Context context) {
         Problem.loadServiceTypes();
+
+        UserController.loadTradesmanPrivate(context, new OnGotObjectListener<TradesmanPrivate>() {
+            @Override
+            public void onGotThing(TradesmanPrivate o) {
+
+            }
+        });
     }
 }

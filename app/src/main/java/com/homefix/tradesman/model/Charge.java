@@ -84,6 +84,10 @@ public class Charge {
         this.markup_before_vat = markup_before_vat;
     }
 
+    public double getAmountWithVatAndMarkup() {
+        return totalCost() / quantity;
+    }
+
     public double totalCost() {
         // if there is no markup
         if (markup == 0) return quantity * amount * (with_vat ? 1.2 : 1.0);

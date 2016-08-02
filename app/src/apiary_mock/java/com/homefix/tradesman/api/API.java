@@ -12,6 +12,7 @@ import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanFinances;
 import com.homefix.tradesman.model.TradesmanNotification;
+import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.model.TradesmanReview;
 
 import java.util.HashMap;
@@ -59,7 +60,7 @@ public interface API {
             @QueryMap Map<String, Object> params);
 
     @GET("/tradesman/me/private")
-    Call<Tradesman> getTradesmanPrivate(
+    Call<TradesmanPrivate> getTradesmanPrivate(
             @Query("apikey") String apikey,
             @Query("token") String token);
 

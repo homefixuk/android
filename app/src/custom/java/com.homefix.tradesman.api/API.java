@@ -59,7 +59,7 @@ public interface API {
             @QueryMap Map<String, Object> params);
 
     @GET("tradesman/me/private")
-    Call<Tradesman> getTradesmanPrivate(
+    Call<TradesmanPrivate> getTradesmanPrivate(
             @Query("apikey") String apikey,
             @Query("token") String token);
 

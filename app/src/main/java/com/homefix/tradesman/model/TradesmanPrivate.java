@@ -7,6 +7,7 @@ import com.samdroid.string.Strings;
  */
 
 public class TradesmanPrivate {
+
     private Tradesman tradesman;
     private String accountName, accountNumber, sortCode, vatNumber;
 

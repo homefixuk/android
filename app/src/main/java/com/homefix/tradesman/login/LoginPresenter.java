@@ -106,7 +106,7 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
                             return;
                         }
 
-                        HomeFixApplication.setupAppAfterLogin();
+                        HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
 
                         // we can take the user to the app
                         getView().goToApp();

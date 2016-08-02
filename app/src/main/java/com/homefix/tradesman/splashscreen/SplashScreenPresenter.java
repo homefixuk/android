@@ -36,7 +36,7 @@ public class SplashScreenPresenter extends BaseActivityPresenter<SplashScreenVie
                     // else there is a user logged in
                     MyLog.e("HomeFixApplication", "Loaded User: " + user.getName());
 
-                    HomeFixApplication.setupAppAfterLogin();
+                    HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
                 }
 
                 // if the location service is not running

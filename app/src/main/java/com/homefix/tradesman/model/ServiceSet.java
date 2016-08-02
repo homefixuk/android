@@ -67,6 +67,20 @@ public class ServiceSet {
         return charges;
     }
 
+    public double getTotalFromCharges() {
+        if (charges == null || charges.size() == 0) return 0d;
+
+        double total = 0d;
+
+        for (Charge charge : charges) {
+            if (charge == null) continue;
+
+            total += charge.totalCost();
+        }
+
+        return total;
+    }
+
     private static final SendReceiver<ServiceSet> senderReceiver = new SendReceiver<>(ServiceSet.class);
 
     public static SendReceiver<ServiceSet> getSenderReceiver() {
