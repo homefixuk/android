@@ -3,26 +3,25 @@ package com.samdroid.listener;
 import com.samdroid.listener.interfaces.OnFinishListener;
 import com.samdroid.listener.interfaces.OnGetListListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by samuel on 1/28/2016.
  */
-public class OnMultiFinishCallback<O extends Object> implements OnGetListListener<O> {
+public class OnMultiObjectGetFinishCallback<O extends Object> implements OnGetListListener<O> {
 
     private int numFinished = 0, numRequests = 0;
-    private OnFinishListener onFinishListener;
+    private OnGetListListener<O> callback;
 
-    public OnMultiFinishCallback(int numRequests, OnFinishListener onFinishListener) {
+    public OnMultiObjectGetFinishCallback(int numRequests, OnGetListListener<O> callback) {
         this.numRequests = numRequests;
-        this.onFinishListener = onFinishListener;
+        this.callback = callback;
     }
 
     @Override
     public void onGetListFinished(List<O> list) {
         numFinished++;
 
-        if (numFinished >= numRequests) onFinishListener.onThingFinished(0);
+        if (numFinished >= numRequests) callback.onGetListFinished(list);
     }
 }

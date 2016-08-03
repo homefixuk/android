@@ -1,6 +1,8 @@
 package com.homefix.tradesman.home;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,11 +12,25 @@ import android.view.View;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.calendar.CalendarFragment;
+import com.homefix.tradesman.common.CheckatraderScraper;
 import com.homefix.tradesman.home.home_fragment.HomeFragment;
 import com.homefix.tradesman.task.LogoutTask;
+import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
+import com.samdroid.file.FileManager;
+import com.samdroid.listener.interfaces.OnGetListListener;
+import com.samdroid.string.Strings;
+import com.samdroid.thread.MyThreadPool;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by samuel on 6/22/2016.
@@ -88,9 +104,87 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
             LogoutTask.doLogout(this);
             return true;
+
+        } else if (name.equals(getString(R.string.action_recent))) {
+            scrape();
+            return true;
         }
 
         return false;
+    }
+
+    private void scrape() {
+        final File f = getStorageDir(getContext(), "scraper");
+        if (f != null && f.exists()) f.delete();
+
+        for (int type = 0; type < CheckatraderScraper.types.length; type++) {
+            for (int loc = 0; loc < CheckatraderScraper.locations.length; loc++) {
+                for (int page = 0; page < 30; page++) {
+
+                    final int finalType = type;
+                    final int finalLoc = loc;
+                    final int finalPage = page;
+
+                    int t = CheckatraderScraper.types[type];
+                    String l = CheckatraderScraper.locations[loc];
+
+                    if (Strings.isEmpty(l)) continue;
+
+                    MyThreadPool.post(new CheckatraderScraper(t, l, page, new OnGetListListener<CheckatraderScraper.CheckATrader>() {
+                        @Override
+                        public void onGetListFinished(List<CheckatraderScraper.CheckATrader> list) {
+                            String csv = "";
+
+                            for (CheckatraderScraper.CheckATrader trader : list) {
+                                if (trader == null) continue;
+
+                                csv += trader.toCsvString() + "\n";
+                            }
+
+                            String filename = "scrape" + finalType + "" + finalLoc + "" + finalPage + ".txt";
+                            try {
+                                File file = new File(getStorageDir(getContext(), "scraper"), filename);
+                                file.createNewFile();
+                                writeToFile(file, csv);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }));
+                }
+            }
+        }
+    }
+
+    public File getStorageDir(Context context, String name) {
+        // Get the directory for the app's private pictures directory.
+        File folder;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), name);
+        } else {
+            folder = new File(Environment.getExternalStorageDirectory(), name);
+        }
+
+        // make sure the folder exists
+        if (!folder.exists()) {
+            if (!folder.mkdirs()) {
+                MyLog.i(TAG, name + " folder failed to create");
+            } else {
+                MyLog.i(TAG, name + " folder created");
+            }
+        }
+
+        return folder;
+    }
+
+    private void writeToFile(File file, String data) {
+        try {
+            FileOutputStream stream = new FileOutputStream(file);
+            stream.write(data.getBytes());
+            stream.close();
+
+        } catch (Exception e) {
+        }
     }
 
     private void resetActionBarTitle() {

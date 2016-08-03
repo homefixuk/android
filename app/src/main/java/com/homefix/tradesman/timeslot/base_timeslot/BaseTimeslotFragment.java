@@ -333,6 +333,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
 
         hasMadeChanges = false;
         isEdit = false;
+        if (timeslot != null) setTimeslot(timeslot); // update the timeslot
         getBaseActivity().supportInvalidateOptionsMenu();
         setupView();
     }

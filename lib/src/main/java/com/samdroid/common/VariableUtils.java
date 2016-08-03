@@ -183,6 +183,28 @@ public class VariableUtils {
     }
 
     /**
+     * Handles if the value is being stored as an Integer, String, Float or Double
+     *
+     * @param object
+     * @return safely the double value from object
+     */
+    public static Integer getIntegerSafely(Object object) {
+        if (object == null) return null;
+
+        if (object instanceof Integer) {
+            return (Integer) object;
+
+        } else if (object instanceof String) {
+            return Integer.valueOf((String) object);
+
+        } else if (object instanceof Double) {
+            return (Integer) object;
+        }
+
+        return null;
+    }
+
+    /**
      * @param list
      * @return return a copy of the list
      */
@@ -217,6 +239,25 @@ public class VariableUtils {
         for (int i = 0; i < list.size(); i++) {
             MyLog.e("VariableUtils", "i => " + list.get(i));
         }
+    }
+
+    public static <T> String listToString(List<T> list) {
+        if (list == null) {
+            return "[]";
+        }
+
+        String s = "[";
+        for (int i = 0; i < list.size(); i++) {
+            Object next = list.get(i);
+
+            if (next == null) continue;
+
+            if (i > 0) s += ", ";
+
+            s += "" + next;
+        }
+
+        return s + "]";
     }
 
     public static <T> void printArray(T[] array) {
@@ -526,7 +567,7 @@ public class VariableUtils {
         Set<String> aKeys = a.keySet();
         Set<String> bKeys = b.keySet();
         for (String aKey : aKeys) {
-            for (String bKey: bKeys) {
+            for (String bKey : bKeys) {
                 if (a.get(aKey) != null && !a.get(aKey).equals(b.get(bKey))) return false;
             }
         }

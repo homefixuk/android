@@ -155,6 +155,9 @@ dependencies {
     // Pdf
     compile 'com.itextpdf:itextg:5.5.9'
 
+    // jsoup HTML parser library @ http://jsoup.org/
+    compile 'org.jsoup:jsoup:1.9.2'
+
     // test
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'

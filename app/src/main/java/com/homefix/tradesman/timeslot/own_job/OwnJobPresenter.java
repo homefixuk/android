@@ -197,7 +197,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
         }
 
         Call<Service> call = HomeFix.getAPI().updateService(
-                originalTimeslot.getObjectId(),
+                originalTimeslot.getId(),
                 UserController.getToken(),
                 changes);
 

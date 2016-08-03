@@ -16,22 +16,14 @@ public class WebUtils {
     public static String getWebPageContents(String url) {
         String s = "";
 
-        URLConnection con = null;
-        BufferedReader in = null;
+        URLConnection con;
         try {
-            URL requestUrl = new URL(url);
+            URL requestUrl = new URL(Strings.checkUrl(url));
             con = requestUrl.openConnection();
             s = Strings.getInputReaderInput(new InputStreamReader(con.getInputStream()));
 
         } catch (Exception e) {
             e.printStackTrace();
-
-        } finally {
-            if (in != null) try {
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         return s;

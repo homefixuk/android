@@ -43,16 +43,18 @@ public class Timeslot {
     }
 
     private long start, end, length;
-    private String objectId, type;
+    private String id, type;
     private Tradesman tradesman;
     private Service service;
 
-    public String getObjectId() {
-        return Strings.returnSafely(objectId);
+    public String getId() {
+        id =  Strings.returnSafely(id);
+
+        return id;
     }
 
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public long getStart() {

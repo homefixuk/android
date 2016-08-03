@@ -502,6 +502,28 @@ public class Strings {
     }
 
     /**
+     * @return the string resources combined
+     */
+    public static String combineStrings(String delimiter, String... strings) {
+        String s = "";
+
+        delimiter = returnSafely(delimiter);
+
+        // for every string id
+        for (int i = 0; i < strings.length; i++) {
+            String next = returnSafely(strings[i]);
+
+            if (Strings.isEmpty(next)) continue;
+
+            if (i > 0) s += delimiter;
+
+            s += next;
+        }
+
+        return s;
+    }
+
+    /**
      * Add a resource string to the end of a string
      *
      * @param context
@@ -943,6 +965,32 @@ public class Strings {
         if (!url.startsWith("http://")) url = "http://" + url;
 
         return url;
+    }
+
+    /**
+     * @param url
+     * @return make sure the URL has http:// in front
+     */
+    public static String checkUrlSecure(String url) {
+        if (Strings.isEmpty(url)) return "";
+
+        if (!url.startsWith("https://")) url = "https://" + url;
+
+        return url;
+    }
+
+    /**
+     * @param s
+     * @return the extract href link
+     */
+    public static String extractHref(String s) {
+        Pattern p = Pattern.compile("href=\"(.*?)\"");
+        Matcher m = p.matcher(s);
+        if (m.find()) {
+            return m.group(1); // this variable should contain the link URL
+        }
+
+        return "";
     }
 
     private static final NavigableMap<Long, String> suffixes = new TreeMap<>();

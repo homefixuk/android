@@ -36,8 +36,8 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
     public void save(final Timeslot timeslot, Calendar mStart, Calendar mEnd) {
         if (!isViewAttached()) return;
 
-        // if the user has made no changes
-        if (!getView().hasMadeChanges()) {
+        // if the user has made no changes to the timeslot
+        if (getView().getTimeslot() != null && !getView().hasMadeChanges()) {
             getView().onSaveComplete(timeslot);
             return;
         }
@@ -90,7 +90,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
 
         } else {
             // else the user was editing a timeslot //
-            HomeFix.getAPI().updateTimeslot(UserController.getToken(), timeslot.getObjectId(), map).enqueue(callback);
+            HomeFix.getAPI().updateTimeslot(UserController.getToken(), timeslot.getId(), map).enqueue(callback);
         }
     }
 
@@ -143,7 +143,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
 
                         };
 
-                        HomeFix.getAPI().deleteTimeslot(UserController.getToken(), timeslot.getObjectId()).enqueue(callback);
+                        HomeFix.getAPI().deleteTimeslot(UserController.getToken(), timeslot.getId()).enqueue(callback);
 
                     }
 

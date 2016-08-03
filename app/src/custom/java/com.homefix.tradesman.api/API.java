@@ -4,6 +4,7 @@ import com.homefix.tradesman.model.Activity;
 import com.homefix.tradesman.model.Attachment;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.Charge;
+import com.homefix.tradesman.model.Part;
 import com.homefix.tradesman.model.Payment;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Service;
@@ -12,6 +13,7 @@ import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanFinances;
 import com.homefix.tradesman.model.TradesmanNotification;
+import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.model.TradesmanReview;
 
 import java.util.HashMap;
@@ -21,8 +23,10 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
@@ -48,75 +52,76 @@ public interface API {
             @Query("password") String password);
 
     @DELETE("user/logout")
-    Call<HashMap<String, Object>> logout(@Query("token") String token);
+    Call<HashMap<String, Object>> logout(@Header("Authorization") String token);
 
     @GET("tradesman/me")
-    Call<Tradesman> getTradesman(@Query("token") String token);
+    Call<Tradesman> getTradesman(@Header("Authorization") String token);
 
     @PATCH("tradesman/me")
     Call<Tradesman> updateTradesmanDetails(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @QueryMap Map<String, Object> params);
 
     @GET("tradesman/me/private")
     Call<TradesmanPrivate> getTradesmanPrivate(
             @Query("apikey") String apikey,
-            @Query("token") String token);
+            @Header("Authorization") String token);
 
     @PATCH("tradesman/me/private")
     Call<Tradesman> updateTradesmanPrivateDetails(
-            @Query("token") String token,
+            @Header("Authorization") String token,
+            @Query("apikey") String apikey,
             @QueryMap Map<String, Object> params);
 
     @POST("tradesman/location")
     Call<Timeslot> updateLocation(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @QueryMap Map<String, Object> location);
 
     @GET("tradesman/notifications")
     Call<List<TradesmanNotification>> getTradesmanNotifications(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("filter") Map<String, Object> filter);
 
     @GET("tradesman/finance")
     Call<TradesmanFinances> getTradesmanFinances(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("filter") Map<String, Object> filter);
 
     @GET("tradesman/reviews")
     Call<List<TradesmanReview>> getTradesmanReviews(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("filter") Map<String, Object> filter);
 
     @GET("tradesman/timeslots")
     Call<List<Timeslot>> getTradesmanEvents(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("filter") Map<String, Object> filter);
 
     @POST("tradesman/timeslot")
     Call<Timeslot> addTimeslot(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("time_slot") HomeFix.TimeslotMap timeslotMap);
 
-    @PATCH("tradesman/timeslot")
+    @PATCH("tradesman/timeslot/{timeslot_id}")
     Call<Timeslot> updateTimeslot(
-            @Query("token") String token,
-            @Query("original_timeslot_id") String original_timeslot_id,
-            @Query("time_slot") HomeFix.TimeslotMap timeslotMap);
+            @Header("Authorization") String token,
+            @Path("timeslot_id") String original_timeslot_id,
+            @QueryMap HomeFix.TimeslotMap timeslotMap);
 
-    @DELETE("tradesman/timeslot")
+    @DELETE("tradesman/timeslot/{timeslot_id}")
     Call<Map<String, Object>> deleteTimeslot(
-            @Query("token") String token,
-            @Query("original_timeslot_id") String original_timeslot_id);
+            @Header("Authorization") String token,
+            @Path("timeslot_id") String original_timeslot_id);
 
-    @GET("service")
+    @GET("service/{service_id}")
     Call<Service> getService(
-            @Query("token") String token,
-            @Query("id") String id);
+            @Header("Authorization") String token,
+            @Path("service_id") String id);
 
     @POST("service")
     Call<Service> createService(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("customer_name") String customer_name,
             @Query("customer_email") String customer_email,
             @Query("customer_phone") String customer_phone,
@@ -133,92 +138,101 @@ public interface API {
             @Query("end_time") double end_time,
             @Query("tradesman_notes") String tradesman_note);
 
-    @PATCH("service")
+    @PATCH("service/{service_id}")
     Call<Service> updateService(
-            @Query("id") String timeslotId,
-            @Query("token") String token,
+            @Path("service_id") String timeslotId,
+            @Header("Authorization") String token,
             @Query("changes") Map<String, Object> changes);
 
-    // TODO: add Part calls
-
     @GET("service/current")
-    Call<Service> getCurrentService(@Query("token") String token);
+    Call<Service> getCurrentService(@Header("Authorization") String token);
 
     @GET("service/next")
-    Call<Service> getNextService(@Query("token") String token);
+    Call<Service> getNextService(@Header("Authorization") String token);
 
     @GET("service/types")
-    Call<List<Problem>> getServiceTypes(@Query("token") String token);
+    Call<List<Problem>> getServiceTypes(@Header("Authorization") String token);
 
     @GET("service/statuses")
-    Call<List<ServiceStatusFlow>> getServiceStatusFlow(@Query("token") String token);
+    Call<List<ServiceStatusFlow>> getServiceStatusFlow(@Header("Authorization") String token);
 
     @GET("services")
     Call<List<Service>> getServices(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("filter") Map<String, Object> filter);
 
-    @GET("activities/tradesman")
-    Call<List<Activity>> getTradesmanActivities(
-            @Query("token") String token,
+    @GET("activities")
+    Call<List<Activity>> getActivities(
+            @Header("Authorization") String token,
             @Query("filter") Map<String, Object> filter);
-
-    @GET("activities/service")
-    Call<List<Activity>> getServiceActivities(
-            @Query("token") String token,
-            @Query("filter") Map<String, Object> filter);
-
-    @GET("attachment")
-    Call<Attachment> getServiceAttachment(
-            @Query("token") String token,
-            @Query("id") String id);
 
     @POST("attachment")
-    Call<Service> createServiceAttachment(
-            @Query("token") String token,
+    Call<Service> createAttachment(
+            @Header("Authorization") String token,
             @Query("service_id") String service_id,
             @Query("type") String type,
             @Query("text") String text,
             @Query("file") String fileUrl);
 
+    @GET("attachment/{attachment_id}")
+    Call<Attachment> getAttachment(
+            @Header("Authorization") String token,
+            @Path("attachment_id") String id);
+
     @GET("attachments")
-    Call<List<Attachment>> getServiceAttachments(
-            @Query("token") String token,
+    Call<List<Attachment>> getAttachments(
+            @Header("Authorization") String token,
             @Query("filter") Map<String, Object> filter);
 
     @GET("cca")
-    Call<CCA> getCCA(@Query("apikey") String apikey, @Query("token") String token);
+    Call<CCA> getCCA(@Query("apikey") String apikey, @Header("Authorization") String token);
 
-    @POST("service/charge")
+    @POST("charge")
     Call<Charge> addCharge(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("charge") Charge charge);
 
-    @PATCH("service/charge")
+    @PATCH("charge/{charge_id}")
     Call<Charge> updateCharge(
-            @Query("token") String token,
-            @Query("original_charge_id") String original_charge_id,
+            @Header("Authorization") String token,
+            @Path("charge_id") String original_charge_id,
             @Query("charge") Charge charge);
 
-    @DELETE("service/charge")
+    @DELETE("charge/{charge_id}")
     Call<Map<String, Object>> deleteCharge(
-            @Query("token") String token,
-            @Query("original_charge_id") String original_charge_id);
+            @Header("Authorization") String token,
+            @Path("charge_id") String original_charge_id);
 
-    @POST("service/payment")
+    @POST("payment")
     Call<Payment> addPayment(
-            @Query("token") String token,
+            @Header("Authorization") String token,
             @Query("payment") Payment payment);
 
-    @PATCH("service/payment")
+    @PATCH("payment/{payment_id}")
     Call<Payment> updatePayment(
-            @Query("token") String token,
-            @Query("original_payment_id") String original_payment_id,
+            @Header("Authorization") String token,
+            @Path("payment_id") String original_payment_id,
             @Query("payment") Payment payment);
 
-    @DELETE("service/payment")
+    @DELETE("payment/{payment_id}")
     Call<Map<String, Object>> deletePayment(
-            @Query("token") String token,
-            @Query("original_payment_id") String original_payment_id);
+            @Header("Authorization") String token,
+            @Path("payment_id") String original_payment_id);
+
+    @POST("part")
+    Call<Payment> addPart(
+            @Header("Authorization") String token,
+            @Query("part") Part part);
+
+    @PATCH("part/{part_id}")
+    Call<Payment> updatePart(
+            @Header("Authorization") String token,
+            @Path("part_id") String original_part_id,
+            @Query("part") Part part);
+
+    @DELETE("part/{part_id}")
+    Call<Map<String, Object>> deletePart(
+            @Header("Authorization") String token,
+            @Path("part_id") String original_payment_id);
 
 }
