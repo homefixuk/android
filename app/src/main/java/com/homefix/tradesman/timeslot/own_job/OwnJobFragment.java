@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
@@ -26,14 +27,26 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+
 /**
  * Created by samuel on 7/19/2016.
  */
 
 public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> implements BaseServiceView {
 
-    private View mChargesBar, mInvoiceBar, mPaymentsBar;
-    private TextView mChargesLblTxt, mChargesTxt, mInvoiceTxt, mPaymentsTxt;
+    @BindView(R.id.invoice_bar)
+    protected View mInvoiceBar;
+
+    @BindView(R.id.payments_bar)
+    protected View mPaymentsBar;
+
+    @BindView(R.id.charges_total_txt)
+    protected TextView mChargesTxt;
+
+    @BindView(R.id.payments_txt)
+    protected TextView mPaymentsTxt;
 
     public OwnJobFragment() {
     }
@@ -51,23 +64,6 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     }
 
     @Override
-    protected void injectDependencies() {
-        super.injectDependencies();
-
-        View view = getView();
-
-        if (view == null) return;
-
-        mChargesBar = view.findViewById(R.id.charges_bar);
-        mChargesLblTxt = (TextView) mChargesBar.findViewById(R.id.charges_total_lbl);
-        mChargesTxt = (TextView) mChargesBar.findViewById(R.id.charges_total_txt);
-        mInvoiceBar = view.findViewById(R.id.invoice_bar);
-        mInvoiceTxt = (TextView) mInvoiceBar.findViewById(R.id.invoice_txt);
-        mPaymentsBar = view.findViewById(R.id.payments_bar);
-        mPaymentsTxt = (TextView) mPaymentsBar.findViewById(R.id.payments_txt);
-    }
-
-    @Override
     public void setupView() {
         super.setupView();
 
@@ -77,7 +73,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
             if (serviceSet != null) {
                 if (mChargesTxt != null) {
-                    mChargesTxt.setText(Html.fromHtml("£" + Strings.priceToString(serviceSet.getTotalCost()) + " total"));
+                    mChargesTxt.setText(HtmlHelper.fromHtml("£" + Strings.priceToString(serviceSet.getTotalCost()) + " total"));
                 }
 
                 if (mPaymentsTxt != null) {
@@ -102,119 +98,9 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
         BackgroundColourOnTouchListener touchListener = new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark);
 
-        if (mChargesBar != null) {
-            mChargesBar.setOnTouchListener(touchListener);
-            mChargesBar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    goToActivitySendingService(ChargesActivity.class);
-                }
-            });
-        }
+        if (mInvoiceBar != null) mInvoiceBar.setOnTouchListener(touchListener);
 
-        if (mInvoiceBar != null) {
-            mInvoiceBar.setOnTouchListener(touchListener);
-            mInvoiceBar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MaterialDialogWrapper.getListDialog(
-                            getActivity(),
-                            "Customer Invoice",
-                            new CharSequence[]{"Send to Customer", "View Invoice"},
-                            new MaterialDialog.ListCallback() {
-                                @Override
-                                public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                                    OwnJobInvoice invoice = new OwnJobInvoice(mTimeslot != null ? mTimeslot.getService() : null);
-
-                                    invoice.generate();
-                                    File file = invoice.getFile();
-
-                                    if (file == null) {
-                                        showDialog("Sorry, something went wrong! Please try again.", false);
-                                        if (dialog != null) dialog.dismiss();
-                                        return;
-                                    }
-
-                                    if (which == 0) {
-                                        Service service = mTimeslot != null ? mTimeslot.getService() : null;
-                                        String content = "";
-
-                                        content += "Hi " + invoice.getCustomerFirstName() + ",\n\n";
-                                        content += "Please see your attached invoice";
-                                        if (service != null && service.getDepartTime() > 0) {
-                                            Date d = new Date();
-                                            d.setTime(service.getDepartTime());
-                                            content += " for the work done on the " + SimpleDateFormat.getInstance().format(d) + ".";
-                                        } else {
-                                            content += ".";
-                                        }
-                                        content += "\n\n";
-                                        content += "Kind Regards,\n";
-                                        content += UserController.getCurrentUser().getName();
-
-                                        IntentHelper.openEmailWithAttachment(
-                                                getContext(),
-                                                invoice.getCustomerEmail(),
-                                                invoice.getSubject(),
-                                                content,
-                                                file.getAbsolutePath());
-
-                                        dialog.dismiss();
-
-                                    } else if (which == 1) {
-                                        invoice.view(getContext());
-
-                                        // Note: do not dismiss dialog so the invoice can be sent after viewing it
-                                    }
-                                }
-                            }
-
-                    ).show();
-                }
-            });
-        }
-
-        if (mPaymentsBar != null)
-
-        {
-            mPaymentsBar.setOnTouchListener(touchListener);
-            mPaymentsBar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    goToActivitySendingService(PaymentsActivity.class);
-                }
-            });
-        }
-
-        // if not in edit mode
-        if (!isEdit)
-
-        {
-            if (mSaveTxt != null) {
-                mSaveTxt.setText("DONE");
-                mSaveTxt.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        getBaseActivity().tryClose();
-                    }
-                });
-            }
-            return;
-        }
-
-        // else in edit mode //
-        if (mSaveTxt != null)
-
-        {
-            mSaveTxt.setText(mTimeslot != null ? "UPDATE" : "CREATE");
-            mSaveTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveClicked();
-                }
-            });
-        }
-
+        if (mPaymentsBar != null) mPaymentsBar.setOnTouchListener(touchListener);
     }
 
     private void goToActivitySendingService(Class activityClass) {
@@ -288,6 +174,73 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                 mPersonPhoneNumberTxt.getText().toString(),
                 mCustomerPropertyType.getText().toString(),
                 mDescriptionTxt.getText().toString());
+    }
+
+    @OnClick(R.id.charges_bar)
+    public void onChargesClicked() {
+        goToActivitySendingService(ChargesActivity.class);
+    }
+
+    @OnClick(R.id.invoice_bar)
+    public void onInvoiceClicked() {
+        MaterialDialogWrapper.getListDialog(
+                getActivity(),
+                "Customer Invoice",
+                new CharSequence[]{"Send to Customer", "View Invoice"},
+                new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        OwnJobInvoice invoice = new OwnJobInvoice(mTimeslot != null ? mTimeslot.getService() : null);
+
+                        invoice.generate();
+                        File file = invoice.getFile();
+
+                        if (file == null) {
+                            showDialog("Sorry, something went wrong! Please try again.", false);
+                            if (dialog != null) dialog.dismiss();
+                            return;
+                        }
+
+                        if (which == 0) {
+                            Service service = mTimeslot != null ? mTimeslot.getService() : null;
+                            String content = "";
+
+                            content += "Hi " + invoice.getCustomerFirstName() + ",\n\n";
+                            content += "Please see your attached invoice";
+                            if (service != null && service.getDepartTime() > 0) {
+                                Date d = new Date();
+                                d.setTime(service.getDepartTime());
+                                content += " for the work done on the " + SimpleDateFormat.getInstance().format(d) + ".";
+                            } else {
+                                content += ".";
+                            }
+                            content += "\n\n";
+                            content += "Kind Regards,\n";
+                            content += UserController.getCurrentUser().getName();
+
+                            IntentHelper.openEmailWithAttachment(
+                                    getContext(),
+                                    invoice.getCustomerEmail(),
+                                    invoice.getSubject(),
+                                    content,
+                                    file.getAbsolutePath());
+
+                            dialog.dismiss();
+
+                        } else if (which == 1) {
+                            invoice.view(getContext());
+
+                            // Note: do not dismiss dialog so the invoice can be sent after viewing it
+                        }
+                    }
+                }
+
+        ).show();
+    }
+
+    @OnClick(R.id.payments_bar)
+    public void onPaymentsClicked() {
+        goToActivitySendingService(PaymentsActivity.class);
     }
 
 }

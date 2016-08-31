@@ -19,6 +19,8 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import icepick.Icepick;
 
 /**
@@ -33,6 +35,8 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
 
     protected MaterialDialog mBaseDialog;
 
+    private Unbinder unbinder;
+
     public BaseFragment(String TAG) {
         this.TAG = TAG;
     }
@@ -45,6 +49,7 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
     }
 
     @Nullable
@@ -52,8 +57,9 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Icepick.restoreInstanceState(this, savedInstanceState);
-        return inflater.inflate(getLayoutRes(), container, false);
+        View view = inflater.inflate(getLayoutRes(), container, false);
+        injectDependencies(view);
+        return view;
     }
 
     @Override
@@ -65,7 +71,6 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        injectDependencies();
     }
 
     @Override
@@ -164,9 +169,17 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
     /**
      * Inject the dependencies
      */
+    protected void injectDependencies(View view) {
+        if (view == null) return;
 
+        unbinder = ButterKnife.bind(this, view);
+    }
+
+    /**
+     * Inject the dependencies
+     */
     protected void injectDependencies() {
-
+        injectDependencies(getView());
     }
 
     @Override
@@ -185,6 +198,12 @@ public abstract class BaseFragment<A extends HomeFixBaseActivity, V extends Base
     public void onDestroy() {
         super.onDestroy();
         getPresenter().onDestroy();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (unbinder != null) unbinder.unbind();
     }
 
     @Override

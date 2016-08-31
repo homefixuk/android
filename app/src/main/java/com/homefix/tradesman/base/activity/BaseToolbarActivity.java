@@ -19,16 +19,26 @@ import com.homefix.tradesman.base.view.BaseToolbarActivityView;
 import com.samdroid.string.Strings;
 import com.samdroid.view.ScreenUtils;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+
 /**
  * Created by samuel on 6/16/2016.
  */
 
 public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P extends BaseToolbarActivityPresenter<V>> extends HomeFixBaseActivity<V, P> implements BaseToolbarActivityView {
 
-    private Toolbar toolbar;
-    private View mTitleIconHolder;
-    private TextView mActionBarTitleTxt;
-    private ImageView mActionBarTitleIconRight;
+    @BindView(R.id.toolbar)
+    protected Toolbar toolbar;
+
+    @BindView(R.id.title_and_icon_holder)
+    protected View mTitleIconHolder;
+
+    @BindView(R.id.toolbar_title_text_override)
+    protected TextView mActionBarTitleTxt;
+
+    @BindView(R.id.title_icon_right)
+    protected ImageView mActionBarTitleIconRight;
 
     private boolean showToolbar = true;
 
@@ -44,16 +54,6 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
     @Override
     public int getLayoutId() {
         return R.layout.activity_content_fragment_with_app_bar;
-    }
-
-    @Override
-    public void injectDependencies() {
-        super.injectDependencies();
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        mTitleIconHolder = findViewById(R.id.title_and_icon_holder);
-        mActionBarTitleTxt = (TextView) mTitleIconHolder.findViewById(R.id.toolbar_title_text_override);
-        mActionBarTitleIconRight = (ImageView) mTitleIconHolder.findViewById(R.id.title_icon_right);
     }
 
     @Override

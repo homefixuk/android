@@ -44,6 +44,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+import butterknife.OnLongClick;
+import butterknife.OnTouch;
+
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -52,37 +57,44 @@ import static android.app.Activity.RESULT_OK;
 
 public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresenter<BaseServiceView>> extends BaseTimeslotFragment<TimeslotActivity, BaseServiceView, P> implements BaseServiceView {
 
+    @BindView(R.id.location_bar)
     protected View mLocationBar;
-    protected TextView mJobTypeTxt, mLocationTxt, mCustomerPropertyType;
-    protected ImageView mLocationIcon, mEmailIcon, mPhoneIcon;
-    protected EditText mPersonNameTxt, mPersonEmailTxt, mPersonPhoneNumberTxt, mDescriptionTxt;
+
+    @BindView(R.id.job_type_txt)
+    protected TextView mJobTypeTxt;
+
+    @BindView(R.id.location_txt)
+    protected TextView mLocationTxt;
+
+    @BindView(R.id.property_type_txt)
+    protected TextView mCustomerPropertyType;
+
+    @BindView(R.id.location_icon)
+    protected ImageView mLocationIcon;
+
+    @BindView(R.id.email_icon)
+    protected ImageView mEmailIcon;
+
+    @BindView(R.id.phone_icon)
+    protected ImageView mPhoneIcon;
+
+    @BindView(R.id.person_name_txt)
+    protected EditText mPersonNameTxt;
+
+    @BindView(R.id.person_email_txt)
+    protected EditText mPersonEmailTxt;
+
+    @BindView(R.id.person_phone_number_txt)
+    protected EditText mPersonPhoneNumberTxt;
+
+    @BindView(R.id.description_txt)
+    protected EditText mDescriptionTxt;
+
     protected Place mLocationPlace;
     protected String addressLine1, addressLine2, addressLine3, country, postcode;
     protected Double latitude = null, longitude = null;
 
     public BaseServiceFragment() {
-    }
-
-    @Override
-    protected void injectDependencies() {
-        super.injectDependencies();
-
-        View view = getView();
-
-        if (view == null) return;
-
-        mJobTypeTxt = (TextView) view.findViewById(R.id.job_type_txt);
-        mLocationBar = view.findViewById(R.id.location_bar);
-        mLocationTxt = (TextView) mLocationBar.findViewById(R.id.location_txt);
-        mPersonNameTxt = (EditText) view.findViewById(R.id.person_name_txt);
-        mPersonEmailTxt = (EditText) view.findViewById(R.id.person_email_txt);
-        mPersonPhoneNumberTxt = (EditText) view.findViewById(R.id.person_phone_number_txt);
-        mCustomerPropertyType = (TextView) view.findViewById(R.id.property_type_txt);
-        mDescriptionTxt = (EditText) view.findViewById(R.id.description_txt);
-
-        mLocationIcon = (ImageView) mLocationBar.findViewById(R.id.location_icon);
-        mEmailIcon = (ImageView) view.findViewById(R.id.email_icon);
-        mPhoneIcon = (ImageView) view.findViewById(R.id.phone_icon);
     }
 
     @Override
@@ -133,47 +145,12 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         // if not in edit mode
         if (!isEdit) {
-            mJobTypeTxt.setOnClickListener(null);
-
             mLocationIcon.setImageResource(R.drawable.directions);
             mEmailIcon.setVisibility(View.VISIBLE);
             mPhoneIcon.setVisibility(View.VISIBLE);
 
             // setup locations
-            View.OnClickListener directionsClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (latitude != null && longitude != null)
-                        IntentHelper.googleMapsDirections(getActivity(), latitude, longitude);
-                    else
-                        IntentHelper.googleMapsDirections(getActivity(), getReadableLocationString(","));
-                }
-            };
-            mLocationBar.setOnClickListener(directionsClickListener);
             mLocationBar.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark));
-            mLocationBar.setOnLongClickListener(null);
-
-            // setup email
-            View.OnClickListener emailClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String email = mPersonEmailTxt.getText().toString();
-
-                    if (Strings.isEmpty(email)) {
-                        Toast.makeText(getContext(), "No email to send to", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    ShareCompat.IntentBuilder.from(getActivity())
-                            .setType("message/rfc822")
-                            .addEmailTo(email)
-                            .setSubject("Homefix")
-                            .setText("")
-                            .startChooser();
-                }
-            };
-            mEmailIcon.setOnClickListener(emailClickListener);
-            mPersonEmailTxt.setOnClickListener(emailClickListener);
 
             BackgroundViewColourOnTouchListener listener = new BackgroundViewColourOnTouchListener(
                     mPersonEmailTxt,
@@ -182,49 +159,12 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             mPersonEmailTxt.setOnTouchListener(listener);
             mEmailIcon.setOnTouchListener(listener);
 
-            View.OnClickListener phoneClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String phone = mPersonPhoneNumberTxt.getText().toString();
-
-                    if (Strings.isEmpty(phone)) {
-                        MaterialDialogWrapper.getConfirmationDialog(
-                                getActivity(),
-                                "No phone number for the customer. Open the dialer anyway?",
-                                "OPEN DIALER",
-                                "CANCEL",
-                                new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        dialog.dismiss();
-
-                                        IntentHelper.callPhoneNumber(getContext(), "");
-                                    }
-                                },
-                                new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        dialog.dismiss();
-                                    }
-                                }).show();
-                        return;
-                    }
-
-                    IntentHelper.callPhoneNumber(getContext(), phone);
-                }
-            };
-            mPhoneIcon.setOnClickListener(phoneClickListener);
-            mPersonPhoneNumberTxt.setOnClickListener(phoneClickListener);
-
             BackgroundViewColourOnTouchListener phoneListener = new BackgroundViewColourOnTouchListener(
                     mPersonPhoneNumberTxt,
                     ContextCompat.getColor(getContext(), R.color.transparent),
                     ContextCompat.getColor(getContext(), R.color.colorAccentDark));
             mPersonPhoneNumberTxt.setOnTouchListener(phoneListener);
             mPhoneIcon.setOnTouchListener(phoneListener);
-
-            mCustomerPropertyType.setOnClickListener(null);
-
             return;
         }
 
@@ -232,62 +172,13 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         // hide action buttons from non-edit mode (directions, email, phone)
         mEmailIcon.setVisibility(View.GONE);
-        mEmailIcon.setOnClickListener(null);
         mEmailIcon.setOnTouchListener(null);
-        mPersonEmailTxt.setOnClickListener(null);
         mPersonEmailTxt.setOnTouchListener(null);
-        mPersonPhoneNumberTxt.setOnClickListener(null);
         mPersonPhoneNumberTxt.setOnTouchListener(null);
         mPhoneIcon.setVisibility(View.GONE);
-        mPhoneIcon.setOnClickListener(null);
         mPhoneIcon.setOnTouchListener(null);
 
-        mJobTypeTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // show list of service type names
-                List<String> namesList = Problem.getProblemTypeNames();
-                CharSequence[] array = namesList.toArray(new String[namesList.size()]);
-
-                MaterialDialogWrapper.getListDialog(getActivity(), "Select service type", array, new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                        hasMadeChanges = true;
-
-                        // set the job type text from the one they selected
-                        mJobTypeTxt.setText(text);
-                    }
-                }).show();
-            }
-        });
-
         mLocationIcon.setImageResource(R.drawable.ic_map_marker_grey600_48dp);
-        mLocationBar.setOnTouchListener(null);
-        mLocationBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPlacePicker();
-            }
-        });
-        mLocationBar.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                showManualLocationInput();
-                return true;
-            }
-        });
-
-        mCustomerPropertyType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MaterialDialogWrapper.getListDialog(getActivity(), "Users relation to property", new CharSequence[]{"owner", "tenant", "manager"}, new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                        mCustomerPropertyType.setText(text);
-                    }
-                }).show();
-            }
-        });
     }
 
     /**
@@ -496,6 +387,110 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             return addresses.get(0);
         else
             return null;
+    }
+
+    @OnClick(R.id.job_type_txt)
+    public void onJobTypeClicked() {
+        if (!isEdit) return;
+
+        // show list of service type names
+        List<String> namesList = Problem.getProblemTypeNames();
+        CharSequence[] array = namesList.toArray(new String[namesList.size()]);
+
+        MaterialDialogWrapper.getListDialog(getActivity(), "Select service type", array, new MaterialDialog.ListCallback() {
+            @Override
+            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                hasMadeChanges = true;
+
+                // set the job type text from the one they selected
+                mJobTypeTxt.setText(text);
+            }
+        }).show();
+    }
+
+    @OnClick(R.id.location_bar)
+    public void onLocationClicked() {
+        if (isEdit) {
+            showPlacePicker();
+            return;
+        }
+
+        // else get directions //
+        if (latitude != null && longitude != null)
+            IntentHelper.googleMapsDirections(getActivity(), latitude, longitude);
+        else
+            IntentHelper.googleMapsDirections(getActivity(), getReadableLocationString(","));
+    }
+
+    @OnLongClick
+    public boolean onLocationLongTouch() {
+        if (!isEdit) return false;
+
+        showManualLocationInput();
+        return true;
+    }
+
+    @OnClick({R.id.email_icon, R.id.person_email_txt})
+    public void onEmailClicked() {
+        if (isEdit || mPersonEmailTxt == null) return;
+
+        String email = mPersonEmailTxt.getText().toString();
+
+        if (Strings.isEmpty(email)) {
+            Toast.makeText(getContext(), "No email to send to", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ShareCompat.IntentBuilder.from(getActivity())
+                .setType("message/rfc822")
+                .addEmailTo(email)
+                .setSubject("Homefix")
+                .setText("")
+                .startChooser();
+    }
+
+    @OnClick({R.id.phone_icon, R.id.person_phone_number_txt})
+    public void onPhoneClicked() {
+        if (isEdit || mPersonPhoneNumberTxt == null) return;
+
+        String phone = mPersonPhoneNumberTxt.getText().toString();
+
+        if (Strings.isEmpty(phone)) {
+            MaterialDialogWrapper.getConfirmationDialog(
+                    getActivity(),
+                    "No phone number for the customer. Open the dialer anyway?",
+                    "OPEN DIALER",
+                    "CANCEL",
+                    new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
+
+                            IntentHelper.callPhoneNumber(getContext(), "");
+                        }
+                    },
+                    new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+            return;
+        }
+
+        IntentHelper.callPhoneNumber(getContext(), phone);
+    }
+
+    @OnClick(R.id.property_type_txt)
+    public void onCustomerPropertyRelationshipClicked() {
+        if (!isEdit || mCustomerPropertyType == null) return;
+
+        MaterialDialogWrapper.getListDialog(getActivity(), "Users relation to property", new CharSequence[]{"owner", "tenant", "manager"}, new MaterialDialog.ListCallback() {
+            @Override
+            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                mCustomerPropertyType.setText(text);
+            }
+        }).show();
     }
 
 }

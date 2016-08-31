@@ -16,6 +16,8 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.model.Payment;
 import com.samdroid.string.Strings;
 
+import butterknife.ButterKnife;
+
 /**
  * Created by samuel on 7/27/2016.
  */
@@ -51,7 +53,7 @@ public class AddPaymentView extends LinearLayout {
     public void setType(String type) {
         if (payment != null) payment.setType(Strings.returnSafely(type));
 
-        Spinner spinner = (Spinner) findViewById(R.id.type_spinner);
+        Spinner spinner = ButterKnife.findById(this, R.id.type_spinner);
 
         if (spinner == null) return;
 
@@ -83,7 +85,7 @@ public class AddPaymentView extends LinearLayout {
     public void setAmount(double amount) {
         if (payment != null) payment.setAmount(amount);
 
-        EditText txt = (EditText) findViewById(R.id.amount_txt);
+        EditText txt = ButterKnife.findById(this, R.id.amount_txt);
 
         if (txt == null) return;
 
@@ -108,7 +110,7 @@ public class AddPaymentView extends LinearLayout {
     }
 
     public String getType() {
-        Spinner spinner = (Spinner) findViewById(R.id.type_spinner);
+        Spinner spinner = ButterKnife.findById(this, R.id.type_spinner);
 
         if (spinner == null) return "unknown";
 
@@ -116,7 +118,7 @@ public class AddPaymentView extends LinearLayout {
     }
 
     public double getAmount() {
-        TextView txt = (TextView) findViewById(R.id.amount_txt);
+        TextView txt = ButterKnife.findById(this, R.id.amount_txt);
         return Double.parseDouble(txt != null ? txt.getText().toString() : "0");
     }
 

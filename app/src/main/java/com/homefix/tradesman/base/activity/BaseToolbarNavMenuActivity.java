@@ -1,8 +1,6 @@
 package com.homefix.tradesman.base.activity;
 
 import android.Manifest;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +27,9 @@ import com.homefix.tradesman.model.User;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by samuel on 6/22/2016.
  */
@@ -36,11 +37,19 @@ import com.samdroid.string.Strings;
 public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuActivityView, P extends BaseToolbarNavMenuActivityPresenter<V>> extends BaseToolbarActivity<V, P>
         implements BaseToolbarNavMenuActivityView, NavigationView.OnNavigationItemSelectedListener {
 
-    private NavigationView navigationView;
-    private View navHeaderView;
-    private DrawerLayout drawerLayout;
-    private FloatingActionButton mFab;
-    private TextView mUserNameTxt, mUserInfoTxt, mCallCcaTxt;
+    @BindView(R.id.navigation_view)
+    protected NavigationView navigationView;
+
+    @BindView(R.id.drawer)
+    protected DrawerLayout drawerLayout;
+
+    @BindView(R.id.fab)
+    protected FloatingActionButton mFab;
+
+    protected TextView mUserNameTxt, mUserInfoTxt;
+
+    @BindView(R.id.call_cca_text)
+    protected TextView mCallCcaTxt;
 
     private String ccaPhoneNumber;
 
@@ -60,17 +69,14 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     @Override
     public void injectDependencies() {
         super.injectDependencies();
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
-        navHeaderView = navigationView.getHeaderView(0);
-        if (navHeaderView != null) {
-            mUserNameTxt = (TextView) navHeaderView.findViewById(R.id.user_name);
-            mUserInfoTxt = (TextView) navHeaderView.findViewById(R.id.user_info);
+        if (navigationView != null) {
+            View navHeaderView = navigationView.getHeaderView(0);
+            if (navHeaderView != null) {
+                mUserNameTxt = ButterKnife.findById(navHeaderView, R.id.user_name);
+                mUserInfoTxt = ButterKnife.findById(navHeaderView, R.id.user_info);
+            }
         }
-
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mCallCcaTxt = (TextView) findViewById(R.id.call_cca_text);
     }
 
     @Override

@@ -31,8 +31,11 @@ import com.samdroid.common.ColorUtils;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.string.Strings;
 
+import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,8 +48,18 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
 
     private Service service;
 
-    private TextView mTotalCost, mTotalPaid, mRemainingTxt;
-    private ListView mListView;
+    @BindView(R.id.total_cost)
+    protected TextView mTotalCost;
+
+    @BindView(R.id.total_paid)
+    protected TextView mTotalPaid;
+
+    @BindView(R.id.remaining)
+    protected TextView mRemainingTxt;
+
+    @BindView(R.id.list)
+    protected ListView mListView;
+
     private ArrayAdapter<Payment> mAdapter;
 
     public PaymentsFragment() {
@@ -63,20 +76,6 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
     @Override
     protected int getLayoutRes() {
         return R.layout.payments_layout;
-    }
-
-    @Override
-    protected void injectDependencies() {
-        super.injectDependencies();
-
-        View view = getView();
-
-        if (view == null) return;
-
-        mTotalCost = (TextView) view.findViewById(R.id.total_cost);
-        mTotalPaid = (TextView) view.findViewById(R.id.total_paid);
-        mRemainingTxt = (TextView) view.findViewById(R.id.remaining);
-        mListView = (ListView) view.findViewById(R.id.list);
     }
 
     @Override
@@ -103,8 +102,9 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
         if (mAdapter == null) {
             mAdapter = new ArrayAdapter<Payment>(getActivity(), R.layout.payments_item_layout) {
 
+                @NonNull
                 @Override
-                public View getView(int position, View convertView, ViewGroup parent) {
+                public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                     View view = convertView;
 
                     if (view == null) {
@@ -112,10 +112,16 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
                         view = inflater.inflate(R.layout.payments_item_layout, parent, false);
                     }
 
-                    TextView mLbl = (TextView) view.findViewById(R.id.label);
-                    TextView mAmount = (TextView) view.findViewById(R.id.amount);
+                    TextView mLbl = ButterKnife.findById(view, R.id.label);
+                    TextView mAmount = ButterKnife.findById(view, R.id.amount);
 
                     final Payment payment = getItem(position);
+                    if (payment == null) {
+                        view.setVisibility(View.GONE);
+                        return view;
+                    }
+
+                    view.setVisibility(View.VISIBLE);
 
                     mLbl.setText(payment.getType());
                     mAmount.setText(String.format("£%s", Strings.priceToString(payment.getAmount())));
@@ -158,8 +164,11 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
                     return view;
                 }
             };
-            mAdapter.addAll(serviceSet != null ? serviceSet.getPayments() : null);
-            mAdapter.notifyDataSetChanged();
+            List<Payment> paymentList = serviceSet != null ? serviceSet.getPayments() : null;
+            if (paymentList != null) {
+                mAdapter.addAll(paymentList);
+                mAdapter.notifyDataSetChanged();
+            }
         }
 
         mListView.setAdapter(mAdapter);

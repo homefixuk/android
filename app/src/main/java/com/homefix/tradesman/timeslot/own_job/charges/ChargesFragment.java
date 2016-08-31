@@ -28,9 +28,11 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.string.Strings;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,8 +45,12 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
 
     private Service service;
 
-    private TextView mTotalCost;
-    private ListView mListView;
+    @BindView(R.id.amount)
+    protected TextView mTotalCost;
+
+    @BindView(R.id.list)
+    protected ListView mListView;
+
     private ArrayAdapter<Charge> mAdapter;
 
     public ChargesFragment() {
@@ -64,18 +70,6 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
     }
 
     @Override
-    protected void injectDependencies() {
-        super.injectDependencies();
-
-        View view = getView();
-
-        if (view == null) return;
-
-        mTotalCost = (TextView) view.findViewById(R.id.amount);
-        mListView = (ListView) view.findViewById(R.id.list);
-    }
-
-    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -87,8 +81,9 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         if (mAdapter == null) {
             mAdapter = new ArrayAdapter<Charge>(getActivity(), R.layout.charges_item_layout) {
 
+                @NonNull
                 @Override
-                public View getView(int position, View convertView, ViewGroup parent) {
+                public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                     View view = convertView;
 
                     if (view == null) {
@@ -96,9 +91,9 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
                         view = inflater.inflate(R.layout.charges_item_layout, parent, false);
                     }
 
-                    TextView mLbl = (TextView) view.findViewById(R.id.label);
-                    TextView mAmount = (TextView) view.findViewById(R.id.amount);
-                    TextView mQuantity = (TextView) view.findViewById(R.id.quantity);
+                    TextView mLbl = ButterKnife.findById(view, R.id.label);
+                    TextView mAmount = ButterKnife.findById(view, R.id.amount);
+                    TextView mQuantity = ButterKnife.findById(view, R.id.quantity);
 
                     final Charge charge = getItem(position);
 
@@ -144,8 +139,12 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
                     return view;
                 }
             };
-            mAdapter.addAll(serviceSet != null ? serviceSet.getCharges() : null);
-            mAdapter.notifyDataSetChanged();
+
+            List<Charge> chargeList = serviceSet != null ? serviceSet.getCharges() : null;
+            if (chargeList != null) {
+                mAdapter.addAll(chargeList);
+                mAdapter.notifyDataSetChanged();
+            }
         }
 
         mListView.setAdapter(mAdapter);

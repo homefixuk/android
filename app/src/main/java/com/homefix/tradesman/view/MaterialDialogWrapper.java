@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import butterknife.ButterKnife;
 import clojure.lang.Obj;
 
 public class MaterialDialogWrapper {
@@ -254,7 +255,7 @@ public class MaterialDialogWrapper {
         LayoutInflater inflater = activity.getLayoutInflater();
 
         View view = inflater.inflate(R.layout.empty_vertical_scroll_view, null, false);
-        final LinearLayout content = (LinearLayout) view.findViewById(R.id.content);
+        final LinearLayout content = ButterKnife.findById(view, R.id.content);
 
         EditText firstEdtTxt = null;
 
@@ -342,7 +343,7 @@ public class MaterialDialogWrapper {
         View view = inflater.inflate(R.layout.edit_text_padded, null, false);
 
         // set the current content
-        final EditText edtTxt = (EditText) view.findViewById(R.id.edit_text);
+        final EditText edtTxt = ButterKnife.findById(view, R.id.edit_text);
         edtTxt.setHint(Strings.returnSafely(hint));
         edtTxt.setText(Strings.returnSafely(initialString));
 

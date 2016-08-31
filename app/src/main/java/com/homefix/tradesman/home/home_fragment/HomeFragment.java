@@ -14,12 +14,15 @@ import com.homefix.tradesman.service.LocationService;
 
 import java.util.Date;
 
+import butterknife.BindView;
+
 /**
  * Created by samuel on 6/28/2016.
  */
 
 public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragmentView, HomeFragmentPresenter> implements HomeFragmentView, OnNewLocationListener {
 
+    @BindView(R.id.text)
     TextView textView;
 
     public HomeFragment() {
@@ -36,13 +39,6 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_home;
-    }
-
-    @Override
-    protected void injectDependencies() {
-        super.injectDependencies();
-
-        textView = (TextView) getView().findViewById(R.id.text);
     }
 
     @Override

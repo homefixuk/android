@@ -41,7 +41,7 @@ public class Charge {
     }
 
     public String getDescription() {
-        return description;
+        return Strings.returnSafely(description);
     }
 
     public void setDescription(String description) {

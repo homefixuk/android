@@ -2,9 +2,6 @@ package com.homefix.tradesman.login;
 
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
@@ -13,16 +10,20 @@ import com.samdroid.input.AsteriskPasswordTransformationMethod;
 import com.samdroid.resource.ColourUtils;
 import com.samdroid.string.Strings;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+
 /**
  * Created by samuel on 6/24/2016.
  */
 
 public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter> implements LoginView {
 
-    View mContactUs;
-    TextView mContactUsTxt;
-    EditText mEmailEdt, mPasswordEdt;
-    Button mLoginBtn;
+    @BindView(R.id.email_edt)
+    EditText mEmailEdt;
+
+    @BindView(R.id.password_edt)
+    EditText mPasswordEdt;
 
     public LoginActivity() {
         super(LoginActivity.class.getSimpleName());
@@ -38,17 +39,6 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
     @Override
     public int getLayoutId() {
         return R.layout.activity_login;
-    }
-
-    @Override
-    public void injectDependencies() {
-        super.injectDependencies();
-
-        mEmailEdt = (EditText) findViewById(R.id.email_edt);
-        mPasswordEdt = (EditText) findViewById(R.id.password_edt);
-        mLoginBtn = (Button) findViewById(R.id.login_btn);
-        mContactUs = findViewById(R.id.contact_us);
-        mContactUsTxt = (TextView) findViewById(R.id.contact_us_txt);
     }
 
     @Override
@@ -71,27 +61,21 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
         mPasswordEdt.setHint("Password");
         mPasswordEdt.setTransformationMethod(new AsteriskPasswordTransformationMethod());
         mPasswordEdt.setHintTextColor(ColourUtils.getColour(getContext(), R.color.greyLight));
+    }
 
-        mLoginBtn.setOnClickListener(new View.OnClickListener() {
+    @OnClick(R.id.contact_us)
+    public void onContactUsClicked() {
+        getPresenter().onContactUsClicked();
+    }
 
-            @Override
-            public void onClick(View v) {
-                if (mEmailEdt == null || mPasswordEdt == null) return;
+    @OnClick(R.id.login_btn)
+    public void onLoginClicked() {
+        if (mEmailEdt == null || mPasswordEdt == null) return;
 
-                if (getPresenter() != null)
-                    getPresenter().doEmailPasswordLogin(
-                            mEmailEdt.getText().toString(),
-                            mPasswordEdt.getText().toString());
-            }
-
-        });
-
-        mContactUs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getPresenter().onContactUsClicked();
-            }
-        });
+        if (getPresenter() != null)
+            getPresenter().doEmailPasswordLogin(
+                    mEmailEdt.getText().toString(),
+                    mPasswordEdt.getText().toString());
     }
 
     @Override

@@ -36,6 +36,7 @@ import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
+import butterknife.ButterKnife;
 import icepick.Icepick;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -85,6 +86,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
      * Inject the views into this activity
      */
     public void injectDependencies() {
+        ButterKnife.bind(this);
     }
 
     @Override

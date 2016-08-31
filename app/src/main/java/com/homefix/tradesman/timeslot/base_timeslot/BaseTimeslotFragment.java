@@ -21,6 +21,9 @@ import com.samdroid.common.TimeUtils;
 
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+
 /**
  * Created by samuel on 7/13/2016.
  */
@@ -31,8 +34,25 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     protected boolean isEdit = false, hasMadeChanges = false;
     protected Timeslot mTimeslot;
 
+    @BindView(R.id.icon)
     protected ImageView mIcon;
-    protected TextView mStartDateTxt, mStartTimeTxt, mEndDateTxt, mEndTimeTxt, mSaveTxt;
+
+    @BindView(R.id.start_date)
+    protected TextView mStartDateTxt;
+
+    @BindView(R.id.start_time)
+    protected TextView mStartTimeTxt;
+
+    @BindView(R.id.end_date)
+    protected TextView mEndDateTxt;
+
+    @BindView(R.id.end_time)
+    protected TextView mEndTimeTxt;
+
+    @BindView(R.id.save)
+    protected TextView mSaveTxt;
+
+
     protected Calendar mStartCal, mEndCal;
 
     public BaseTimeslotFragment() {
@@ -54,22 +74,6 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_timeslot;
-    }
-
-    @Override
-    protected void injectDependencies() {
-        super.injectDependencies();
-
-        View view = getView();
-
-        if (view == null) return;
-
-        mIcon = (ImageView) view.findViewById(R.id.icon);
-        mStartDateTxt = (TextView) view.findViewById(R.id.start_date);
-        mStartTimeTxt = (TextView) view.findViewById(R.id.start_time);
-        mEndDateTxt = (TextView) view.findViewById(R.id.end_date);
-        mEndTimeTxt = (TextView) view.findViewById(R.id.end_time);
-        mSaveTxt = (TextView) view.findViewById(R.id.save);
     }
 
     @Override
@@ -121,140 +125,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         setStartTime(mStartCal);
         setEndTime(mEndCal);
 
-        hasMadeChanges = false;
-
-        // if not in edit mode
-        if (!isEdit) {
-            mStartDateTxt.setOnClickListener(null);
-            mStartTimeTxt.setOnClickListener(null);
-            mEndDateTxt.setOnClickListener(null);
-            mEndTimeTxt.setOnClickListener(null);
-
-            mSaveTxt.setText("DONE");
-            mSaveTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getBaseActivity().tryClose();
-                }
-            });
-
-            return;
-        }
-
-        // if in edit mode
-        if (mStartDateTxt != null) {
-            mStartDateTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new DatePickerDialog(
-                            getContext(),
-                            new DatePickerDialog.OnDateSetListener() {
-
-                                @Override
-                                public void onDateSet(android.widget.DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                    Calendar calNew = (Calendar) mStartCal.clone();
-                                    calNew.set(Calendar.YEAR, year);
-                                    calNew.set(Calendar.MONTH, monthOfYear);
-                                    calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                                    setStartTime(calNew);
-                                }
-
-                            },
-                            mStartCal.get(Calendar.YEAR),
-                            mStartCal.get(Calendar.MONTH),
-                            mStartCal.get(Calendar.DAY_OF_MONTH)
-
-                    ).show();
-                }
-            });
-        }
-
-        if (mStartTimeTxt != null) {
-            mStartTimeTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new TimePickerDialog(
-                            getContext(),
-                            new TimePickerDialog.OnTimeSetListener() {
-
-                                @Override
-                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    Calendar calNew = (Calendar) mStartCal.clone();
-                                    calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    calNew.set(Calendar.MINUTE, minute);
-                                    setStartTime(calNew);
-                                }
-
-                            },
-                            mStartCal.get(Calendar.HOUR_OF_DAY),
-                            mStartCal.get(Calendar.MINUTE),
-                            true)
-                            .show();
-                }
-            });
-        }
-
-        if (mEndDateTxt != null) {
-            mEndDateTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new DatePickerDialog(
-                            getContext(),
-                            new DatePickerDialog.OnDateSetListener() {
-
-                                @Override
-                                public void onDateSet(android.widget.DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                    Calendar calNew = (Calendar) mEndCal.clone();
-                                    calNew.set(Calendar.YEAR, year);
-                                    calNew.set(Calendar.MONTH, monthOfYear);
-                                    calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                                    setEndTime(calNew);
-                                }
-
-                            },
-                            mEndCal.get(Calendar.YEAR),
-                            mEndCal.get(Calendar.MONTH),
-                            mEndCal.get(Calendar.DAY_OF_MONTH)
-
-                    ).show();
-                }
-            });
-        }
-
-        if (mEndTimeTxt != null) {
-            mEndTimeTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new TimePickerDialog(
-                            getContext(),
-                            new TimePickerDialog.OnTimeSetListener() {
-
-                                @Override
-                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    Calendar calNew = (Calendar) mEndCal.clone();
-                                    calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    calNew.set(Calendar.MINUTE, minute);
-                                    setEndTime(calNew);
-                                }
-
-                            },
-                            mEndCal.get(Calendar.HOUR_OF_DAY),
-                            mEndCal.get(Calendar.MINUTE),
-                            true)
-                            .show();
-                }
-            });
-        }
-
         if (mSaveTxt != null) {
-            mSaveTxt.setText(isEdit ? "SAVE" : "ADD");
-            mSaveTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveClicked();
-                }
-            });
+            mSaveTxt.setText(isEdit ? "DONE" : (mTimeslot == null ? "SAVE" : "ADD"));
         }
+
+        hasMadeChanges = false;
     }
 
     @Override
@@ -323,11 +198,6 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     @Override
-    public void saveClicked() {
-        getPresenter().save(mTimeslot, mStartCal, mEndCal);
-    }
-
-    @Override
     public void onSaveComplete(Timeslot timeslot) {
         hideDialog();
 
@@ -379,6 +249,113 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         if (dialog != null) dialog.dismiss();
                     }
                 }).show();
+    }
+
+    @OnClick(R.id.start_date)
+    public void onStartDateClicked() {
+        if (!isEdit) return;
+
+        new DatePickerDialog(
+                getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(android.widget.DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        Calendar calNew = (Calendar) mStartCal.clone();
+                        calNew.set(Calendar.YEAR, year);
+                        calNew.set(Calendar.MONTH, monthOfYear);
+                        calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        setStartTime(calNew);
+                    }
+
+                },
+                mStartCal.get(Calendar.YEAR),
+                mStartCal.get(Calendar.MONTH),
+                mStartCal.get(Calendar.DAY_OF_MONTH)
+
+        ).show();
+    }
+
+    @OnClick(R.id.start_time)
+    public void onStartTimeClicked() {
+        if (!isEdit) return;
+
+        new TimePickerDialog(
+                getContext(),
+                new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        Calendar calNew = (Calendar) mStartCal.clone();
+                        calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calNew.set(Calendar.MINUTE, minute);
+                        setStartTime(calNew);
+                    }
+
+                },
+                mStartCal.get(Calendar.HOUR_OF_DAY),
+                mStartCal.get(Calendar.MINUTE),
+                true)
+                .show();
+    }
+
+    @OnClick(R.id.end_date)
+    public void onEndDateClicked() {
+        if (!isEdit) return;
+
+        new DatePickerDialog(
+                getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(android.widget.DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        Calendar calNew = (Calendar) mEndCal.clone();
+                        calNew.set(Calendar.YEAR, year);
+                        calNew.set(Calendar.MONTH, monthOfYear);
+                        calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        setEndTime(calNew);
+                    }
+
+                },
+                mEndCal.get(Calendar.YEAR),
+                mEndCal.get(Calendar.MONTH),
+                mEndCal.get(Calendar.DAY_OF_MONTH)
+
+        ).show();
+    }
+
+    @OnClick(R.id.end_time)
+    public void onEndTimeClicked() {
+        if (!isEdit) return;
+
+        new TimePickerDialog(
+                getContext(),
+                new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        Calendar calNew = (Calendar) mEndCal.clone();
+                        calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calNew.set(Calendar.MINUTE, minute);
+                        setEndTime(calNew);
+                    }
+
+                },
+                mEndCal.get(Calendar.HOUR_OF_DAY),
+                mEndCal.get(Calendar.MINUTE),
+                true)
+                .show();
+    }
+
+    @Override
+    @OnClick(R.id.save)
+    public void saveClicked() {
+        if (!isEdit) {
+            getBaseActivity().tryClose();
+            return;
+        }
+
+        getPresenter().save(mTimeslot, mStartCal, mEndCal);
     }
 
 }

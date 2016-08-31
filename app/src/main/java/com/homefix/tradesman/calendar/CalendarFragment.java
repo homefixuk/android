@@ -37,15 +37,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindView;
+
 /**
  * Created by samuel on 7/5/2016.
  */
 
 public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragment<A, CalendarView, CalendarPresenter> implements CalendarView, WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewClickListener {
 
-    private View mCover;
-    private WeekView mView;
-    private CompactCalendarView compactCalendarView;
+    @BindView(R.id.cover)
+    protected View mCover;
+
+    @BindView(R.id.week_view)
+    protected WeekView mView;
+
+    @BindView(R.id.compactcalendar_view)
+    protected CompactCalendarView compactCalendarView;
+
     private boolean isShowing = false;
     private Date mFirstDayOfNewMonth = new Date(); // defaults to current day
     final private SparseBooleanArray monthsFromServer = new SparseBooleanArray();
@@ -66,17 +74,6 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     @Override
     protected int getLayoutRes() {
         return R.layout.fragment_calendar;
-    }
-
-    @Override
-    protected void injectDependencies() {
-        super.injectDependencies();
-
-        if (getView() == null) return;
-
-        mView = (WeekView) getView().findViewById(R.id.week_view);
-        mCover = getView().findViewById(R.id.cover);
-        compactCalendarView = (CompactCalendarView) getView().findViewById(R.id.compactcalendar_view);
     }
 
     @Override

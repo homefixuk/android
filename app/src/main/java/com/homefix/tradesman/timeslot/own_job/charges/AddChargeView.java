@@ -17,6 +17,8 @@ import com.homefix.tradesman.model.Charge;
 import com.samdroid.common.ColorUtils;
 import com.samdroid.string.Strings;
 
+import butterknife.ButterKnife;
+
 /**
  * Created by samuel on 7/27/2016.
  */
@@ -56,7 +58,7 @@ public class AddChargeView extends LinearLayout {
     public void setName(String name) {
         if (charge != null) charge.setDescription(Strings.returnSafely(name));
 
-        TextView txt = (TextView) findViewById(R.id.name_txt);
+        TextView txt = ButterKnife.findById(this, R.id.name_txt);
 
         if (txt == null) return;
 
@@ -81,7 +83,7 @@ public class AddChargeView extends LinearLayout {
     }
 
     public void setNameError(String error) {
-        TextView txt = (TextView) findViewById(R.id.name_txt);
+        TextView txt = ButterKnife.findById(this, R.id.name_txt);
 
         if (txt == null) return;
 
@@ -91,7 +93,7 @@ public class AddChargeView extends LinearLayout {
     public void setQuantity(double quantity) {
         if (charge != null) charge.setQuantity(quantity);
 
-        TextView txt = (TextView) findViewById(R.id.quantity_txt);
+        TextView txt = ButterKnife.findById(this, R.id.quantity_txt);
 
         if (txt == null) return;
 
@@ -116,7 +118,7 @@ public class AddChargeView extends LinearLayout {
     }
 
     public void setQuantityError(String error) {
-        TextView txt = (TextView) findViewById(R.id.quantity_txt);
+        TextView txt = ButterKnife.findById(this, R.id.quantity_txt);
 
         if (txt == null) return;
 
@@ -126,7 +128,7 @@ public class AddChargeView extends LinearLayout {
     public void setAmount(double amount) {
         if (charge != null) charge.setAmount(amount);
 
-        EditText txt = (EditText) findViewById(R.id.amount_txt);
+        EditText txt = ButterKnife.findById(this, R.id.amount_txt);
 
         if (txt == null) return;
 
@@ -153,7 +155,7 @@ public class AddChargeView extends LinearLayout {
     public void setChargeVAT(boolean chargeVAT) {
         if (charge != null) charge.setWithVat(chargeVAT);
 
-        TextView txt = (TextView) findViewById(R.id.charge_vat_txt);
+        TextView txt = ButterKnife.findById(this, R.id.charge_vat_txt);
 
         if (txt == null) return;
 
@@ -173,7 +175,7 @@ public class AddChargeView extends LinearLayout {
     public void setMarkup(double markup) {
         if (charge != null) charge.setMarkup(markup);
 
-        EditText txt = (EditText) findViewById(R.id.markup_txt);
+        EditText txt = ButterKnife.findById(this, R.id.markup_txt);
 
         if (txt == null) return;
 
@@ -200,7 +202,7 @@ public class AddChargeView extends LinearLayout {
     public void setMarkupBeforeVAT(boolean markupBeforeVAT) {
         if (charge != null) charge.setMarkupBeforeVat(markupBeforeVAT);
 
-        TextView txt = (TextView) findViewById(R.id.markup_before_vat_txt);
+        TextView txt = ButterKnife.findById(this, R.id.markup_before_vat_txt);
 
         if (txt == null) return;
 
@@ -216,22 +218,22 @@ public class AddChargeView extends LinearLayout {
     }
 
     public String getName() {
-        TextView txt = (TextView) findViewById(R.id.name_txt);
+        TextView txt = ButterKnife.findById(this, R.id.name_txt);
         return txt != null ? txt.getText().toString() : "";
     }
 
     public double getQuantity() {
-        TextView txt = (TextView) findViewById(R.id.quantity_txt);
+        TextView txt = ButterKnife.findById(this, R.id.quantity_txt);
         return Double.parseDouble(txt != null ? txt.getText().toString() : "0");
     }
 
     public double getAmount() {
-        TextView txt = (TextView) findViewById(R.id.amount_txt);
+        TextView txt = ButterKnife.findById(this, R.id.amount_txt);
         return Double.parseDouble(txt != null ? txt.getText().toString() : "0");
     }
 
     public double getMarkup() {
-        TextView txt = (TextView) findViewById(R.id.markup_txt);
+        TextView txt = ButterKnife.findById(this, R.id.markup_txt);
         return Double.parseDouble(txt != null ? txt.getText().toString() : "0");
     }
 
