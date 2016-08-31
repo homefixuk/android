@@ -9,7 +9,7 @@ import com.samdroid.string.Strings;
 public class Property {
 
     Group group;
-    String address_line_1, address_line_2, address_line_3, country, postcode, phone;
+    String addressLine1, addressLine2, addressLine3, country, postcode, phone;
     int number_tennants, number_bedrooms;
     double latitude, longitude;
 
@@ -17,16 +17,16 @@ public class Property {
         return group;
     }
 
-    public String getAddress_line_1() {
-        return Strings.returnSafely(address_line_1);
+    public String getAddressLine1() {
+        return Strings.returnSafely(addressLine1);
     }
 
-    public String getAddress_line_2() {
-        return Strings.returnSafely(address_line_2);
+    public String getAddressLine2() {
+        return Strings.returnSafely(addressLine2);
     }
 
-    public String getAddress_line_3() {
-        return Strings.returnSafely(address_line_3);
+    public String getAddressLine3() {
+        return Strings.returnSafely(addressLine3);
     }
 
     public String getCountry() {
@@ -58,14 +58,14 @@ public class Property {
     }
 
     public String getReadableAddress() {
-        if (!Strings.isEmpty(address_line_1)) address_line_1 = address_line_1.replace(postcode, "");
-        if (!Strings.isEmpty(address_line_2)) address_line_2 = address_line_2.replace(postcode, "");
-        if (!Strings.isEmpty(address_line_3)) address_line_3 = address_line_3.replace(postcode, "");
+        if (!Strings.isEmpty(addressLine1)) addressLine1 = addressLine1.replace(postcode, "");
+        if (!Strings.isEmpty(addressLine2)) addressLine2 = addressLine2.replace(postcode, "");
+        if (!Strings.isEmpty(addressLine3)) addressLine3 = addressLine3.replace(postcode, "");
 
         String s = "";
-        s += !Strings.isEmpty(address_line_1) ? address_line_1 + "," : "";
-        s += !Strings.isEmpty(address_line_2) ? address_line_2 + ", " : "";
-        s += !Strings.isEmpty(address_line_3) ? address_line_3 + ", " : "";
+        s += !Strings.isEmpty(addressLine1) ? addressLine1 + "," : "";
+        s += !Strings.isEmpty(addressLine2) ? addressLine2 + ", " : "";
+        s += !Strings.isEmpty(addressLine3) ? addressLine3 + ", " : "";
         s += !Strings.isEmpty(postcode) ? postcode + ", " : "";
         s += !Strings.isEmpty(country) ? country : "";
 

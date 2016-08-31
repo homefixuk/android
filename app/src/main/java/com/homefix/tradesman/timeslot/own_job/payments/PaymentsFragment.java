@@ -83,14 +83,14 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ServiceSet serviceSet = service != null ? service.getService_set() : null;
+        ServiceSet serviceSet = service != null ? service.getServiceSet() : null;
 
         if (serviceSet != null) {
             if (mTotalPaid != null)
-                mTotalPaid.setText(String.format("£%s", Strings.priceToString(serviceSet.getAmount_paid())));
+                mTotalPaid.setText(String.format("£%s", Strings.priceToString(serviceSet.getAmountPaid())));
 
             if (mTotalCost != null)
-                mTotalCost.setText(String.format("£%s", Strings.priceToString(serviceSet.getTotal_cost())));
+                mTotalCost.setText(String.format("£%s", Strings.priceToString(serviceSet.getTotalCost())));
 
             if (mRemainingTxt != null) {
                 double remaining = serviceSet.getAmountRemaining();
@@ -217,7 +217,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
 
         if (isEmpty) {
             payment = new Payment();
-            payment.setServiceSet(service.getService_set());
+            payment.setServiceSet(service.getServiceSet());
         }
 
         final Payment finalPayment = payment;

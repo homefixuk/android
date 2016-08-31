@@ -73,16 +73,16 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
         if (mTimeslot != null) {
             Service service = mTimeslot.getService();
-            ServiceSet serviceSet = service != null ? service.getService_set() : null;
+            ServiceSet serviceSet = service != null ? service.getServiceSet() : null;
 
             if (serviceSet != null) {
                 if (mChargesTxt != null) {
-                    mChargesTxt.setText(Html.fromHtml("£" + Strings.priceToString(serviceSet.getTotal_cost()) + " total"));
+                    mChargesTxt.setText(Html.fromHtml("£" + Strings.priceToString(serviceSet.getTotalCost()) + " total"));
                 }
 
                 if (mPaymentsTxt != null) {
                     double amountRemaining = serviceSet.getAmountRemaining();
-                    double amountPaid = serviceSet.getAmount_paid();
+                    double amountPaid = serviceSet.getAmountPaid();
                     String s = "";
 
                     if (amountRemaining > 0) {
@@ -141,9 +141,9 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
                                         content += "Hi " + invoice.getCustomerFirstName() + ",\n\n";
                                         content += "Please see your attached invoice";
-                                        if (service != null && service.getDepart_time() > 0) {
+                                        if (service != null && service.getDepartTime() > 0) {
                                             Date d = new Date();
-                                            d.setTime(service.getDepart_time());
+                                            d.setTime(service.getDepartTime());
                                             content += " for the work done on the " + SimpleDateFormat.getInstance().format(d) + ".";
                                         } else {
                                             content += ".";

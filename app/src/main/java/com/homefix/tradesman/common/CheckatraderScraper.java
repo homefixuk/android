@@ -1,6 +1,7 @@
 package com.homefix.tradesman.common;
 
 import android.net.Uri;
+import android.util.SparseArray;
 
 import com.samdroid.common.MyLog;
 import com.samdroid.common.VariableUtils;
@@ -21,12 +22,20 @@ import java.util.List;
 
 public class CheckatraderScraper implements Runnable {
 
-    public static final int[] types = new int[]{151, 20};
-    public static final String[] locations = new String[]{"st albans", "", "", "", "", ""};
+    public static final String[] locations = new String[]{"st albans", "london", "watford", "enfield", "slough", "chigwell", "staines"};
+
+    public static SparseArray<String> types = new SparseArray<>();
+
+    static {
+        types.append(151, "General Plumbing");
+        types.append(20, "Plumber");
+        types.append(10, "Central Heating Engineer");
+        types.append(12, "Electrician");
+    }
 
     private static final String
             TAG = CheckatraderScraper.class.getSimpleName(),
-            BASE_SEARCH_URL = "http://www.checkatrade.com/Search/?location=%s&sort=1&page=%s&facet_Sub-categories=%s",
+            BASE_SEARCH_URL = "http://www.checkatrade.com/Search/?location=%s&sort=2&page=%s&facet_Sub-categories=%s",
             BASE_PLUMBER_URL = "http://www.checkatrade.com";
 
     private String location;
@@ -99,7 +108,8 @@ public class CheckatraderScraper implements Runnable {
             myCallback = new MultiGetListener(hrefs.size(), callback);
 
             // start getting all the tradesman
-            for (String href : hrefs) new GetTraderThread(href, myCallback).start();
+            for (String href : hrefs)
+                new GetTraderThread(href, types.get(jobType), myCallback).start();
 
         } catch (Exception e) {
             MyLog.printStackTrace(e);
@@ -111,11 +121,12 @@ public class CheckatraderScraper implements Runnable {
     private class GetTraderThread extends Thread {
 
         private MultiGetListener<CheckATrader> callback;
-        private String href;
+        private String href, trade;
 
-        public GetTraderThread(String href, MultiGetListener<CheckATrader> callback) {
+        public GetTraderThread(String href, String trade, MultiGetListener<CheckATrader> callback) {
             super();
             this.href = href;
+            this.trade = trade;
             this.callback = callback;
         }
 
@@ -125,7 +136,7 @@ public class CheckatraderScraper implements Runnable {
 
             MyLog.e(TAG, "HREF: " + href);
 
-            CheckATrader trader = getPlumber(href);
+            CheckATrader trader = getPlumber(href, trade);
 
             MyLog.e(TAG, trader.toString());
 
@@ -133,8 +144,8 @@ public class CheckatraderScraper implements Runnable {
         }
     }
 
-    private CheckATrader getPlumber(String refName) {
-        CheckATrader trader = new CheckATrader();
+    private CheckATrader getPlumber(String refName, String trade) {
+        CheckATrader trader = new CheckATrader(trade);
 
         try {
             if (!refName.startsWith("/")) refName = "/" + refName;
@@ -252,11 +263,12 @@ public class CheckatraderScraper implements Runnable {
 
     public static class CheckATrader {
 
-        public String companyName, name, basedIn, email, website, phone, mobile, worksIn, numberReviews;
+        public String trade, companyName, name, basedIn, email, website, phone, mobile, worksIn, numberReviews;
         public double rating;
         List<String> ticks;
 
-        public CheckATrader() {
+        public CheckATrader(String trade) {
+            this.trade = trade;
         }
 
         public String getCompanyName() {
@@ -357,7 +369,7 @@ public class CheckatraderScraper implements Runnable {
         }
 
         public String toCsvString() {
-            return "\"" + companyName + "\",\"" + name + "\",\"" + phone + "\",\"" + mobile + "\",\"" + email + "\",\"" + website + "\",\"" + rating + "\",\"" + numberReviews + "\",\"" + basedIn + "\",\"" + worksIn + "\",\"" + VariableUtils.listToString(ticks) + "\"";
+            return "\"" + trade + "\",\"" + companyName + "\",\"" + name + "\",\"" + phone + "\",\"" + mobile + "\",\"" + email + "\",\"" + website + "\",\"" + rating + "\",\"" + numberReviews + "\",\"" + basedIn + "\",\"" + worksIn + "\",\"" + VariableUtils.listToString(ticks) + "\"";
         }
 
     }

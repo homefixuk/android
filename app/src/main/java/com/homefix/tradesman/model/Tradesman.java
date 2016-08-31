@@ -14,9 +14,9 @@ import java.util.Map;
 public class Tradesman extends User {
 
     private String type, picture;
-    private double rating, experience, standard_hourly_rate;
-    private List<String> work_areas;
-    private Location current_location;
+    private double rating, experience, standardHourlyRate;
+    private List<String> workAreas;
+    private Location currentLocation;
     private Map<String, Object> settings;
 
     public String getType() {
@@ -35,14 +35,14 @@ public class Tradesman extends User {
         return experience;
     }
 
-    public List<String> getWork_areas() {
-        if (work_areas == null) work_areas = new ArrayList<>();
+    public List<String> getWorkAreas() {
+        if (workAreas == null) workAreas = new ArrayList<>();
 
-        return work_areas;
+        return workAreas;
     }
 
-    public Location getCurrent_location() {
-        return current_location;
+    public Location getCurrentLocation() {
+        return currentLocation;
     }
 
     public Map<String, Object> getSettings() {
@@ -51,12 +51,12 @@ public class Tradesman extends User {
         return settings;
     }
 
-    public double getStandard_hourly_rate() {
-        return standard_hourly_rate;
+    public double getStandardHourlyRate() {
+        return standardHourlyRate;
     }
 
-    public void setStandard_hourly_rate(double standard_hourly_rate) {
-        this.standard_hourly_rate = standard_hourly_rate;
+    public void setStandardHourlyRate(double standardHourlyRate) {
+        this.standardHourlyRate = standardHourlyRate;
     }
 
     public void setType(String type) {
@@ -75,12 +75,12 @@ public class Tradesman extends User {
         this.experience = experience;
     }
 
-    public void setWork_areas(List<String> work_areas) {
-        this.work_areas = work_areas;
+    public void setWorkAreas(List<String> workAreas) {
+        this.workAreas = workAreas;
     }
 
-    public void setCurrent_location(Location current_location) {
-        this.current_location = current_location;
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
     }
 
     public void setSettings(Map<String, Object> settings) {

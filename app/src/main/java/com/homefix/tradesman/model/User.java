@@ -8,24 +8,24 @@ import com.samdroid.string.Strings;
 
 public class User {
 
-    String id, first_name, last_name, email, mobile, role;
-    String shipping_number_or_name, shipping_street, shipping_city, shipping_state, shipping_postal_code, shipping_country;
-    String billing_name_or_number, billing_street, billing_city, billing_state, billing_postal_code, billing_country;
+    String id, firstName, lastName, email, mobile, role;
+    String shippingNumberOrName, shippingStreet, shippingCity, shippingState, shippingPostalCode, shippingCountry;
+    String billingNameOrNumber, billingStreet, billingCity, billingState, billingPostalCode, billingCountry;
 
     public String getId() {
         return Strings.returnSafely(id);
     }
 
     public String getName() {
-        return Strings.combineNames(first_name, last_name);
+        return Strings.combineNames(firstName, lastName);
     }
 
-    public String getFirst_name() {
-        return Strings.returnSafely(first_name);
+    public String getFirstName() {
+        return Strings.returnSafely(firstName);
     }
 
-    public String getLast_name() {
-        return Strings.returnSafely(last_name);
+    public String getLastName() {
+        return Strings.returnSafely(lastName);
     }
 
     public String getEmail() {
@@ -36,52 +36,52 @@ public class User {
         return Strings.returnSafely(mobile);
     }
 
-    public String getShipping_number_or_name() {
-        return Strings.returnSafely(shipping_number_or_name);
+    public String getShippingNumberOrName() {
+        return Strings.returnSafely(shippingNumberOrName);
     }
 
-    public String getShipping_street() {
-        return Strings.returnSafely(shipping_street);
+    public String getShippingStreet() {
+        return Strings.returnSafely(shippingStreet);
     }
 
-    public String getShipping_city() {
-        return Strings.returnSafely(shipping_city);
+    public String getShippingCity() {
+        return Strings.returnSafely(shippingCity);
     }
 
-    public String getShipping_state() {
-        return Strings.returnSafely(shipping_state);
+    public String getShippingState() {
+        return Strings.returnSafely(shippingState);
     }
 
-    public String getShipping_postal_code() {
-        return Strings.returnSafely(shipping_postal_code);
+    public String getShippingPostalCode() {
+        return Strings.returnSafely(shippingPostalCode);
     }
 
-    public String getShipping_country() {
-        return Strings.returnSafely(shipping_country);
+    public String getShippingCountry() {
+        return Strings.returnSafely(shippingCountry);
     }
 
-    public String getBilling_name_or_number() {
-        return Strings.returnSafely(billing_name_or_number);
+    public String getBillingNameOrNumber() {
+        return Strings.returnSafely(billingNameOrNumber);
     }
 
-    public String getBilling_street() {
-        return Strings.returnSafely(billing_street);
+    public String getBillingStreet() {
+        return Strings.returnSafely(billingStreet);
     }
 
-    public String getBilling_city() {
-        return Strings.returnSafely(billing_city);
+    public String getBillingCity() {
+        return Strings.returnSafely(billingCity);
     }
 
-    public String getBilling_state() {
-        return Strings.returnSafely(billing_state);
+    public String getBillingState() {
+        return Strings.returnSafely(billingState);
     }
 
-    public String getBilling_postal_code() {
-        return Strings.returnSafely(billing_postal_code);
+    public String getBillingPostalCode() {
+        return Strings.returnSafely(billingPostalCode);
     }
 
-    public String getBilling_country() {
-        return Strings.returnSafely(billing_country);
+    public String getBillingCountry() {
+        return Strings.returnSafely(billingCountry);
     }
 
     public String getRole() {

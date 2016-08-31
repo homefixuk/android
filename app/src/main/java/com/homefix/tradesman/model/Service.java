@@ -12,21 +12,21 @@ import java.util.List;
 
 public class Service {
 
-    private ServiceSet service_set;
+    private ServiceSet serviceSet;
     private Tradesman tradesman;
     private Problem problem;
     private String id, status;
-    private long request_time, arrival_time, depart_time, estimated_duration;
-    private int estimated_cost, actual_duration, actual_cost;
-    private String tradesman_notes;
-    private String key_location;
-    private List<Service> previous_services;
-    private boolean is_own_job;
-    private String incomplete_reason, actual_diagnosis, work_completed_description;
-    private List<Part> parts_used;
+    private long requestTime, arrivalTime, departTime, estimatedDuration;
+    private int estimatedCost, actualDuration, actualCost;
+    private String tradesmanNotes;
+    private String keyLocation;
+    private List<Service> previousServices;
+    private boolean isOwnJob;
+    private String incompleteReason, actualDiagnosis, workCompletedDescription;
+    private List<Part> partsUsed;
 
-    public ServiceSet getService_set() {
-        return service_set;
+    public ServiceSet getServiceSet() {
+        return serviceSet;
     }
 
     public Tradesman getTradesman() {
@@ -45,46 +45,46 @@ public class Service {
         return Strings.returnSafely(status);
     }
 
-    public long getRequest_time() {
-        return request_time;
+    public long getRequestTime() {
+        return requestTime;
     }
 
-    public long getArrival_time() {
-        return arrival_time;
+    public long getArrivalTime() {
+        return arrivalTime;
     }
 
-    public long getDepart_time() {
-        return depart_time;
+    public long getDepartTime() {
+        return departTime;
     }
 
-    public long getEstimated_duration() {
-        return estimated_duration;
+    public long getEstimatedDuration() {
+        return estimatedDuration;
     }
 
-    public int getEstimated_cost() {
-        return estimated_cost;
+    public int getEstimatedCost() {
+        return estimatedCost;
     }
 
-    public int getActual_duration() {
-        return actual_duration;
+    public int getActualDuration() {
+        return actualDuration;
     }
 
-    public int getActual_cost() {
-        return actual_cost;
+    public int getActualCost() {
+        return actualCost;
     }
 
-    public String getTradesman_notes() {
-        return Strings.returnSafely(tradesman_notes);
+    public String getTradesmanNotes() {
+        return Strings.returnSafely(tradesmanNotes);
     }
 
-    public String getKey_location() {
-        return Strings.returnSafely(key_location);
+    public String getKeyLocation() {
+        return Strings.returnSafely(keyLocation);
     }
 
-    public List<Service> getPrevious_services() {
-        if (previous_services == null) previous_services = new ArrayList<>();
+    public List<Service> getPreviousServices() {
+        if (previousServices == null) previousServices = new ArrayList<>();
 
-        return previous_services;
+        return previousServices;
     }
 
     public void setTradesman(Tradesman tradesman) {
@@ -99,66 +99,66 @@ public class Service {
         this.status = status;
     }
 
-    public void setRequest_time(long request_time) {
-        this.request_time = request_time;
+    public void setRequestTime(long requestTime) {
+        this.requestTime = requestTime;
     }
 
-    public void setArrival_time(long arrival_time) {
-        this.arrival_time = arrival_time;
+    public void setArrivalTime(long arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
-    public void setDepart_time(long depart_time) {
-        this.depart_time = depart_time;
+    public void setDepartTime(long departTime) {
+        this.departTime = departTime;
     }
 
-    public void setEstimated_duration(long estimated_duration) {
-        this.estimated_duration = estimated_duration;
+    public void setEstimatedDuration(long estimatedDuration) {
+        this.estimatedDuration = estimatedDuration;
     }
 
-    public void setEstimated_cost(int estimated_cost) {
-        this.estimated_cost = estimated_cost;
+    public void setEstimatedCost(int estimatedCost) {
+        this.estimatedCost = estimatedCost;
     }
 
-    public void setActual_duration(int actual_duration) {
-        this.actual_duration = actual_duration;
+    public void setActualDuration(int actualDuration) {
+        this.actualDuration = actualDuration;
     }
 
-    public void setActual_cost(int actual_cost) {
-        this.actual_cost = actual_cost;
+    public void setActualCost(int actualCost) {
+        this.actualCost = actualCost;
     }
 
-    public void setTradesman_notes(String tradesman_notes) {
-        this.tradesman_notes = tradesman_notes;
+    public void setTradesmanNotes(String tradesmanNotes) {
+        this.tradesmanNotes = tradesmanNotes;
     }
 
-    public void setKey_location(String key_location) {
-        this.key_location = key_location;
+    public void setKeyLocation(String keyLocation) {
+        this.keyLocation = keyLocation;
     }
 
-    public void setPrevious_services(List<Service> previous_services) {
-        this.previous_services = previous_services;
+    public void setPreviousServices(List<Service> previousServices) {
+        this.previousServices = previousServices;
     }
 
-    public boolean is_own_job() {
-        return is_own_job;
+    public boolean isOwnJob() {
+        return isOwnJob;
     }
 
-    public String getIncomplete_reason() {
-        return Strings.returnSafely(incomplete_reason);
+    public String getIncompleteReason() {
+        return Strings.returnSafely(incompleteReason);
     }
 
-    public String getActual_diagnosis() {
-        return Strings.returnSafely(actual_diagnosis);
+    public String getActualDiagnosis() {
+        return Strings.returnSafely(actualDiagnosis);
     }
 
-    public String getWork_completed_description() {
-        return Strings.returnSafely(work_completed_description);
+    public String getWorkCompletedDescription() {
+        return Strings.returnSafely(workCompletedDescription);
     }
 
-    public List<Part> getParts_used() {
-        if (parts_used == null) parts_used = new ArrayList<>();
+    public List<Part> getPartsUsed() {
+        if (partsUsed == null) partsUsed = new ArrayList<>();
 
-        return parts_used;
+        return partsUsed;
     }
 
     private static final SendReceiver<Service> senderReceiver = new SendReceiver<>(Service.class);

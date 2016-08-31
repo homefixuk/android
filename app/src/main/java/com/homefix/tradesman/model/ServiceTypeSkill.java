@@ -6,12 +6,12 @@ package com.homefix.tradesman.model;
 
 public class ServiceTypeSkill {
 
-    Problem service_type;
+    Problem serviceType;
     Skill skill;
     int level;
 
-    public Problem getService_type() {
-        return service_type;
+    public Problem getServiceType() {
+        return serviceType;
     }
 
     public Skill getSkill() {

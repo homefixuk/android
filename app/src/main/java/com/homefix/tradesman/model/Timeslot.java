@@ -48,7 +48,7 @@ public class Timeslot {
     private Service service;
 
     public String getId() {
-        id =  Strings.returnSafely(id);
+        id = Strings.returnSafely(id);
 
         return id;
     }

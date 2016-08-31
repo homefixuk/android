@@ -17,18 +17,12 @@ import com.homefix.tradesman.home.home_fragment.HomeFragment;
 import com.homefix.tradesman.task.LogoutTask;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
-import com.samdroid.file.FileManager;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.string.Strings;
 import com.samdroid.thread.MyThreadPool;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.Calendar;
 import java.util.List;
 
@@ -78,82 +72,104 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
         String name = item.getTitle().toString();
 
+        if (mCurrentPage > 0 && name.equals(getString(mCurrentPage))) {
+            hideNavMenu();
+            return false;
+        }
+
         if (name.equals(getString(R.string.action_home))) {
             hideNavMenu();
-
-            if (mCurrentPage == R.string.action_home) return false;
-            else {
-                showHome();
-                return true;
-            }
+            showHome();
+            return true;
 
         } else if (name.equals(getString(R.string.action_calendar))) {
             hideNavMenu();
-
-            if (mCurrentPage == R.string.action_calendar) return false;
-            else {
-                showCalendar();
-                return true;
-            }
+            showCalendar();
+            return true;
 
         } else if (name.equals(getString(R.string.action_logout))) {
-            if (mCurrentPage == R.string.action_logout) {
-                hideNavMenu();
-                return false;
-            }
-
             LogoutTask.doLogout(this);
             return true;
 
         } else if (name.equals(getString(R.string.action_recent))) {
-            scrape();
+//            scrape();
+            return true;
+
+        } else if (name.equals(getString(R.string.action_help))) {
+//            String filename = "scrape_" + System.currentTimeMillis() + ".csv";
+//            try {
+//                File file = new File(getStorageDir(getContext(), "scraper"), filename);
+//                file.createNewFile();
+//                writeToFile(file, getCsv());
+//                MyLog.e(TAG, "Saved CSV to file");
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
             return true;
         }
 
         return false;
     }
 
+    private String csv = "";
+
+    public synchronized String getCsv() {
+        return csv;
+    }
+
+    private synchronized void setCsv(String csv) {
+        this.csv = csv;
+    }
+
+    public void addToCsv(String s) {
+        if (Strings.isEmpty(s)) return;
+
+        setCsv(getCsv() + "\n" + s);
+    }
+
     private void scrape() {
         final File f = getStorageDir(getContext(), "scraper");
         if (f != null && f.exists()) f.delete();
 
-        for (int type = 0; type < CheckatraderScraper.types.length; type++) {
-            for (int loc = 0; loc < CheckatraderScraper.locations.length; loc++) {
-                for (int page = 0; page < 30; page++) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-                    final int finalType = type;
-                    final int finalLoc = loc;
-                    final int finalPage = page;
-
-                    int t = CheckatraderScraper.types[type];
-                    String l = CheckatraderScraper.locations[loc];
-
-                    if (Strings.isEmpty(l)) continue;
-
-                    MyThreadPool.post(new CheckatraderScraper(t, l, page, new OnGetListListener<CheckatraderScraper.CheckATrader>() {
-                        @Override
-                        public void onGetListFinished(List<CheckatraderScraper.CheckATrader> list) {
-                            String csv = "";
-
-                            for (CheckatraderScraper.CheckATrader trader : list) {
-                                if (trader == null) continue;
-
-                                csv += trader.toCsvString() + "\n";
-                            }
-
-                            String filename = "scrape" + finalType + "" + finalLoc + "" + finalPage + ".txt";
+                for (int typeIndex = 0; typeIndex < CheckatraderScraper.types.size(); typeIndex++) {
+                    for (int loc = 0; loc < CheckatraderScraper.locations.length; loc++) {
+                        for (int page = 0; page < 30; page++) {
                             try {
-                                File file = new File(getStorageDir(getContext(), "scraper"), filename);
-                                file.createNewFile();
-                                writeToFile(file, csv);
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                Thread.sleep(1000, 0);
+                            } catch (InterruptedException e) {
+                                MyLog.printStackTrace(e);
                             }
+
+                            int t = CheckatraderScraper.types.keyAt(typeIndex);
+                            String l = CheckatraderScraper.locations[loc];
+
+                            if (Strings.isEmpty(l)) continue;
+
+                            MyThreadPool.post(new CheckatraderScraper(t, l, page, new OnGetListListener<CheckatraderScraper.CheckATrader>() {
+                                @Override
+                                public void onGetListFinished(List<CheckatraderScraper.CheckATrader> list) {
+                                    String csv = "";
+
+                                    for (CheckatraderScraper.CheckATrader trader : list) {
+                                        if (trader == null || Strings.isEmpty(trader.companyName) || Strings.isEmpty(trader.email))
+                                            continue;
+
+                                        csv += trader.toCsvString() + "\n";
+                                    }
+
+                                    addToCsv(csv);
+                                }
+                            }));
                         }
-                    }));
+                    }
                 }
             }
-        }
+        }).start();
     }
 
     public File getStorageDir(Context context, String name) {

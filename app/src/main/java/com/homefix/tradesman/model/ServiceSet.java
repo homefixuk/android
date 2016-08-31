@@ -12,47 +12,47 @@ import java.util.List;
 
 public class ServiceSet {
 
-    CustomerProperty customer_property;
-    long created_at, resolved_at;
-    String customer_description;
-    int number_services;
-    double total_cost, amount_paid;
+    CustomerProperty customerProperty;
+    long createdAt, resolvedAt;
+    String customerDescription;
+    int numberServices;
+    double totalCost, amountPaid;
     private List<Payment> payments;
     private List<Charge> charges;
 
     public ServiceSet() {
     }
 
-    public CustomerProperty getCustomer_property() {
-        return customer_property;
+    public CustomerProperty getCustomerProperty() {
+        return customerProperty;
     }
 
-    public long getCreated_at() {
-        return created_at;
+    public long getCreatedAt() {
+        return createdAt;
     }
 
-    public long getResolved_at() {
-        return resolved_at;
+    public long getResolvedAt() {
+        return resolvedAt;
     }
 
-    public String getCustomer_description() {
-        return Strings.returnSafely(customer_description);
+    public String getCustomerDescription() {
+        return Strings.returnSafely(customerDescription);
     }
 
-    public int getNumber_services() {
-        return number_services;
+    public int getNumberServices() {
+        return numberServices;
     }
 
-    public double getTotal_cost() {
-        return total_cost;
+    public double getTotalCost() {
+        return totalCost;
     }
 
-    public double getAmount_paid() {
-        return amount_paid;
+    public double getAmountPaid() {
+        return amountPaid;
     }
 
     public double getAmountRemaining() {
-        return total_cost - amount_paid;
+        return totalCost - amountPaid;
     }
 
     public List<Payment> getPayments() {

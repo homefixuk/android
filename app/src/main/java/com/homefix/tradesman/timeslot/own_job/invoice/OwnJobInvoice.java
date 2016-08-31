@@ -55,7 +55,7 @@ public class OwnJobInvoice extends BasePdf {
 
         document.add(new Paragraph("Date: " + SimpleDateFormat.getDateInstance().format(new Date()), subFont));
 
-        ServiceSet serviceSet = service.getService_set();
+        ServiceSet serviceSet = service.getServiceSet();
 
         // Tradesman
         Tradesman tradesman = service.getTradesman();
@@ -66,12 +66,12 @@ public class OwnJobInvoice extends BasePdf {
 
         // Customer details
         Paragraph pCustomer = new Paragraph("To:", subFont);
-        CustomerProperty customerProperty = serviceSet != null ? serviceSet.getCustomer_property() : null;
+        CustomerProperty customerProperty = serviceSet != null ? serviceSet.getCustomerProperty() : null;
         if (customerProperty != null) {
             Customer customer = customerProperty.getCustomer();
             Property property = customerProperty.getProperty();
             if (customer != null) {
-                customerFirstName = customer.getFirst_name();
+                customerFirstName = customer.getFirstName();
                 if (Strings.isEmpty(customerFirstName)) customerFirstName = customer.getName();
 
                 if (!Strings.isEmpty(customer.getName()))
@@ -79,12 +79,12 @@ public class OwnJobInvoice extends BasePdf {
             }
 
             if (property != null) {
-                if (!Strings.isEmpty(property.getAddress_line_1()))
-                    pCustomer.add(new Paragraph(property.getAddress_line_1(), subGrayFont));
-                if (!Strings.isEmpty(property.getAddress_line_2()))
-                    pCustomer.add(new Paragraph(property.getAddress_line_2(), subGrayFont));
-                if (!Strings.isEmpty(property.getAddress_line_3()))
-                    pCustomer.add(new Paragraph(property.getAddress_line_3(), subGrayFont));
+                if (!Strings.isEmpty(property.getAddressLine1()))
+                    pCustomer.add(new Paragraph(property.getAddressLine1(), subGrayFont));
+                if (!Strings.isEmpty(property.getAddressLine2()))
+                    pCustomer.add(new Paragraph(property.getAddressLine2(), subGrayFont));
+                if (!Strings.isEmpty(property.getAddressLine3()))
+                    pCustomer.add(new Paragraph(property.getAddressLine3(), subGrayFont));
                 if (!Strings.isEmpty(property.getCountry()))
                     pCustomer.add(new Paragraph(property.getCountry(), subGrayFont));
                 if (!Strings.isEmpty(property.getPostcode()))
@@ -106,7 +106,7 @@ public class OwnJobInvoice extends BasePdf {
         createTable(document);
 
         double totalCost = serviceSet != null ? serviceSet.getTotalFromCharges() : 0d;
-        if (totalCost == 0d) totalCost = serviceSet != null ? serviceSet.getTotal_cost() : 0d;
+        if (totalCost == 0d) totalCost = serviceSet != null ? serviceSet.getTotalCost() : 0d;
         if (totalCost > 0) {
             addEmptyLine(document);
             Paragraph pTotalCost = new Paragraph("Total Cost: £" + Strings.priceToString(totalCost), subFont);
@@ -145,7 +145,7 @@ public class OwnJobInvoice extends BasePdf {
 
     private void createTable(Document document)
             throws DocumentException {
-        java.util.List<Charge> charges = service.getService_set().getCharges();
+        java.util.List<Charge> charges = service.getServiceSet().getCharges();
 
         if (charges == null || charges.size() == 0) return;
 

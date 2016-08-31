@@ -13,9 +13,9 @@ public class Charge {
     private double amount = 0;
     private String description; // labour/part/other
     private double quantity = 1;
-    private boolean with_vat = true;
+    private boolean withVat = true;
     private double markup = 0;
-    private boolean markup_before_vat = false;
+    private boolean markupBeforeVat = false;
 
     public Charge() {
     }
@@ -52,16 +52,16 @@ public class Charge {
         return quantity;
     }
 
-    public boolean isWith_vat() {
-        return with_vat;
+    public boolean isWithVat() {
+        return withVat;
     }
 
     public double getMarkup() {
         return markup;
     }
 
-    public boolean isMarkup_before_vat() {
-        return markup_before_vat;
+    public boolean isMarkupBeforeVat() {
+        return markupBeforeVat;
     }
 
     public void setService(Service service) {
@@ -72,16 +72,16 @@ public class Charge {
         this.quantity = quantity;
     }
 
-    public void setWith_vat(boolean with_vat) {
-        this.with_vat = with_vat;
+    public void setWithVat(boolean withVat) {
+        this.withVat = withVat;
     }
 
     public void setMarkup(double markup) {
         this.markup = markup;
     }
 
-    public void setMarkup_before_vat(boolean markup_before_vat) {
-        this.markup_before_vat = markup_before_vat;
+    public void setMarkupBeforeVat(boolean markupBeforeVat) {
+        this.markupBeforeVat = markupBeforeVat;
     }
 
     public double getAmountWithVatAndMarkup() {
@@ -90,11 +90,11 @@ public class Charge {
 
     public double totalCost() {
         // if there is no markup
-        if (markup == 0) return quantity * amount * (with_vat ? 1.2 : 1.0);
+        if (markup == 0) return quantity * amount * (withVat ? 1.2 : 1.0);
 
-        double VAT = quantity * amount * (with_vat ? 0.2 : 0.0);
+        double VAT = quantity * amount * (withVat ? 0.2 : 0.0);
 
-        if (markup_before_vat) return (quantity * amount * (1.0 + markup)) + VAT;
+        if (markupBeforeVat) return (quantity * amount * (1.0 + markup)) + VAT;
 
         // else markup is after VAT
         return ((quantity * amount) + VAT) * (1.0 + markup);

@@ -20,7 +20,7 @@ public class Problem {
 
     private String name, description;
     private long time;
-    private List<Part> potential_parts;
+    private List<Part> potentialParts;
 
     public Problem() {
 
@@ -46,10 +46,10 @@ public class Problem {
         return time;
     }
 
-    public List<Part> getPotential_parts() {
-        if (potential_parts == null) potential_parts = new ArrayList<>();
+    public List<Part> getPotentialParts() {
+        if (potentialParts == null) potentialParts = new ArrayList<>();
 
-        return potential_parts;
+        return potentialParts;
     }
 
     public void setTime(long time) {

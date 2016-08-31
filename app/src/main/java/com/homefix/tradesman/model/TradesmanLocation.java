@@ -7,15 +7,15 @@ package com.homefix.tradesman.model;
 public class TradesmanLocation extends Location {
 
     Tradesman tradesman;
-    boolean is_going_to_job;
+    boolean isGoingToJob;
     long timestmap;
 
     public Tradesman getTradesman() {
         return tradesman;
     }
 
-    public boolean is_going_to_job() {
-        return is_going_to_job;
+    public boolean isGoingToJob() {
+        return isGoingToJob;
     }
 
     public long getTimestmap() {

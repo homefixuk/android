@@ -9,8 +9,8 @@ import com.samdroid.string.Strings;
 public class Part {
 
     Service service;
-    String name, from, description, installation_info, image, source;
-    double cost, with_vat;
+    String name, from, description, installationInfo, image, source;
+    double cost, withVat;
 
     public Part() {
     }
@@ -27,8 +27,8 @@ public class Part {
         return service;
     }
 
-    public String getInstallation_info() {
-        return Strings.returnSafely(installation_info);
+    public String getInstallationInfo() {
+        return Strings.returnSafely(installationInfo);
     }
 
     public String getImage() {
@@ -47,7 +47,7 @@ public class Part {
         return from;
     }
 
-    public double getWith_vat() {
-        return with_vat;
+    public double getWithVat() {
+        return withVat;
     }
 }

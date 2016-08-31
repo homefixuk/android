@@ -7,22 +7,22 @@ package com.homefix.tradesman.model;
 public class TradesmanFinances {
 
     Tradesman tradesman;
-    int number_jobs;
-    double hours_worked, amount_earned;
+    int numberJobs;
+    double hoursWorked, amountEarned;
 
     public Tradesman getTradesman() {
         return tradesman;
     }
 
-    public int getNumber_jobs() {
-        return number_jobs;
+    public int getNumberJobs() {
+        return numberJobs;
     }
 
-    public double getHours_worked() {
-        return hours_worked;
+    public double getHoursWorked() {
+        return hoursWorked;
     }
 
-    public double getAmount_earned() {
-        return amount_earned;
+    public double getAmountEarned() {
+        return amountEarned;
     }
 }

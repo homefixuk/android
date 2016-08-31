@@ -151,7 +151,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
         Service service = originalTimeslot.getService();
         if (service != null) {
-            CustomerProperty customerProperty = service.getService_set().getCustomer_property();
+            CustomerProperty customerProperty = service.getServiceSet().getCustomerProperty();
             if (customerProperty != null) {
                 if (!customerProperty.getType().equals(customerPropertyRelationship))
                     changes.put("customer_property_relationship", customerPropertyRelationship);
@@ -168,11 +168,11 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
                 Property property = customerProperty.getProperty();
                 if (property != null) {
-                    if (!property.getAddress_line_1().equals(addressLine1))
+                    if (!property.getAddressLine1().equals(addressLine1))
                         changes.put("address_line_1", addressLine1);
-                    if (!property.getAddress_line_2().equals(addressLine2))
+                    if (!property.getAddressLine2().equals(addressLine2))
                         changes.put("address_line_1", addressLine2);
-                    if (!property.getAddress_line_3().equals(addressLine3))
+                    if (!property.getAddressLine3().equals(addressLine3))
                         changes.put("address_line_1", Strings.returnSafely(addressLine3));
                     if (!property.getPostcode().equals(postcode)) changes.put("postcode", postcode);
                     if (!property.getCountry().equals(country)) changes.put("country", country);
@@ -192,7 +192,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
             if (end.getTimeInMillis() > 0 && originalTimeslot.getEnd() != end.getTimeInMillis())
                 changes.put("end_time", end.getTimeInMillis());
 
-            if (!service.getTradesman_notes().equals(description))
+            if (!service.getTradesmanNotes().equals(description))
                 changes.put("tradesman_notes", description);
         }
 

@@ -79,10 +79,10 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ServiceSet serviceSet = service != null ? service.getService_set() : null;
+        ServiceSet serviceSet = service != null ? service.getServiceSet() : null;
 
         if (mTotalCost != null && serviceSet != null)
-            mTotalCost.setText(String.format("£%s", Strings.priceToString(serviceSet.getTotal_cost())));
+            mTotalCost.setText(String.format("£%s", Strings.priceToString(serviceSet.getTotalCost())));
 
         if (mAdapter == null) {
             mAdapter = new ArrayAdapter<Charge>(getActivity(), R.layout.charges_item_layout) {

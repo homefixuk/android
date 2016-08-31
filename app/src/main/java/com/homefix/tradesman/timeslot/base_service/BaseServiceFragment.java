@@ -94,16 +94,16 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             Service service = mTimeslot.getService();
 
             if (service != null) {
-                CustomerProperty customerProperty = service.getService_set().getCustomer_property();
+                CustomerProperty customerProperty = service.getServiceSet().getCustomerProperty();
 
                 if (customerProperty != null) {
                     mCustomerPropertyType.setText(customerProperty.getType());
 
                     Property property = customerProperty.getProperty();
                     if (property != null) {
-                        addressLine1 = property.getAddress_line_1();
-                        addressLine2 = property.getAddress_line_2();
-                        addressLine3 = property.getAddress_line_3();
+                        addressLine1 = property.getAddressLine1();
+                        addressLine2 = property.getAddressLine2();
+                        addressLine3 = property.getAddressLine3();
                         postcode = property.getPostcode();
                         country = property.getCountry();
                         latitude = property.getLatitude();
@@ -121,7 +121,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                     mJobTypeTxt.setText(problem != null ? problem.getName() : "");
                 }
 
-                mDescriptionTxt.setText(service.getTradesman_notes());
+                mDescriptionTxt.setText(service.getTradesmanNotes());
                 updateLocationText();
             }
         }

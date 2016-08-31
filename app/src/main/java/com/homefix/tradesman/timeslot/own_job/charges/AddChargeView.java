@@ -48,9 +48,9 @@ public class AddChargeView extends LinearLayout {
         setName(charge.getDescription());
         setQuantity(charge.getQuantity());
         setAmount(charge.getAmount());
-        setChargeVAT(charge.isWith_vat());
+        setChargeVAT(charge.isWithVat());
         setMarkup(charge.getMarkup());
-        setMarkupBeforeVAT(charge.isMarkup_before_vat());
+        setMarkupBeforeVAT(charge.isMarkupBeforeVat());
     }
 
     public void setName(String name) {
@@ -151,7 +151,7 @@ public class AddChargeView extends LinearLayout {
     }
 
     public void setChargeVAT(boolean chargeVAT) {
-        if (charge != null) charge.setWith_vat(chargeVAT);
+        if (charge != null) charge.setWithVat(chargeVAT);
 
         TextView txt = (TextView) findViewById(R.id.charge_vat_txt);
 
@@ -165,7 +165,7 @@ public class AddChargeView extends LinearLayout {
             @Override
             public void onClick(View v) {
                 // toggle the value
-                setChargeVAT(!charge.isWith_vat());
+                setChargeVAT(!charge.isWithVat());
             }
         });
     }
@@ -198,7 +198,7 @@ public class AddChargeView extends LinearLayout {
     }
 
     public void setMarkupBeforeVAT(boolean markupBeforeVAT) {
-        if (charge != null) charge.setMarkup_before_vat(markupBeforeVAT);
+        if (charge != null) charge.setMarkupBeforeVat(markupBeforeVAT);
 
         TextView txt = (TextView) findViewById(R.id.markup_before_vat_txt);
 
@@ -210,7 +210,7 @@ public class AddChargeView extends LinearLayout {
             @Override
             public void onClick(View v) {
                 // toggle the value
-                setMarkupBeforeVAT(!charge.isMarkup_before_vat());
+                setMarkupBeforeVAT(!charge.isMarkupBeforeVat());
             }
         });
     }

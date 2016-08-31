@@ -31,7 +31,7 @@ public class ChargesActivity extends BaseCloseActivity {
 
         Service service = Service.getSenderReceiver().remove(serviceKey);
 
-        if (service == null || service.getService_set() == null) {
+        if (service == null || service.getServiceSet() == null) {
             Toast.makeText(getContext(), "Sorry, something went wrong.", Toast.LENGTH_SHORT).show();
             finishWithAnimation();
             return;
