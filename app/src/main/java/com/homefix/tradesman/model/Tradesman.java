@@ -17,7 +17,7 @@ public class Tradesman extends User {
     private double rating, experience, standardHourlyRate;
     private List<String> workAreas;
     private Location currentLocation;
-    private Map<String, Object> settings;
+    private String settings;
 
     public String getType() {
         return Strings.returnSafely(type);
@@ -45,10 +45,8 @@ public class Tradesman extends User {
         return currentLocation;
     }
 
-    public Map<String, Object> getSettings() {
-        if (settings == null) settings = new HashMap<>();
-
-        return settings;
+    public String getSettings() {
+        return Strings.returnSafely(settings);
     }
 
     public double getStandardHourlyRate() {
@@ -83,7 +81,7 @@ public class Tradesman extends User {
         this.currentLocation = currentLocation;
     }
 
-    public void setSettings(Map<String, Object> settings) {
+    public void setSettings(String settings) {
         this.settings = settings;
     }
 }

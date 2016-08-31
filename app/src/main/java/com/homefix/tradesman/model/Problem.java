@@ -69,6 +69,11 @@ public class Problem {
 
             @Override
             public void onResponse(Call<List<Problem>> call, Response<List<Problem>> response) {
+                if (response == null || response.body() == null) {
+                    onFailure(call, null);
+                    return;
+                }
+
                 // store them in the static list
                 getProblemTypes().clear();
                 getProblemTypes().addAll(response.body());

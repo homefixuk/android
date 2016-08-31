@@ -46,13 +46,13 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
             }
         };
 
-        HomeFix.getAPI().signup(
-                getView().getContext().getString(HomeFix.API_KEY),
-                "Test",
-                "Plumber",
-                "testplumber@homefix.co.uk",
-                "password",
-                "TRADE").enqueue(callback);
+//        HomeFix.getAPI().signup(
+//                getView().getContext().getString(HomeFix.API_KEY),
+//                "Test",
+//                "Plumber",
+//                "testplumber@homefix.co.uk",
+//                "password",
+//                "TRADE").enqueue(callback);
     }
 
     public void doEmailPasswordLogin(String email, String password) {

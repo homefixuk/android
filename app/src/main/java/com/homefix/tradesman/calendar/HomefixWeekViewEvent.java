@@ -14,7 +14,7 @@ import java.util.List;
  * Created by samuel on 7/5/2016.
  */
 
-public class gitHomefixWeekViewEvent extends WeekViewEvent {
+public class HomefixWeekViewEvent extends WeekViewEvent {
 
     Timeslot timeslot;
 
