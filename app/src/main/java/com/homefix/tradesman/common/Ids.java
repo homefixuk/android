@@ -12,7 +12,7 @@ public class Ids {
             CODE_LOCATION_RECEIVER = 2,
             TIMESLOT_CHANGE = 3,
             PLACE_PICKER_REQUEST = 4,
-            CODE_5 = 5;
+            WORK_AREAS_CODE = 5;
 
 
 }

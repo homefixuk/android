@@ -8,9 +8,9 @@ import com.samdroid.string.Strings;
 
 public class User {
 
-    String id, firstName, lastName, email, mobile, role;
-    String shippingNumberOrName, shippingStreet, shippingCity, shippingState, shippingPostalCode, shippingCountry;
-    String billingNameOrNumber, billingStreet, billingCity, billingState, billingPostalCode, billingCountry;
+    String id, firstName, lastName, email, mobile, role, homePhone;
+    String homeAddressLine1, homeAddressLine2, homeAddressLine3, homePostcode, homeCountry;
+    String billingAddressLine1, billingAddressLine2, billingAddressLine3, billingPostcode, billingCountry;
 
     public String getId() {
         return Strings.returnSafely(id);
@@ -32,52 +32,48 @@ public class User {
         return Strings.returnSafely(email);
     }
 
+    public String getHomePhone() {
+        return Strings.returnSafely(homePhone);
+    }
+
     public String getMobile() {
         return Strings.returnSafely(mobile);
     }
 
-    public String getShippingNumberOrName() {
-        return Strings.returnSafely(shippingNumberOrName);
+    public String getHomeAddressLine1() {
+        return Strings.returnSafely(homeAddressLine1);
     }
 
-    public String getShippingStreet() {
-        return Strings.returnSafely(shippingStreet);
+    public String getHomeAddressLine2() {
+        return Strings.returnSafely(homeAddressLine2);
     }
 
-    public String getShippingCity() {
-        return Strings.returnSafely(shippingCity);
+    public String getHomeAddressLine3() {
+        return Strings.returnSafely(homeAddressLine3);
     }
 
-    public String getShippingState() {
-        return Strings.returnSafely(shippingState);
+    public String getHomePostcode() {
+        return Strings.returnSafely(homePostcode);
     }
 
-    public String getShippingPostalCode() {
-        return Strings.returnSafely(shippingPostalCode);
+    public String getHomeCountry() {
+        return Strings.returnSafely(homeCountry);
     }
 
-    public String getShippingCountry() {
-        return Strings.returnSafely(shippingCountry);
+    public String getBillingAddressLine1() {
+        return Strings.returnSafely(billingAddressLine1);
     }
 
-    public String getBillingNameOrNumber() {
-        return Strings.returnSafely(billingNameOrNumber);
+    public String getBillingAddressLine2() {
+        return Strings.returnSafely(billingAddressLine2);
     }
 
-    public String getBillingStreet() {
-        return Strings.returnSafely(billingStreet);
+    public String getBillingAddressLine3() {
+        return Strings.returnSafely(billingAddressLine3);
     }
 
-    public String getBillingCity() {
-        return Strings.returnSafely(billingCity);
-    }
-
-    public String getBillingState() {
-        return Strings.returnSafely(billingState);
-    }
-
-    public String getBillingPostalCode() {
-        return Strings.returnSafely(billingPostalCode);
+    public String getBillingPostcode() {
+        return Strings.returnSafely(billingPostcode);
     }
 
     public String getBillingCountry() {
@@ -86,5 +82,73 @@ public class User {
 
     public String getRole() {
         return Strings.returnSafely(role);
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public void setHomePhone(String homePhone) {
+        this.homePhone = homePhone;
+    }
+
+    public void setHomeAddressLine1(String homeAddressLine1) {
+        this.homeAddressLine1 = homeAddressLine1;
+    }
+
+    public void setHomeAddressLine2(String homeAddressLine2) {
+        this.homeAddressLine2 = homeAddressLine2;
+    }
+
+    public void setHomeAddressLine3(String homeAddressLine3) {
+        this.homeAddressLine3 = homeAddressLine3;
+    }
+
+    public void setHomePostcode(String homePostcode) {
+        this.homePostcode = homePostcode;
+    }
+
+    public void setHomeCountry(String homeCountry) {
+        this.homeCountry = homeCountry;
+    }
+
+    public void setBillingAddressLine1(String billingAddressLine1) {
+        this.billingAddressLine1 = billingAddressLine1;
+    }
+
+    public void setBillingAddressLine2(String billingAddressLine2) {
+        this.billingAddressLine2 = billingAddressLine2;
+    }
+
+    public void setBillingAddressLine3(String billingAddressLine3) {
+        this.billingAddressLine3 = billingAddressLine3;
+    }
+
+    public void setBillingPostcode(String billingPostcode) {
+        this.billingPostcode = billingPostcode;
+    }
+
+    public void setBillingCountry(String billingCountry) {
+        this.billingCountry = billingCountry;
     }
 }

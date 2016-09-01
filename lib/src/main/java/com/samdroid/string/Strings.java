@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -962,7 +963,7 @@ public class Strings {
     public static String checkUrl(String url) {
         if (Strings.isEmpty(url)) return "";
 
-        if (!url.startsWith("http://")) url = "http://" + url;
+        if (!url.startsWith("https://") && !url.startsWith("http://")) url = "http://" + url;
 
         return url;
     }
@@ -1061,6 +1062,23 @@ public class Strings {
      */
     public static boolean isEmailValid(String email) {
         return !isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    public static String flattenList(List<String> list, String delimiter) {
+        if (list == null || list.size() == 0) return "";
+
+        delimiter = Strings.returnSafely(delimiter);
+        String s = "";
+        for (int i = 0; i < list.size(); i++) {
+            if (Strings.isEmpty(list.get(i))) continue;
+
+            if (!Strings.isEmpty(s)) s += delimiter;
+
+            s += list.get(i);
+        }
+
+        if (s.endsWith(delimiter)) s = s.substring(0, s.length() - delimiter.length());
+        return s;
     }
 
 }

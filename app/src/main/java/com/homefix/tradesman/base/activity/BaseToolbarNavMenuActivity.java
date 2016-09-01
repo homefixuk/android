@@ -1,6 +1,7 @@
 package com.homefix.tradesman.base.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,18 +15,23 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.presenter.BaseToolbarNavMenuActivityPresenter;
 import com.homefix.tradesman.base.view.BaseToolbarNavMenuActivityView;
+import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.User;
+import com.homefix.tradesman.profile.ProfileFragment;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,6 +58,8 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     protected TextView mCallCcaTxt;
 
     private String ccaPhoneNumber;
+
+    protected ProfileFragment<BaseToolbarNavMenuActivity> mProfileFragment;
 
     public BaseToolbarNavMenuActivity(String TAG) {
         super(TAG);
@@ -88,6 +96,16 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         // Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
         navigationView.setNavigationItemSelectedListener(this);
 
+        View navHeaderView = navigationView.getHeaderView(0);
+        if (navHeaderView != null) {
+            navHeaderView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onNavigationProfileClicked();
+                }
+            });
+        }
+
         ActionBarDrawerToggle actionBarDrawerToggle =
                 new ActionBarDrawerToggle(
                         this,
@@ -113,7 +131,6 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
                         super.onDrawerOpened(drawerView);
                     }
                 };
-
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
 
         // calling sync state is necessary or else your hamburger icon wont show up
@@ -130,6 +147,19 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         });
 
         setupUser();
+    }
+
+    protected void onNavigationProfileClicked() {
+        if (mProfileFragment == null) {
+            mProfileFragment = new ProfileFragment<>();
+        }
+
+        replaceFragment(mProfileFragment);
+
+        setActionbarTitle("My Profile");
+        supportInvalidateOptionsMenu();
+
+        if (drawerLayout != null) drawerLayout.closeDrawers();
     }
 
     @Override
@@ -175,7 +205,7 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
             return;
         }
 
-        mCallCcaTxt.setText(Html.fromHtml("Call CCA " + Strings.setStringTags(ccaPhoneNumber, Strings.HTML_TAG.BOLD)));
+        mCallCcaTxt.setText(HtmlHelper.fromHtml("Call CCA " + Strings.setStringTags(ccaPhoneNumber, Strings.HTML_TAG.BOLD)));
         mCallCcaTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -224,6 +254,11 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         if (cca != null) setCCANumber(cca.getMobile());
     }
 
+    /**
+     * Replace the current fragment with a new one
+     *
+     * @param fragment
+     */
     protected void replaceFragment(Fragment fragment) {
         if (fragment == null) return;
 
@@ -237,4 +272,18 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Ids.WORK_AREAS_CODE) {
+            if (resultCode == RESULT_CANCELED || mProfileFragment == null || data == null) return;
+
+            ArrayList<String> list = data.getStringArrayListExtra("list");
+            if (list == null) return;
+
+            mProfileFragment.onNewWorkAreasReturned(list);
+            return;
+        }
+    }
 }

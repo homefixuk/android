@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -112,6 +113,13 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         return false;
     }
 
+    @Override
+    protected void onNavigationProfileClicked() {
+        super.onNavigationProfileClicked();
+
+        mCurrentPage = R.string.action_profile;
+    }
+
     private String csv = "";
 
     public synchronized String getCsv() {
@@ -215,6 +223,8 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         replaceFragment(homeFragment);
         setCurrentPage(R.string.action_home);
         resetActionBarTitle();
+
+        supportInvalidateOptionsMenu();
     }
 
     private void showCalendar() {
@@ -251,6 +261,8 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
                 if (calendarFragment != null) calendarFragment.toggleCalendar();
             }
         });
+
+        supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -268,6 +280,12 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
                     todayItem.setTitle("Today (" + Calendar.getInstance().get(Calendar.DATE) + ")");
             }
 
+            return true;
+
+        } else if (mCurrentPage == R.string.action_profile) {
+            // inflate the profile menu
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.profile, menu);
             return true;
         }
 
@@ -293,6 +311,10 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
         } else if (item.getItemId() == R.id.action_five_days) {
             if (calendarFragment != null) calendarFragment.setNumberDays(5);
+            return true;
+
+        } else if (mCurrentPage == R.string.action_profile && item.getItemId() == R.id.action_settings) {
+            // TODO: go to settings page
             return true;
         }
 

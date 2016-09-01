@@ -185,7 +185,7 @@ public class SelectableRoundedImageView extends ImageView {
             try {
                 d = rsrc.getDrawable(mResource, null);
             } catch (NotFoundException e) {
-                Log.w(TAG, "Unable to find resource: " + mResource, e);
+                Log.w("SelectableRoundImageV", "Unable to find resource: " + mResource, e);
                 // Don't try again.
                 mResource = 0;
             }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.multidex.MultiDexApplication;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.TradesmanPrivate;
@@ -30,6 +31,8 @@ public class HomeFixApplication extends MultiDexApplication {
         CacheUtils.configureCache(this);
 
         MyLog.setLoggingEnabled(BuildConfig.DEBUG);
+
+        Fresco.initialize(this);
     }
 
     public static void startLocationTracking(Context context) {

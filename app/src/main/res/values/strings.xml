@@ -10,6 +10,7 @@
     <string name="action_add">Add</string>
     <string name="action_home">Home</string>
     <string name="action_calendar">Calendar</string>
+    <string name="action_profile">Profile</string>
     <string name="action_choose_day">Choose Day</string>
     <string name="action_week_view"># Days</string>
     <string name="action_one_day">1 day</string>
@@ -50,6 +51,18 @@
     <string name="amount">Amount</string>
     <string name="markup">Markup</string>
     <string name="markup_hint">Markup\/Discount (0-100\%)</string>
+    <string name="tradesman_name">Tradesman Name</string>
+    <string name="personal_info">Personal Info</string>
+    <string name="home_phone">Home Phone</string>
+    <string name="mobile_phone">Mobile Phone</string>
+    <string name="address">Address</string>
+    <string name="home_address">Home Address</string>
+    <string name="stats">Stats</string>
+    <string name="years_experience">Years Experience</string>
+    <string name="total_hours_worked">Total Hours Worked</string>
+    <string name="total_hours_worked_this_week">Total hours worked this week</string>
+    <string name="work_areas">Work Areas</string>
+    <string name="action_done">Done</string>
 
     <string-array name="payment_types">
         <item>cash</item>

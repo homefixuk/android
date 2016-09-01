@@ -86,7 +86,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':lib')
 
-
     // Google
     compile 'com.android.support:design:24.2.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha1'
@@ -162,6 +161,9 @@ dependencies {
     // Butterknife http://jakewharton.github.io/butterknife/
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
+
+    // Fresco
+    compile 'com.facebook.fresco:fresco:0.13.0'
 
     // test
     testCompile 'junit:junit:4.12'

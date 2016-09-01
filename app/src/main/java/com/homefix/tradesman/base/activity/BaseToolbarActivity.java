@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,6 +40,9 @@ public abstract class BaseToolbarActivity<V extends BaseToolbarActivityView, P e
 
     @BindView(R.id.title_icon_right)
     protected ImageView mActionBarTitleIconRight;
+
+    @BindView(R.id.content_frame)
+    protected FrameLayout mContentView;
 
     private boolean showToolbar = true;
 

@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -275,6 +276,8 @@ public class MaterialDialogWrapper {
             edtTxt.setText(value);
             edtTxt.setTag(key);
 
+            edtTxt.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
             defaultMaps.put(key, value);
 
             if (firstEdtTxt == null) firstEdtTxt = edtTxt;
@@ -331,12 +334,31 @@ public class MaterialDialogWrapper {
         return builder.build();
     }
 
+
     @SuppressLint("InflateParams")
     public static MaterialDialog getEditTextDialog(
             final Activity context,
             final String initialString,
             final String hint,
             final String positiveTxt,
+            final SubmitObjectChangesCallback callback) {
+        return getEditTextDialog(
+                context,
+                initialString,
+                hint,
+                positiveTxt,
+                0,
+                callback
+        );
+    }
+
+    @SuppressLint("InflateParams")
+    public static MaterialDialog getEditTextDialog(
+            final Activity context,
+            final String initialString,
+            final String hint,
+            final String positiveTxt,
+            final int inputType,
             final SubmitObjectChangesCallback callback) {
 
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -346,6 +368,7 @@ public class MaterialDialogWrapper {
         final EditText edtTxt = ButterKnife.findById(view, R.id.edit_text);
         edtTxt.setHint(Strings.returnSafely(hint));
         edtTxt.setText(Strings.returnSafely(initialString));
+        edtTxt.setInputType(inputType);
 
         MaterialDialog.Builder builder = new MaterialDialog.Builder(context)
                 .customView(view, true)
