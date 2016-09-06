@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'homefix'
+            keyPassword 'Homefix2016'
+            storeFile file('C:/Users/samuel/Google Drive/workspace/HomeFix/homefix_keystore.jks')
+            storePassword 'Homefix2016'
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
     defaultConfig {
@@ -17,31 +25,29 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug {
             minifyEnabled false
             applicationIdSuffix ".debug"
         }
     }
-
     productFlavors {
         apiary_mock {
             minSdkVersion 21
             applicationId "com.homefix.tradesman.apiary_mock"
             versionName "1.0-apiary"
         }
-
         salesforce {
             applicationId "com.homefix.tradesman.sf"
             versionName "1.0-sf"
         }
-
         custom {
             applicationId "com.homefix.tradesman"
             versionName "1.0"
+            signingConfig signingConfigs.config
         }
     }
-
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
@@ -51,12 +57,10 @@ android {
         exclude 'META-INF/ASL2.0'
         exclude 'META-INF/MANIFEST.MF'
     }
-
     dexOptions {
         preDexLibraries = false
         javaMaxHeapSize "4g"
     }
-
     sourceSets {
         main {
             java.srcDirs = ['src/main/java']
@@ -83,37 +87,29 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':lib')
-
     // Google
     compile 'com.android.support:design:24.2.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha1'
     compile 'com.android.support:multidex:1.0.1'
-
     // UI
     compile 'com.github.rey5137:material:1.2.2'
-
     // Mosby (MVP)
     compile 'com.hannesdorfmann.mosby:mvp:2.0.1'
     compile 'com.hannesdorfmann.mosby:viewstate:2.0.1'
-
     // Cache library
     compile 'com.lifeofcoding:cacheutilslibrary:1.1.0@aar'
     compile 'com.google.code.gson:gson:2.4'
     compile 'commons-io:commons-io:2.4'
-
     // Icepick
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
-
     // Fragment Args - https://github.com/sockeqwe/fragmentargs
     compile 'com.hannesdorfmann.fragmentargs:annotation:3.0.2'
     apt 'com.hannesdorfmann.fragmentargs:processor:3.0.2'
-
     // EventBus
     compile 'org.greenrobot:eventbus:3.0.0'
-
     // Rx and Retrofit
     compile 'io.reactivex:rxandroid:1.2.1'
     // Because RxAndroid releases are few and far between, it is recommended you also
@@ -122,7 +118,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
-
     provided 'javax.ws.rs:javax.ws.rs-api:2.0.1'
     compile('org.glassfish.jersey.core:jersey-server:2.22.2') {
         exclude module: 'javax.inject'
@@ -135,36 +130,27 @@ dependencies {
     testCompile('org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.22.2') {
         exclude module: 'javax.inject'
     }
-
     // Material Dialogs
     compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') {
         transitive = true
         exclude module: 'recyclerview-v7'
         exclude module: 'support'
     }
-
     // Location https://github.com/mrmans0n/smart-location-lib
     compile 'io.nlopez.smartlocation:library:3.2.4'
-
     // Week-View https://github.com/alamkanak/Android-Week-View
     compile 'com.github.alamkanak:android-week-view:1.2.6'
-
     // Calendar https://github.com/SundeepK/CompactCalendarView
     compile 'com.github.sundeepk:compact-calendar-view:1.8.5'
-
     // Pdf
     compile 'com.itextpdf:itextg:5.5.9'
-
     // jsoup HTML parser library @ http://jsoup.org/
     compile 'org.jsoup:jsoup:1.9.2'
-
     // Butterknife http://jakewharton.github.io/butterknife/
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
-
     // Fresco
     compile 'com.facebook.fresco:fresco:0.13.0'
-
     // test
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'

@@ -62,7 +62,6 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     private String ccaPhoneNumber;
 
     protected ProfileFragment<BaseToolbarNavMenuActivity> mProfileFragment;
-    protected SettingsFragment<BaseToolbarNavMenuActivity> mSettingsFragment;
 
     public BaseToolbarNavMenuActivity(String TAG) {
         super(TAG);

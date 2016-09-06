@@ -121,6 +121,17 @@ public class Strings {
     }
 
     /**
+     * Returns a string safely if it is empty or null
+     *
+     * @param s String to check
+     * @return if the string is null or has length zero
+     */
+    @NonNull
+    public static String returnSafely(String s, @NonNull String defaultString) {
+        return isEmpty(s) ? defaultString : s;
+    }
+
+    /**
      * Add double inverted commas to a string
      *
      * @param s String to edit

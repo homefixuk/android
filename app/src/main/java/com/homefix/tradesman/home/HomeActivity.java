@@ -1,6 +1,7 @@
 package com.homefix.tradesman.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.calendar.CalendarFragment;
 import com.homefix.tradesman.common.CheckatraderScraper;
 import com.homefix.tradesman.home.home_fragment.HomeFragment;
+import com.homefix.tradesman.profile.settings.SettingsActivity;
 import com.homefix.tradesman.profile.settings.SettingsFragment;
 import com.homefix.tradesman.task.LogoutTask;
 import com.samdroid.common.MyLog;
@@ -314,11 +316,10 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             return true;
 
         } else if (mCurrentPage == R.string.action_profile && item.getItemId() == R.id.action_settings) {
-            // show the settings page
-            if (mSettingsFragment == null) mSettingsFragment = new SettingsFragment<>();
-            replaceFragment(mSettingsFragment);
-            setCurrentPage(R.id.action_settings);
-            setActionbarTitle("Profile Settings");
+            // go to the settings page
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
+            overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
             return true;
         }
 

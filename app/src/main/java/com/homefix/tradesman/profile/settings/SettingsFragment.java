@@ -12,11 +12,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.activity.BaseToolbarActivity;
 import com.homefix.tradesman.base.adapter.MyListAdapter;
-import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanPrivate;
@@ -26,10 +27,12 @@ import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,7 +44,7 @@ import retrofit2.Response;
  * Created by samuel on 9/1/2016.
  */
 
-public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragment<A, SettingsView, SettingsPresenter> implements SettingsView {
+public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFragment<A, SettingsView, SettingsPresenter> implements SettingsView {
 
     @BindView(R.id.list)
     protected ListView mListView;
@@ -165,6 +168,10 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                 new MaterialDialogWrapper.SubmitObjectChangesCallback() {
                     @Override
                     public void onChangeSubmitted(Object original, Object changed) {
+                        // if there was no change, do nothing
+                        if ((original != null && original.equals(changed))
+                                || (original == null && changed == null)) return;
+
                         Double d = null;
                         try {
                             String value = Strings.returnSafely(String.valueOf(changed));
@@ -189,6 +196,8 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                             return;
                         }
 
+                        showDialog("Saving hourly rate...", true);
+
                         Map<String, Object> changes = new HashMap<>();
                         changes.put("standardHourlyRate", d);
                         HomeFix.getAPI()
@@ -204,7 +213,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                                             return;
                                         }
 
-                                        Toast.makeText(getContext(), "Updated Hourly Rate", Toast.LENGTH_SHORT).show();
+                                        hideDialog();
                                         refreshView();
                                     }
 
@@ -238,6 +247,10 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                 new MaterialDialogWrapper.SubmitObjectChangesCallback() {
                     @Override
                     public void onChangeSubmitted(Object original, Object changed) {
+                        // if there was no change, do nothing
+                        if ((original != null && original.equals(changed))
+                                || (original == null && changed == null)) return;
+
                         String s = Strings.returnSafely(String.valueOf(changed));
 
                         if (Strings.isEmpty(originalVatNumber) && Strings.isEmpty(s)) {
@@ -254,6 +267,8 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                             return;
                         }
 
+                        showDialog("Saving VAT Number...", true);
+
                         Map<String, Object> changes = new HashMap<>();
                         changes.put("vatNumber", s);
                         HomeFix.getAPI()
@@ -269,7 +284,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                                             return;
                                         }
 
-                                        Toast.makeText(getContext(), "Updated VAT Number", Toast.LENGTH_SHORT).show();
+                                        hideDialog();
                                         refreshView();
                                     }
 
@@ -291,7 +306,86 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
     }
 
     private void onBankAccountClicked() {
+        if (tradesmanPrivate == null) {
+            Toast.makeText(getContext(), "Sorry, unable to update your bank account right now", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        List<String> keys = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+
+        keys.add("accountName");
+        labels.add("Account Name");
+        values.add(tradesmanPrivate.getAccountName());
+
+        keys.add("accountNumber");
+        labels.add("Account Number");
+        values.add(tradesmanPrivate.getAccountNumber());
+
+        keys.add("sortCode");
+        labels.add("Sort-code");
+        values.add(tradesmanPrivate.getSortCode());
+
+        keys.add("nameOnAccount");
+        labels.add("Name On Account");
+        values.add(tradesmanPrivate.getNameOnAccount());
+
+        MaterialDialogWrapper.getMultiInputDialogWithLabels(
+                getActivity(),
+                "Your bank details",
+                "SAVE",
+                keys,
+                labels,
+                values,
+                new OnGotObjectListener<HashMap<String, String>>() {
+                    @Override
+                    public void onGotThing(HashMap<String, String> newValues) {
+                        if (newValues == null || newValues.isEmpty()) {
+                            Toast.makeText(getContext(), "Sorry, something went wrong. Please try again", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // put all the changes into a object map
+                        Map<String, Object> changes = new HashMap<>();
+                        Set<String> keys = newValues.keySet();
+                        for (String key : keys) {
+                            if (Strings.isEmpty(key)) continue;
+                            changes.put(key, newValues.get(key));
+                        }
+
+                        showDialog("Saving bank account info...", true);
+
+                        // send the updates to the server
+                        HomeFix.getAPI()
+                                .updateTradesmanPrivateDetails(
+                                        UserController.getToken(),
+                                        getString(HomeFix.API_KEY_resId),
+                                        changes)
+                                .enqueue(new Callback<Tradesman>() {
+                                    @Override
+                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
+                                        if (response == null || response.body() == null) {
+                                            showErrorDialog();
+                                            return;
+                                        }
+
+                                        hideDialog();
+                                        refreshView();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Tradesman> call, Throwable t) {
+                                        if (t != null && MyLog.isIsLogEnabled())
+                                            t.printStackTrace();
+
+                                        showErrorDialog();
+                                    }
+                                });
+                    }
+                }
+
+        ).show();
     }
 
     private void onBusinessClicked() {
@@ -307,6 +401,10 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                 new MaterialDialogWrapper.SubmitObjectChangesCallback() {
                     @Override
                     public void onChangeSubmitted(Object original, Object changed) {
+                        // if there was no change, do nothing
+                        if ((original != null && original.equals(changed))
+                                || (original == null && changed == null)) return;
+
                         String s = Strings.returnSafely(String.valueOf(changed));
 
                         if (Strings.isEmpty(originalBusinessName) && Strings.isEmpty(s)) {
@@ -323,6 +421,8 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                             return;
                         }
 
+                        showDialog("Saving business name...", true);
+
                         Map<String, Object> changes = new HashMap<>();
                         changes.put("businessName", s);
                         HomeFix.getAPI()
@@ -338,7 +438,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragmen
                                             return;
                                         }
 
-                                        Toast.makeText(getContext(), "Updated Business Name", Toast.LENGTH_SHORT).show();
+                                        hideDialog();
                                         refreshView();
                                     }
 

@@ -6,6 +6,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.support.annotation.NonNull;
+import android.support.annotation.Size;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -296,14 +299,16 @@ public class MaterialDialogWrapper {
 
                     @Override
                     public void onShow(DialogInterface dialog) {
-                        finalFirstEdtTxt.setSelection(finalFirstEdtTxt.getText().length());
-                        finalFirstEdtTxt.requestFocus();
+                        if (finalFirstEdtTxt != null) {
+                            finalFirstEdtTxt.setSelection(finalFirstEdtTxt.getText().length());
+                            finalFirstEdtTxt.requestFocus();
+                        }
                     }
                 })
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
 
                     @Override
-                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         HashMap<String, String> results = new HashMap<>();
 
                         int childCount = content.getChildCount();
@@ -315,16 +320,15 @@ public class MaterialDialogWrapper {
                             results.put(key, editText.getText().toString());
                         }
 
-                        if (dialog != null) dialog.dismiss();
+                        dialog.dismiss();
 
                         if (callback != null) callback.onGotThing(results);
                     }
 
                 }).onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onClick(MaterialDialog dialog, DialogAction which) {
-                        if (dialog != null) dialog.dismiss();
-                        if (callback != null) callback.onGotThing(defaultMaps);
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
                     }
 
                 })
@@ -334,6 +338,107 @@ public class MaterialDialogWrapper {
         return builder.build();
     }
 
+    /**
+     * Multi input dialog. Pass in a map with the fields you want the user to input, the callback
+     * will return the hashmap with the updated (or same if the user cancels) values
+     *
+     * @param activity
+     * @param positiveTxt
+     * @param keys
+     * @param defaults
+     * @param callback
+     * @return
+     */
+    @SuppressLint("InflateParams")
+    public static MaterialDialog getMultiInputDialogWithLabels(
+            final Activity activity,
+            final String title,
+            final String positiveTxt,
+            final List<String> keys,
+            final List<String> labels,
+            final List<String> defaults,
+            final OnGotObjectListener<HashMap<String, String>> callback) {
+
+        LayoutInflater inflater = activity.getLayoutInflater();
+
+        View view = inflater.inflate(R.layout.empty_vertical_scroll_view, null, false);
+        final LinearLayout content = ButterKnife.findById(view, R.id.content);
+
+        EditText firstEdtTxt = null;
+
+        for (int i = 0; i < keys.size(); i++) {
+            String key = Strings.returnSafely(keys.get(i));
+
+            if (Strings.isEmpty(key)) continue;
+
+            // set the current content
+            View holderView = inflater.inflate(R.layout.edit_text_padded_with_label, null);
+            TextView labelView = ButterKnife.findById(holderView, R.id.label);
+            EditText edtTxt = ButterKnife.findById(holderView, R.id.edit_text);
+
+            labelView.setText(Strings.returnSafely(labels.get(i)));
+
+            edtTxt.setHint(Strings.returnSafely(labels.get(i)));
+            String value = Strings.returnSafely(defaults.get(i));
+            edtTxt.setText(value);
+            edtTxt.setTag(key);
+            edtTxt.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+            if (firstEdtTxt == null) firstEdtTxt = edtTxt;
+
+            content.addView(holderView);
+        }
+
+        final EditText finalFirstEdtTxt = firstEdtTxt;
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(activity)
+                .customView(view, true)
+                .title(Strings.returnSafely(title))
+                .positiveText(positiveTxt)
+                .positiveColorRes(R.color.black)
+                .negativeText("CANCEL")
+                .negativeColorRes(R.color.black)
+                .showListener(new OnShowListener() {
+
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        if (finalFirstEdtTxt != null) {
+                            finalFirstEdtTxt.setSelection(finalFirstEdtTxt.getText().length());
+                            finalFirstEdtTxt.requestFocus();
+                        }
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        HashMap<String, String> results = new HashMap<>();
+
+                        int childCount = content.getChildCount();
+                        EditText editText;
+                        String key;
+                        for (int i = 0; i < childCount; i++) {
+                            editText = ButterKnife.findById(content.getChildAt(i), R.id.edit_text);
+                            key = (String) editText.getTag();
+                            results.put(key, editText.getText().toString());
+                        }
+
+                        dialog.dismiss();
+
+                        if (callback != null) callback.onGotThing(results);
+                    }
+
+                }).onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+
+                })
+                .autoDismiss(true)
+                .cancelable(false);
+
+        return builder.build();
+    }
 
     @SuppressLint("InflateParams")
     public static MaterialDialog getEditTextDialog(
@@ -348,7 +453,7 @@ public class MaterialDialogWrapper {
                 initialString,
                 hint,
                 positiveTxt,
-                0,
+                InputType.TYPE_CLASS_TEXT,
                 callback
         );
     }
@@ -389,7 +494,7 @@ public class MaterialDialogWrapper {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
 
                     @Override
-                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         if (edtTxt == null) {
                             try {
                                 getAlertDialog(
@@ -413,10 +518,9 @@ public class MaterialDialogWrapper {
 
                 }).onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
-                        if (callback != null)
-                            callback.onChangeCancelled(initialString);
+                        if (callback != null) callback.onChangeCancelled(initialString);
                     }
 
                 })

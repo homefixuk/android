@@ -9,7 +9,7 @@ import com.samdroid.string.Strings;
 public class TradesmanPrivate extends BaseModel {
 
     private Tradesman tradesman;
-    private String accountName, accountNumber, sortCode, vatNumber, businessName;
+    private String accountName, accountNumber, sortCode, nameOnAccount, vatNumber, businessName;
     private double standardHourlyRate;
 
     public TradesmanPrivate() {
@@ -69,5 +69,13 @@ public class TradesmanPrivate extends BaseModel {
 
     public void setStandardHourlyRate(double standardHourlyRate) {
         this.standardHourlyRate = standardHourlyRate;
+    }
+
+    public String getNameOnAccount() {
+        return nameOnAccount;
+    }
+
+    public void setNameOnAccount(String nameOnAccount) {
+        this.nameOnAccount = nameOnAccount;
     }
 }

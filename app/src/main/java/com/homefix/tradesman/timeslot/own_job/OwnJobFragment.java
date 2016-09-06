@@ -39,6 +39,9 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     @BindView(R.id.invoice_bar)
     protected View mInvoiceBar;
 
+    @BindView(R.id.charges_bar)
+    protected View mChargesBar;
+
     @BindView(R.id.payments_bar)
     protected View mPaymentsBar;
 
@@ -90,16 +93,15 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                         s += Strings.setStringColour("(£" + Strings.priceToString(amountPaid) + " paid)", ColorUtils.green);
                     }
 
-                    mPaymentsTxt.setText(Html.fromHtml(s));
+                    mPaymentsTxt.setText(HtmlHelper.fromHtml(s));
                 }
 
             }
         }
 
         BackgroundColourOnTouchListener touchListener = new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark);
-
         if (mInvoiceBar != null) mInvoiceBar.setOnTouchListener(touchListener);
-
+        if (mChargesBar != null) mChargesBar.setOnTouchListener(touchListener);
         if (mPaymentsBar != null) mPaymentsBar.setOnTouchListener(touchListener);
     }
 

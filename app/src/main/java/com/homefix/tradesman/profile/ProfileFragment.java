@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.text.InputType;
 import android.widget.TextView;
 
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.interfaces.SimpleDraweeControllerBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.api.HomeFix;
@@ -108,14 +110,15 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
         Uri imageUri = Uri.parse(Strings.checkUrl(mCurrentUser.getPicture()));
         imageView.setImageURI(imageUri);
 
-        nameView.setText(mCurrentUser.getName());
-        emailView.setText(mCurrentUser.getEmail());
-        homePhoneView.setText(mCurrentUser.getHomePhone());
-        mobilePhoneView.setText(mCurrentUser.getMobile());
-        addressView.setText(getReadableLocationString(", "));
+
+        nameView.setText(Strings.returnSafely(mCurrentUser.getName(), "No Name"));
+        emailView.setText(Strings.returnSafely(mCurrentUser.getEmail(), "no@email.com"));
+        homePhoneView.setText(Strings.returnSafely(mCurrentUser.getHomePhone(), "Long hold here to set your home phone"));
+        mobilePhoneView.setText(Strings.returnSafely(mCurrentUser.getMobile(), "Long hold here to set your mobile phone"));
+        addressView.setText(Strings.returnSafely(getReadableLocationString(", "), "Long hold here to set your address"));
         yearsExperienceView.setText(Strings.formatRaised(mCurrentUser.getExperience()));
 
-        workAreasView.setText(Strings.flattenList(mCurrentUser.getWorkAreas(), ", "));
+        workAreasView.setText(Strings.returnSafely(Strings.flattenList(mCurrentUser.getWorkAreas(), ", "), "Long hold here to set your work areas"));
     }
 
     protected String getReadableLocationString(String delimiter) {
@@ -142,7 +145,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
 
         MaterialDialogWrapper.getEditTextDialog(
                 getActivity(),
-                null,
+                "",
                 mCurrentUser.getHomePhone(),
                 "Home Phone Number",
                 "SAVE",
@@ -151,10 +154,12 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                     @Override
                     public void onChangeSubmitted(Object original, Object changed) {
                         // if there was no change, do nothing
-                        if ((original != null && !original.equals(changed))
+                        if ((original != null && original.equals(changed))
                                 || (original == null && changed == null)) return;
 
                         String newMobile = Strings.returnSafely(String.valueOf(changed));
+
+                        showDialog("Updating Home Phone...", true);
 
                         Map<String, Object> changes = new HashMap<>();
                         changes.put("homePhone", newMobile);
@@ -169,6 +174,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                                         }
 
                                         mCurrentUser = response.body();
+                                        hideDialog();
                                         setupView();
                                     }
 
@@ -206,10 +212,12 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                     @Override
                     public void onChangeSubmitted(Object original, Object changed) {
                         // if there was no change, do nothing
-                        if ((original != null && !original.equals(changed))
+                        if ((original != null && original.equals(changed))
                                 || (original == null && changed == null)) return;
 
                         String newMobile = Strings.returnSafely(String.valueOf(changed));
+
+                        showDialog("Updating Mobile Phone...", true);
 
                         Map<String, Object> changes = new HashMap<>();
                         changes.put("mobile", newMobile);
@@ -224,6 +232,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                                         }
 
                                         mCurrentUser = response.body();
+                                        hideDialog();
                                         setupView();
                                     }
 
@@ -279,6 +288,8 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
             public void onGotThing(HashMap<String, String> newAddress) {
                 if (newAddress == null) return;
 
+                showDialog("Updating Address...", true);
+
                 // send the changes to the server
                 Map<String, Object> changes = new HashMap<>();
                 changes.put("addressLine1", Strings.returnSafely(newAddress.get(_ADDRESS_LINE_1)));
@@ -298,6 +309,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
 
                                 // update the view with the user profile returned
                                 mCurrentUser = response.body();
+                                hideDialog();
                                 setupView();
                             }
 
@@ -329,6 +341,8 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
     public void onNewWorkAreasReturned(ArrayList<String> workAreas) {
         if (workAreas == null) workAreas = new ArrayList<>();
 
+        showDialog("Updating Work Areas...", true);
+
         // send the updates to the server
         Map<String, Object> changes = new HashMap<>();
         changes.put("workAreas", workAreas);
@@ -343,6 +357,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                         }
 
                         mCurrentUser = response.body();
+                        hideDialog();
                         setupView();
                     }
 

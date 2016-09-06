@@ -53,6 +53,9 @@
         <activity
             android:name=".base.activity.EditListActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".profile.settings.SettingsActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.LocationService"

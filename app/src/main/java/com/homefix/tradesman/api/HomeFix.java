@@ -33,7 +33,7 @@ public class HomeFix {
             HOST_APIARY_MOCK = "http://private-52b01-homefixtradesman.apiary-mock.com/",
             HOST_SALESFORCE_PROD = "https://fieldexprt-homefix.cs80.force.com/services/apexrest/",
             HOST_SALESFORCE_SANDBOX = "https://fieldexprt-homefix.eu5.force.com/services/apexrest/",
-            HOST_CUSTOM_DEV = "http://ec2-52-90-29-184.compute-1.amazonaws.com/int/", //"http://atlas-jacob.codio.io:3000/api/v1/",
+            HOST_CUSTOM_DEV = "http://ec2-52-90-29-184.compute-1.amazonaws.com/int/",
             HOST_CUSTOM_PROD = "http://ec2-52-90-29-184.compute-1.amazonaws.com/int/";
 
     public enum REQUEST_TYPE {

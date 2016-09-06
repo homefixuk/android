@@ -24,6 +24,8 @@
                 android:id="@+id/profile_image"
                 android:layout_width="@dimen/base_padding_ten"
                 android:layout_height="@dimen/base_padding_ten"
+                fresco:failureImage="@drawable/ic_account_grey600_48dp"
+                fresco:placeholderImage="@color/colorPrimary"
                 fresco:roundAsCircle="true"
                 fresco:roundingBorderColor="@color/colorPrimaryDark"
                 fresco:roundingBorderWidth="@dimen/base_padding_half" />
