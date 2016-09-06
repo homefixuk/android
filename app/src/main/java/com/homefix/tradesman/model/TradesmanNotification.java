@@ -6,7 +6,7 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanNotification {
+public class TradesmanNotification extends BaseModel {
 
     private Tradesman tradesman;
     private String type, title, content;

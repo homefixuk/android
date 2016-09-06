@@ -14,7 +14,7 @@ import java.util.Map;
 public class Tradesman extends User {
 
     private String type, picture;
-    private double rating, experience, standardHourlyRate;
+    private double rating, experience;
     private List<String> workAreas;
     private Location currentLocation;
     private String settings;
@@ -47,14 +47,6 @@ public class Tradesman extends User {
 
     public String getSettings() {
         return Strings.returnSafely(settings);
-    }
-
-    public double getStandardHourlyRate() {
-        return standardHourlyRate;
-    }
-
-    public void setStandardHourlyRate(double standardHourlyRate) {
-        this.standardHourlyRate = standardHourlyRate;
     }
 
     public void setType(String type) {

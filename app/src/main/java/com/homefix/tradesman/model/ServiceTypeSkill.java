@@ -4,11 +4,11 @@ package com.homefix.tradesman.model;
  * Created by samuel on 6/15/2016.
  */
 
-public class ServiceTypeSkill {
+public class ServiceTypeSkill extends BaseModel {
 
-    Problem serviceType;
-    Skill skill;
-    int level;
+    private Problem serviceType;
+    private Skill skill;
+    private int level;
 
     public Problem getServiceType() {
         return serviceType;

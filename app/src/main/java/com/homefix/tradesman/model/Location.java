@@ -4,9 +4,9 @@ package com.homefix.tradesman.model;
  * Created by samuel on 6/15/2016.
  */
 
-public class Location {
+public class Location extends BaseModel {
 
-    double latitude, longitude;
+    private double latitude, longitude;
 
     public double getLatitude() {
         return latitude;

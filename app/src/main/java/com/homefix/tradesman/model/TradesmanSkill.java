@@ -4,11 +4,11 @@ package com.homefix.tradesman.model;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanSkill {
+public class TradesmanSkill extends BaseModel {
 
-    Tradesman tradesman;
-    Skill skill;
-    int level;
+    private Tradesman tradesman;
+    private Skill skill;
+    private int level;
 
     public Tradesman getTradesman() {
         return tradesman;

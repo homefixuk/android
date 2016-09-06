@@ -6,9 +6,9 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class Group {
+public class Group extends BaseModel {
 
-    String name;
+    private String name;
 
     public String getName() {
         return Strings.returnSafely(name);

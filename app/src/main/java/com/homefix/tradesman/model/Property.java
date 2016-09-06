@@ -6,12 +6,15 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class Property {
+public class Property extends BaseModel {
 
-    Group group;
-    String addressLine1, addressLine2, addressLine3, country, postcode, phone;
-    int number_tennants, number_bedrooms;
-    double latitude, longitude;
+    private Group group;
+    private String addressLine1, addressLine2, addressLine3, country, postcode, phone;
+    private int number_tennants, number_bedrooms;
+    private double latitude, longitude;
+
+    public Property() {
+    }
 
     public Group getGroup() {
         return group;
@@ -74,4 +77,47 @@ public class Property {
         return s;
     }
 
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public void setAddressLine1(String addressLine1) {
+        this.addressLine1 = addressLine1;
+    }
+
+    public void setAddressLine2(String addressLine2) {
+        this.addressLine2 = addressLine2;
+    }
+
+    public void setAddressLine3(String addressLine3) {
+        this.addressLine3 = addressLine3;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public void setPostcode(String postcode) {
+        this.postcode = postcode;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setNumber_tennants(int number_tennants) {
+        this.number_tennants = number_tennants;
+    }
+
+    public void setNumber_bedrooms(int number_bedrooms) {
+        this.number_bedrooms = number_bedrooms;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 }

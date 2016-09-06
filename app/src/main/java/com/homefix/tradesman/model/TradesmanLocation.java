@@ -6,9 +6,9 @@ package com.homefix.tradesman.model;
 
 public class TradesmanLocation extends Location {
 
-    Tradesman tradesman;
-    boolean isGoingToJob;
-    long timestmap;
+    private Tradesman tradesman;
+    private boolean isGoingToJob;
+    private long timestmap;
 
     public Tradesman getTradesman() {
         return tradesman;

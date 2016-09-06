@@ -142,6 +142,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
 
         MaterialDialogWrapper.getEditTextDialog(
                 getActivity(),
+                null,
                 mCurrentUser.getHomePhone(),
                 "Home Phone Number",
                 "SAVE",
@@ -196,6 +197,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
 
         MaterialDialogWrapper.getEditTextDialog(
                 getActivity(),
+                null,
                 mCurrentUser.getMobile(),
                 "Mobile Phone Number",
                 "SAVE",
@@ -317,10 +319,11 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
 
     @Optional
     @OnLongClick(R.id.work_areas)
-    public void onWorkAreasLongTouch() {
+    public boolean onWorkAreasLongTouch() {
         Intent i = new Intent(getActivity(), EditListActivity.class);
         i.putStringArrayListExtra("list", new ArrayList<>(mCurrentUser != null ? mCurrentUser.getWorkAreas() : new ArrayList<String>()));
         getActivity().startActivityForResult(i, Ids.WORK_AREAS_CODE);
+        return true;
     }
 
     public void onNewWorkAreasReturned(ArrayList<String> workAreas) {

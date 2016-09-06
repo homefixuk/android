@@ -9,8 +9,8 @@ import java.util.List;
 
 public class Customer extends User {
 
-    String priority;
-    List<Tradesman> preferredTradesman;
+    private String priority;
+    private List<Tradesman> preferredTradesman;
 
     public Customer() {
         super();

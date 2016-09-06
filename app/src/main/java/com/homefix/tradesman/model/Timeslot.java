@@ -13,16 +13,15 @@ import java.util.List;
  * Created by samuel on 6/15/2016.
  */
 
-public class Timeslot {
+public class Timeslot extends BaseModel {
 
     public enum TYPE {
 
         NONE, AVAILABILITY, BREAK, SERVICE, OWN_JOB;
 
         public boolean equals(String type) {
-            if (Strings.isEmpty(type)) return false;
+            return !Strings.isEmpty(type) && name().equals(type);
 
-            return name().equals(type);
         }
 
         public static TYPE getTypeEnum(String type) {
@@ -43,19 +42,9 @@ public class Timeslot {
     }
 
     private long start, end, length;
-    private String id, type;
+    private String type;
     private Tradesman tradesman;
     private Service service;
-
-    public String getId() {
-        id = Strings.returnSafely(id);
-
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public long getStart() {
         return start;

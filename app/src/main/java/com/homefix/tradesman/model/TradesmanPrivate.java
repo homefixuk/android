@@ -6,10 +6,11 @@ import com.samdroid.string.Strings;
  * Created by samuel on 7/27/2016.
  */
 
-public class TradesmanPrivate {
+public class TradesmanPrivate extends BaseModel {
 
     private Tradesman tradesman;
-    private String accountName, accountNumber, sortCode, vatNumber;
+    private String accountName, accountNumber, sortCode, vatNumber, businessName;
+    private double standardHourlyRate;
 
     public TradesmanPrivate() {
     }
@@ -52,5 +53,21 @@ public class TradesmanPrivate {
 
     public void setVatNumber(String vatNumber) {
         this.vatNumber = vatNumber;
+    }
+
+    public String getBusinessName() {
+        return Strings.returnSafely(businessName);
+    }
+
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public double getStandardHourlyRate() {
+        return standardHourlyRate;
+    }
+
+    public void setStandardHourlyRate(double standardHourlyRate) {
+        this.standardHourlyRate = standardHourlyRate;
     }
 }

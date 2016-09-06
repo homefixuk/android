@@ -28,6 +28,8 @@ import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.profile.ProfileFragment;
+import com.homefix.tradesman.profile.settings.SettingsFragment;
+import com.homefix.tradesman.profile.settings.SettingsPresenter;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
 
@@ -60,6 +62,7 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     private String ccaPhoneNumber;
 
     protected ProfileFragment<BaseToolbarNavMenuActivity> mProfileFragment;
+    protected SettingsFragment<BaseToolbarNavMenuActivity> mSettingsFragment;
 
     public BaseToolbarNavMenuActivity(String TAG) {
         super(TAG);

@@ -6,7 +6,7 @@ import com.samdroid.string.Strings;
  * Created by samuel on 7/27/2016.
  */
 
-public class Charge {
+public class Charge extends BaseModel {
 
     private String id;
     private Service service;

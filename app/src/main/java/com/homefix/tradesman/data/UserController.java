@@ -109,7 +109,7 @@ public class UserController {
             return;
         }
 
-        String API_KEY = context != null ? context.getString(HomeFix.API_KEY) : "";
+        String API_KEY = context != null ? context.getString(HomeFix.API_KEY_resId) : "";
 
         Callback<TradesmanPrivate> callback1 = new Callback<TradesmanPrivate>() {
             @Override

@@ -1,0 +1,382 @@
+package com.homefix.tradesman.profile.settings;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.text.InputType;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.homefix.tradesman.R;
+import com.homefix.tradesman.api.HomeFix;
+import com.homefix.tradesman.base.activity.BaseToolbarActivity;
+import com.homefix.tradesman.base.adapter.MyListAdapter;
+import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.model.Tradesman;
+import com.homefix.tradesman.model.TradesmanPrivate;
+import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.MyLog;
+import com.samdroid.listener.BackgroundColourOnTouchListener;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.string.Strings;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * Created by samuel on 9/1/2016.
+ */
+
+public class SettingsFragment<A extends BaseToolbarActivity> extends BaseFragment<A, SettingsView, SettingsPresenter> implements SettingsView {
+
+    @BindView(R.id.list)
+    protected ListView mListView;
+
+    protected ArrayAdapter<String> mAdapter;
+
+    protected Tradesman tradesman;
+    protected TradesmanPrivate tradesmanPrivate;
+
+    public SettingsFragment() {
+        super(SettingsFragment.class.getSimpleName());
+    }
+
+
+    @Override
+    protected SettingsPresenter getPresenter() {
+        if (presenter == null) presenter = new SettingsPresenter(this);
+
+        return presenter;
+    }
+
+    @Override
+    protected int getLayoutRes() {
+        return R.layout.fragment_profile_settings;
+    }
+
+    public List<String> getSettingsOptions() {
+        return Arrays.asList("Business", "Bank Account", "VAT Number", "Standard Hourly Rate");
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mAdapter = new MyListAdapter<String>(getActivity(), "SettingsAdapter", android.R.layout.simple_list_item_2, getSettingsOptions()) {
+
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                View view = getActivity().getLayoutInflater().inflate(android.R.layout.simple_list_item_2, parent, false);
+
+                final String option = Strings.returnSafely(getItem(position));
+
+                // set the name of the option
+                TextView text1 = ButterKnife.findById(view, android.R.id.text1);
+                text1.setText(option);
+                text1.setTextColor(ContextCompat.getColor(getContext(), R.color.grey));
+
+                // set the data already retrieved for the option
+                TextView text2 = ButterKnife.findById(view, android.R.id.text2);
+                switch (option) {
+
+                    case "Business":
+                        if (tradesmanPrivate == null) break;
+
+                        text2.setText(tradesmanPrivate.getBusinessName());
+                        break;
+
+                    case "Bank Account":
+                        if (tradesmanPrivate == null) break;
+
+                        text2.setText(tradesmanPrivate.getAccountName());
+                        break;
+
+                    case "VAT Number":
+                        if (tradesmanPrivate == null) break;
+
+                        text2.setText(tradesmanPrivate.getVatNumber());
+                        break;
+
+                    case "Standard Hourly Rate":
+                        if (tradesmanPrivate == null) break;
+
+                        text2.setText(String.format("£%s", Strings.formatRaised(tradesmanPrivate.getStandardHourlyRate())));
+                        break;
+                }
+
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        switch (option) {
+
+                            case "Business":
+                                onBusinessClicked();
+                                break;
+
+                            case "Bank Account":
+                                onBankAccountClicked();
+                                break;
+
+                            case "VAT Number":
+                                onVatNumberClicked();
+                                break;
+
+                            case "Standard Hourly Rate":
+                                onStandardHourlyRateClicked();
+                                break;
+
+                        }
+                    }
+                });
+
+                view.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorPrimaryLight));
+
+                return view;
+            }
+        };
+        mListView.setAdapter(mAdapter);
+
+        refreshView();
+    }
+
+    private void onStandardHourlyRateClicked() {
+        MaterialDialogWrapper.getEditTextDialog(
+                getActivity(),
+                "Update your standard hourly rate",
+                tradesmanPrivate != null ? String.valueOf(tradesmanPrivate.getStandardHourlyRate()) : "",
+                "Standard Hourly Rate (£)",
+                "SAVE",
+                InputType.TYPE_CLASS_NUMBER,
+                new MaterialDialogWrapper.SubmitObjectChangesCallback() {
+                    @Override
+                    public void onChangeSubmitted(Object original, Object changed) {
+                        Double d = null;
+                        try {
+                            String value = Strings.returnSafely(String.valueOf(changed));
+                            d = Double.valueOf(value);
+
+                            if (Strings.isEmpty(value)) throw new Exception();
+
+                        } catch (Exception e) {
+                        }
+
+                        if (d == null || d <= 0) {
+                            showConfirmDialog(
+                                    "Sorry, please enter a valid amount",
+                                    "OK",
+                                    "CANCEL",
+                                    new ConfirmDialogCallback() {
+                                        @Override
+                                        public void onPositive() {
+                                            onStandardHourlyRateClicked();
+                                        }
+                                    });
+                            return;
+                        }
+
+                        Map<String, Object> changes = new HashMap<>();
+                        changes.put("standardHourlyRate", d);
+                        HomeFix.getAPI()
+                                .updateTradesmanPrivateDetails(
+                                        UserController.getToken(),
+                                        getString(HomeFix.API_KEY_resId),
+                                        changes)
+                                .enqueue(new Callback<Tradesman>() {
+                                    @Override
+                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
+                                        if (response == null || response.body() == null) {
+                                            showErrorDialog();
+                                            return;
+                                        }
+
+                                        Toast.makeText(getContext(), "Updated Hourly Rate", Toast.LENGTH_SHORT).show();
+                                        refreshView();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Tradesman> call, Throwable t) {
+                                        if (t != null && MyLog.isIsLogEnabled())
+                                            t.printStackTrace();
+
+                                        showErrorDialog();
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onChangeCancelled(Object original) {
+                    }
+
+                }).show();
+    }
+
+    private void onVatNumberClicked() {
+        final String originalVatNumber = tradesmanPrivate != null ? tradesmanPrivate.getVatNumber() : "";
+
+        MaterialDialogWrapper.getEditTextDialog(
+                getActivity(),
+                null,
+                originalVatNumber,
+                "VAT Number",
+                "SAVE",
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS,
+                new MaterialDialogWrapper.SubmitObjectChangesCallback() {
+                    @Override
+                    public void onChangeSubmitted(Object original, Object changed) {
+                        String s = Strings.returnSafely(String.valueOf(changed));
+
+                        if (Strings.isEmpty(originalVatNumber) && Strings.isEmpty(s)) {
+                            showConfirmDialog(
+                                    "Sorry, please enter a valid VAT number",
+                                    "OK",
+                                    "CANCEL",
+                                    new ConfirmDialogCallback() {
+                                        @Override
+                                        public void onPositive() {
+                                            onVatNumberClicked();
+                                        }
+                                    });
+                            return;
+                        }
+
+                        Map<String, Object> changes = new HashMap<>();
+                        changes.put("vatNumber", s);
+                        HomeFix.getAPI()
+                                .updateTradesmanPrivateDetails(
+                                        UserController.getToken(),
+                                        getString(HomeFix.API_KEY_resId),
+                                        changes)
+                                .enqueue(new Callback<Tradesman>() {
+                                    @Override
+                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
+                                        if (response == null || response.body() == null) {
+                                            showErrorDialog();
+                                            return;
+                                        }
+
+                                        Toast.makeText(getContext(), "Updated VAT Number", Toast.LENGTH_SHORT).show();
+                                        refreshView();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Tradesman> call, Throwable t) {
+                                        if (t != null && MyLog.isIsLogEnabled())
+                                            t.printStackTrace();
+
+                                        showErrorDialog();
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onChangeCancelled(Object original) {
+                    }
+
+                }).show();
+    }
+
+    private void onBankAccountClicked() {
+
+    }
+
+    private void onBusinessClicked() {
+        final String originalBusinessName = tradesmanPrivate != null ? tradesmanPrivate.getBusinessName() : "";
+
+        MaterialDialogWrapper.getEditTextDialog(
+                getActivity(),
+                null,
+                originalBusinessName,
+                "Business Name (will appear on invoices)",
+                "SAVE",
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS,
+                new MaterialDialogWrapper.SubmitObjectChangesCallback() {
+                    @Override
+                    public void onChangeSubmitted(Object original, Object changed) {
+                        String s = Strings.returnSafely(String.valueOf(changed));
+
+                        if (Strings.isEmpty(originalBusinessName) && Strings.isEmpty(s)) {
+                            showConfirmDialog(
+                                    "Sorry, please enter a valid business name",
+                                    "OK",
+                                    "CANCEL",
+                                    new ConfirmDialogCallback() {
+                                        @Override
+                                        public void onPositive() {
+                                            onBusinessClicked();
+                                        }
+                                    });
+                            return;
+                        }
+
+                        Map<String, Object> changes = new HashMap<>();
+                        changes.put("businessName", s);
+                        HomeFix.getAPI()
+                                .updateTradesmanPrivateDetails(
+                                        UserController.getToken(),
+                                        getString(HomeFix.API_KEY_resId),
+                                        changes)
+                                .enqueue(new Callback<Tradesman>() {
+                                    @Override
+                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
+                                        if (response == null || response.body() == null) {
+                                            showErrorDialog();
+                                            return;
+                                        }
+
+                                        Toast.makeText(getContext(), "Updated Business Name", Toast.LENGTH_SHORT).show();
+                                        refreshView();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Tradesman> call, Throwable t) {
+                                        if (t != null && MyLog.isIsLogEnabled())
+                                            t.printStackTrace();
+
+                                        showErrorDialog();
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onChangeCancelled(Object original) {
+                    }
+
+                }).show();
+    }
+
+    private void refreshView() {
+        UserController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
+            @Override
+            public void onGotThing(Tradesman o) {
+                tradesman = o;
+
+                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        UserController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
+            @Override
+            public void onGotThing(TradesmanPrivate o) {
+                tradesmanPrivate = o;
+
+                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+}

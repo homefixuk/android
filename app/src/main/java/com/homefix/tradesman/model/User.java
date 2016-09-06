@@ -6,15 +6,11 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class User {
+public class User extends BaseModel {
 
-    String id, firstName, lastName, email, mobile, role, homePhone;
-    String homeAddressLine1, homeAddressLine2, homeAddressLine3, homePostcode, homeCountry;
-    String billingAddressLine1, billingAddressLine2, billingAddressLine3, billingPostcode, billingCountry;
-
-    public String getId() {
-        return Strings.returnSafely(id);
-    }
+    private String firstName, lastName, email, mobile, role, homePhone;
+    private String homeAddressLine1, homeAddressLine2, homeAddressLine3, homePostcode, homeCountry;
+    private String billingAddressLine1, billingAddressLine2, billingAddressLine3, billingPostcode, billingCountry;
 
     public String getName() {
         return Strings.combineNames(firstName, lastName);
@@ -82,10 +78,6 @@ public class User {
 
     public String getRole() {
         return Strings.returnSafely(role);
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public void setFirstName(String firstName) {

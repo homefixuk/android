@@ -4,11 +4,11 @@ package com.homefix.tradesman.model;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanFinances {
+public class TradesmanFinances extends BaseModel {
 
-    Tradesman tradesman;
-    int numberJobs;
-    double hoursWorked, amountEarned;
+    private Tradesman tradesman;
+    private int numberJobs;
+    private double hoursWorked, amountEarned;
 
     public Tradesman getTradesman() {
         return tradesman;

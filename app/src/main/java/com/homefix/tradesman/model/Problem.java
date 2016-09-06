@@ -16,14 +16,14 @@ import retrofit2.Response;
  * Created by samuel on 6/15/2016.
  */
 
-public class Problem {
+public class Problem extends BaseModel {
 
     private String name, description;
     private long time;
     private List<Part> potentialParts;
 
     public Problem() {
-
+        super();
     }
 
     public String getName() {

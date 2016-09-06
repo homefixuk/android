@@ -17,7 +17,6 @@ import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
@@ -147,7 +146,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
             };
 
-            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY), UserController.getToken()).enqueue(callback);
+            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY_resId), UserController.getToken()).enqueue(callback);
         }
 
         if (checkPermissions && !calledPermissionResult) {

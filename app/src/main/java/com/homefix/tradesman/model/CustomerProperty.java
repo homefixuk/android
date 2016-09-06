@@ -6,12 +6,12 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class CustomerProperty {
+public class CustomerProperty extends BaseModel {
 
-    Property property;
-    Customer customer;
-    String type;
-    long from, until;
+    private Property property;
+    private Customer customer;
+    private String type;
+    private long from, until;
 
     public CustomerProperty() {
         super();

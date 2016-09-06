@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,6 +14,7 @@ import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.calendar.CalendarFragment;
 import com.homefix.tradesman.common.CheckatraderScraper;
 import com.homefix.tradesman.home.home_fragment.HomeFragment;
+import com.homefix.tradesman.profile.settings.SettingsFragment;
 import com.homefix.tradesman.task.LogoutTask;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
@@ -314,11 +314,25 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             return true;
 
         } else if (mCurrentPage == R.string.action_profile && item.getItemId() == R.id.action_settings) {
-            // TODO: go to settings page
+            // show the settings page
+            if (mSettingsFragment == null) mSettingsFragment = new SettingsFragment<>();
+            replaceFragment(mSettingsFragment);
+            setCurrentPage(R.id.action_settings);
+            setActionbarTitle("Profile Settings");
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        // if in the settings, go back to the profile
+        if (mCurrentPage == R.id.action_settings) {
+            onNavigationProfileClicked();
+            return;
+        }
+
+        super.onBackPressed();
+    }
 }

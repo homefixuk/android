@@ -6,22 +6,13 @@ import com.samdroid.string.Strings;
  * Created by samuel on 7/27/2016.
  */
 
-public class Payment {
+public class Payment extends BaseModel {
 
-    private String id;
     private ServiceSet serviceSet;
     private double amount;
     private String type; // cash/cheque/bank_transfer/card/stripe/etc.
 
     public Payment() {
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public ServiceSet getServiceSet() {

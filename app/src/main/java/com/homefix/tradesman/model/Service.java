@@ -10,12 +10,12 @@ import java.util.List;
  * Created by samuel on 6/15/2016.
  */
 
-public class Service {
+public class Service extends BaseModel {
 
     private ServiceSet serviceSet;
     private Tradesman tradesman;
     private Problem problem;
-    private String id, status;
+    private String status;
     private long requestTime, arrivalTime, departTime, estimatedDuration;
     private int estimatedCost, actualDuration, actualCost;
     private String tradesmanNotes;
@@ -35,10 +35,6 @@ public class Service {
 
     public Problem getProblem() {
         return problem;
-    }
-
-    public String getId() {
-        return Strings.returnSafely(id);
     }
 
     public String getStatus() {

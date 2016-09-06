@@ -6,12 +6,12 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanReview {
+public class TradesmanReview extends BaseModel {
 
-    Tradesman tradesman;
-    User user;
-    double rating;
-    String review;
+    private Tradesman tradesman;
+    private User user;
+    private double rating;
+    private String review;
 
     public Tradesman getTradesman() {
         return tradesman;

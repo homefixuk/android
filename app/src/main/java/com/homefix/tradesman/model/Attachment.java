@@ -6,7 +6,7 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class Attachment {
+public class Attachment extends BaseModel {
 
     Service service;
     String type, text, file;

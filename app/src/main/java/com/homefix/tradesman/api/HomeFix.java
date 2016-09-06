@@ -2,9 +2,7 @@ package com.homefix.tradesman.api;
 
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.Timeslot;
-import com.homefix.tradesman.model.Tradesman;
 import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
 
@@ -12,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,21 +21,13 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import retrofit2.Call;
-import retrofit2.http.DELETE;
-import retrofit2.http.GET;
-import retrofit2.http.PATCH;
-import retrofit2.http.POST;
-import retrofit2.http.Query;
-import retrofit2.http.QueryMap;
-
 /**
  * Created by samuel on 6/15/2016.
  */
 public class HomeFix {
 
     public final static String HOST_NAME;
-    public final static int API_KEY;
+    public final static int API_KEY_resId;
 
     private static final String
             HOST_APIARY_MOCK = "http://private-52b01-homefixtradesman.apiary-mock.com/",
@@ -66,8 +55,8 @@ public class HomeFix {
             else if (BuildConfig.FLAVOR.equals("custom")) HOST_NAME = HOST_CUSTOM_DEV;
             else HOST_NAME = HOST_APIARY_MOCK;
 
-//            API_KEY = R.string.apikey_dev;
-            API_KEY = R.string.apikey_prod;
+//            API_KEY_resId = R.string.apikey_dev;
+            API_KEY_resId = R.string.apikey_prod;
 
         } else {
             if (BuildConfig.FLAVOR.equals("salesforce")) HOST_NAME = HOST_SALESFORCE_PROD;
@@ -75,7 +64,7 @@ public class HomeFix {
             else if (BuildConfig.FLAVOR.equals("custom")) HOST_NAME = HOST_CUSTOM_PROD;
             else HOST_NAME = HOST_APIARY_MOCK;
 
-            API_KEY = R.string.apikey_prod;
+            API_KEY_resId = R.string.apikey_prod;
         }
     }
 

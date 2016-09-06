@@ -344,6 +344,7 @@ public class MaterialDialogWrapper {
             final SubmitObjectChangesCallback callback) {
         return getEditTextDialog(
                 context,
+                "",
                 initialString,
                 hint,
                 positiveTxt,
@@ -355,6 +356,7 @@ public class MaterialDialogWrapper {
     @SuppressLint("InflateParams")
     public static MaterialDialog getEditTextDialog(
             final Activity context,
+            final String title,
             final String initialString,
             final String hint,
             final String positiveTxt,
@@ -420,6 +422,8 @@ public class MaterialDialogWrapper {
                 })
                 .autoDismiss(true)
                 .cancelable(false);
+
+        if (!Strings.isEmpty(title)) builder.title(title);
 
         return builder.build();
     }

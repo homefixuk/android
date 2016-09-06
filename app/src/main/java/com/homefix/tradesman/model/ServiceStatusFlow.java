@@ -7,10 +7,10 @@ import java.util.List;
  * Created by samuel on 7/27/2016.
  */
 
-public class ServiceStatusFlow {
+public class ServiceStatusFlow extends BaseModel {
 
-    String status;
-    List<ServiceStatusFlow> values;
+    private String status;
+    private List<ServiceStatusFlow> values;
 
     public ServiceStatusFlow() {
     }

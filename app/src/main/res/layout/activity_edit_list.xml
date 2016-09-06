@@ -17,6 +17,8 @@
         android:background="@drawable/primary_light_to_dark_color_selector"
         android:gravity="center"
         android:padding="@dimen/base_padding_double"
-        android:text="@string/action_add" />
+        android:text="@string/action_add"
+        android:textAppearance="@style/SingleLineTheme.Large.Bold"
+        android:textColor="@color/white" />
 
 </RelativeLayout>

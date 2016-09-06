@@ -47,7 +47,7 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
         };
 
 //        HomeFix.getAPI().signup(
-//                getView().getContext().getString(HomeFix.API_KEY),
+//                getView().getContext().getString(HomeFix.API_KEY_resId),
 //                "Test",
 //                "Plumber",
 //                "testplumber@homefix.co.uk",
@@ -133,7 +133,7 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
         };
 
         HomeFix.getAPI().login(
-                getView().getContext().getString(HomeFix.API_KEY),
+                getView().getContext().getString(HomeFix.API_KEY_resId),
                 email,
                 password).enqueue(callback);
     }

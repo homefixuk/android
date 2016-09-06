@@ -111,12 +111,6 @@ public class EditListActivity extends BaseToolbarActivity<BaseToolbarActivityVie
             @NonNull
             @Override
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-//                View view = convertView;
-//
-//                if (view == null) {
-//                    view = getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
-//                }
-
                 View view = super.getView(position, convertView, parent);
 
                 final String s = Strings.returnSafely(getItem(position));

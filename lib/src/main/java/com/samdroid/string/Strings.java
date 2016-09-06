@@ -1,6 +1,7 @@
 package com.samdroid.string;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Patterns;
 
 import com.samdroid.math.MathUtils;
@@ -114,8 +115,9 @@ public class Strings {
      * @param s String to check
      * @return if the string is null or has length zero
      */
+    @NonNull
     public static String returnSafely(String s) {
-        return (s == null || s.length() == 0) ? "" : s;
+        return isEmpty(s) ? "" : s;
     }
 
     /**

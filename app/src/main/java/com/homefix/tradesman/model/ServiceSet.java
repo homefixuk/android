@@ -10,13 +10,13 @@ import java.util.List;
  * Created by samuel on 6/15/2016.
  */
 
-public class ServiceSet {
+public class ServiceSet extends BaseModel {
 
-    CustomerProperty customerProperty;
-    long createdAt, resolvedAt;
-    String customerDescription;
-    int numberServices;
-    double totalCost, amountPaid;
+    private CustomerProperty customerProperty;
+    private long createdAt, resolvedAt;
+    private String customerDescription;
+    private int numberServices;
+    private double totalCost, amountPaid;
     private List<Payment> payments;
     private List<Charge> charges;
 
