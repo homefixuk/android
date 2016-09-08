@@ -39,9 +39,12 @@ public class SplashScreenPresenter extends BaseActivityPresenter<SplashScreenVie
                     HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
                 }
 
-                // if the location service is not running
-                if (!LocationService.isRunning() && getView().getContext() != null) {
-                    getView().getContext().startService(new Intent(getView().getContext(), LocationService.class));
+                try {
+                    // if the location service is not running
+                    if (!LocationService.isRunning() && getView().getContext() != null) {
+                        getView().getContext().startService(new Intent(getView().getContext(), LocationService.class));
+                    }
+                } catch (Exception e) {
                 }
 
                 // now wait before going into the app

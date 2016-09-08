@@ -26,12 +26,14 @@ import java.util.Date;
 public class OwnJobInvoice extends BasePdf {
 
     private Service service;
+    private TradesmanPrivate tradesmanPrivate;
     private String customerFirstName, customerEmail;
 
-    public OwnJobInvoice(Service service) {
+    public OwnJobInvoice(Service service, TradesmanPrivate tradesmanPrivate) {
         super("Service_Invoice_" + service.getId() + "_" + System.currentTimeMillis(), "Homefix Invoice: " + service.getId(), "Homefix Invoice: " + service.getId());
 
         this.service = service;
+        this.tradesmanPrivate = tradesmanPrivate;
     }
 
     public String getCustomerEmail() {
@@ -59,10 +61,25 @@ public class OwnJobInvoice extends BasePdf {
 
         // Tradesman
         Tradesman tradesman = service.getTradesman();
-        String name = tradesman != null ? tradesman.getName() : null;
-        if (Strings.isEmpty(name)) name = "Homefix";
-        Paragraph pFrom = new Paragraph("From: " + name, subFont);
-        document.add(pFrom);
+        String name = tradesmanPrivate != null ? tradesmanPrivate.getBusinessName() : null;
+        if (Strings.isEmpty(name)) name = tradesman != null ? tradesman.getName() : null;
+        if (Strings.isEmpty(name))
+            name = tradesmanPrivate != null ? tradesmanPrivate.getNameOnAccount() : null;
+        String email = tradesman != null ? tradesman.getEmail() : null;
+        if (!Strings.isEmpty(name) || !Strings.isEmpty(email)) {
+            Paragraph pFrom = new Paragraph("From", subFont);
+            document.add(pFrom);
+
+            if (!Strings.isEmpty(name)) {
+                Paragraph nameFrom = new Paragraph(name, subGrayFont);
+                document.add(nameFrom);
+            }
+
+            if (!Strings.isEmpty(email)) {
+                Paragraph emailFrom = new Paragraph(email, subGrayFont);
+                document.add(emailFrom);
+            }
+        }
 
         // Customer details
         Paragraph pCustomer = new Paragraph("To:", subFont);
@@ -134,6 +151,10 @@ public class OwnJobInvoice extends BasePdf {
             if (!Strings.isEmpty(tradesmanPrivate.getVatNumber())) {
                 pBank.add(new Paragraph("VAT Number", smallBold));
                 pBank.add(new Paragraph(tradesmanPrivate.getVatNumber(), subGrayFont));
+            }
+            if (!Strings.isEmpty(tradesmanPrivate.getNameOnAccount())) {
+                pBank.add(new Paragraph("Name on Account", smallBold));
+                pBank.add(new Paragraph(tradesmanPrivate.getNameOnAccount(), subGrayFont));
             }
 
             if (pBank.size() > 0) {

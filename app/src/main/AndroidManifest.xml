@@ -56,6 +56,7 @@
         <activity
             android:name=".profile.settings.SettingsActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".base.activity.pdf.PdfViewActivity" />
 
         <service
             android:name=".service.LocationService"

@@ -254,4 +254,12 @@ public class TimeUtils {
         return format.format(cal.getTime());
     }
 
+    public static Calendar setToTopOfHour(Calendar cal) {
+        Calendar cal2 = cal != null ? (Calendar) cal.clone() : Calendar.getInstance();
+        cal2.set(Calendar.MINUTE, 0);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        return cal2;
+    }
+
 }

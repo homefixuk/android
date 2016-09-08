@@ -100,6 +100,22 @@ public class IntentHelper {
         return Strings.returnSafely(intent.getStringExtra(extraName));
     }
 
+    public static long getLongSafely(@Nullable Intent intent, @NonNull String extraName, long defaultVal) {
+        if (intent == null || !intent.hasExtra(extraName)) return defaultVal;
+
+        try {
+            return intent.getLongExtra(extraName, defaultVal);
+        } catch (Exception e) {
+            return defaultVal;
+        }
+    }
+
+    public static boolean getBooleanSafely(@Nullable Intent intent, @NonNull String extraName, boolean defaultVal) {
+        if (intent == null || !intent.hasExtra(extraName)) return defaultVal;
+
+        return intent.getBooleanExtra(extraName, defaultVal);
+    }
+
     public static void callPhoneNumber(Context context, String num) {
         if (context == null) return;
 

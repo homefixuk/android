@@ -1,6 +1,7 @@
 package com.homefix.tradesman.timeslot.own_job;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
@@ -8,10 +9,13 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.base.activity.pdf.PdfViewActivity;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.data.UserController;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
+import com.homefix.tradesman.model.Tradesman;
+import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.own_job.charges.ChargesActivity;
@@ -21,6 +25,7 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.ColorUtils;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
 import java.io.File;
@@ -191,53 +196,74 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                 new CharSequence[]{"Send to Customer", "View Invoice"},
                 new MaterialDialog.ListCallback() {
                     @Override
-                    public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                        OwnJobInvoice invoice = new OwnJobInvoice(mTimeslot != null ? mTimeslot.getService() : null);
+                    public void onSelection(final MaterialDialog dialog, View itemView, final int which, CharSequence text) {
+                        generateInvoice(new OnGotObjectListener<OwnJobInvoice>() {
+                            @Override
+                            public void onGotThing(OwnJobInvoice invoice) {
+                                File file = invoice != null ? invoice.getFile() : null;
+                                if (file == null) {
+                                    showDialog("Sorry, something went wrong! Please try again.", false);
+                                    return;
+                                }
 
-                        invoice.generate();
-                        File file = invoice.getFile();
+                                if (which == 0) {
+                                    Service service = mTimeslot != null ? mTimeslot.getService() : null;
+                                    String content = "";
 
-                        if (file == null) {
-                            showDialog("Sorry, something went wrong! Please try again.", false);
-                            if (dialog != null) dialog.dismiss();
-                            return;
-                        }
+                                    content += "Hi " + invoice.getCustomerFirstName() + ",\n\n";
+                                    content += "Please see your attached invoice";
+                                    if (service != null && service.getDepartTime() > 0) {
+                                        Date d = new Date();
+                                        d.setTime(service.getDepartTime());
+                                        content += " for the work done on the " + SimpleDateFormat.getInstance().format(d) + ".";
+                                    } else {
+                                        content += ".";
+                                    }
+                                    content += "\n\n";
+                                    content += "Kind Regards,\n";
+                                    content += UserController.getCurrentUser().getName();
 
-                        if (which == 0) {
-                            Service service = mTimeslot != null ? mTimeslot.getService() : null;
-                            String content = "";
+                                    IntentHelper.openEmailWithAttachment(
+                                            getContext(),
+                                            invoice.getCustomerEmail(),
+                                            invoice.getSubject(),
+                                            content,
+                                            file.getAbsolutePath());
 
-                            content += "Hi " + invoice.getCustomerFirstName() + ",\n\n";
-                            content += "Please see your attached invoice";
-                            if (service != null && service.getDepartTime() > 0) {
-                                Date d = new Date();
-                                d.setTime(service.getDepartTime());
-                                content += " for the work done on the " + SimpleDateFormat.getInstance().format(d) + ".";
-                            } else {
-                                content += ".";
+                                    dialog.dismiss();
+
+                                } else if (which == 1) {
+                                    try {
+                                        invoice.view(getContext());
+                                    } catch (Exception e) {
+                                        Intent i = new Intent(getContext(), PdfViewActivity.class);
+                                        i.putExtra("filePath", invoice.getFile().getAbsoluteFile());
+                                        startActivity(i);
+                                        getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+                                    }
+
+                                    // Note: do not dismiss dialog so the invoice can be sent after viewing it
+                                }
                             }
-                            content += "\n\n";
-                            content += "Kind Regards,\n";
-                            content += UserController.getCurrentUser().getName();
-
-                            IntentHelper.openEmailWithAttachment(
-                                    getContext(),
-                                    invoice.getCustomerEmail(),
-                                    invoice.getSubject(),
-                                    content,
-                                    file.getAbsolutePath());
-
-                            dialog.dismiss();
-
-                        } else if (which == 1) {
-                            invoice.view(getContext());
-
-                            // Note: do not dismiss dialog so the invoice can be sent after viewing it
-                        }
+                        });
                     }
                 }
 
         ).show();
+    }
+
+    private void generateInvoice(@NonNull final OnGotObjectListener<OwnJobInvoice> callback) {
+        UserController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
+            @Override
+            public void onGotThing(TradesmanPrivate o) {
+                OwnJobInvoice invoice = new OwnJobInvoice(
+                        mTimeslot != null ? mTimeslot.getService() : null,
+                        o);
+
+                invoice.generate();
+                callback.onGotThing(invoice);
+            }
+        });
     }
 
     @OnClick(R.id.payments_bar)

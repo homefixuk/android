@@ -17,6 +17,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceFactory {
 
+    private static boolean debug = true;
+
     /**
      * Creates a retrofit service from an arbitrary class (clazz)
      *
@@ -57,7 +59,7 @@ public class ServiceFactory {
             if (request.method().compareToIgnoreCase("post") == 0) {
                 requestLog = "\n" + requestLog + "\n" + bodyToString(request);
             }
-            MyLog.d("TAG", "request" + "\n" + requestLog);
+            MyLog.d("TAG", "request" + "\n" + requestLog, debug);
 
             Response response = chain.proceed(request);
             long t2 = System.nanoTime();
@@ -67,7 +69,7 @@ public class ServiceFactory {
 
             String bodyString = response.body().string();
 
-            MyLog.d("TAG", "response" + "\n" + responseLog + "\n" + bodyString);
+            MyLog.d("TAG", "response" + "\n" + responseLog + "\n" + bodyString, debug);
 
             return response.newBuilder()
                     .body(ResponseBody.create(response.body().contentType(), bodyString))

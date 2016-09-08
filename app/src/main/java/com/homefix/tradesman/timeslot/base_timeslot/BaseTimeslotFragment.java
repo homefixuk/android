@@ -52,7 +52,6 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     @BindView(R.id.save)
     protected TextView mSaveTxt;
 
-
     protected Calendar mStartCal, mEndCal;
 
     public BaseTimeslotFragment() {
@@ -93,8 +92,10 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     public void setEditing(boolean edit) {
         isEdit = edit;
         setupView();
-        getActivity().supportInvalidateOptionsMenu();
-        getActivity().invalidateOptionsMenu();
+        if (getActivity() != null) {
+            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
+        }
     }
 
     public void setupView() {
@@ -104,29 +105,22 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
             else mIcon.setImageResource(R.drawable.ic_av_timer_grey600_48dp);
         }
 
-        mStartCal = Calendar.getInstance();
-        mStartCal.set(Calendar.MINUTE, 0);
-        mStartCal.set(Calendar.SECOND, 0);
-        mStartCal.set(Calendar.MILLISECOND, 0);
-
-        mEndCal = Calendar.getInstance();
-        mEndCal.set(Calendar.MINUTE, 0);
-        mEndCal.set(Calendar.SECOND, 0);
-        mEndCal.set(Calendar.MILLISECOND, 0);
+        mStartCal = TimeUtils.setToTopOfHour(mStartCal);
+        mEndCal = TimeUtils.setToTopOfHour(mEndCal);
 
         if (mTimeslot != null) {
             mStartCal.setTimeInMillis(mTimeslot.getStart());
             mEndCal.setTimeInMillis(mTimeslot.getEnd());
 
-        } else {
-            mEndCal.add(Calendar.MINUTE, 30);
+        } else if (mEndCal.getTimeInMillis() < mStartCal.getTimeInMillis() + TimeUtils.getHoursInMillis(1)) {
+            mEndCal.setTimeInMillis(mStartCal.getTimeInMillis() + TimeUtils.getHoursInMillis(1));
         }
 
         setStartTime(mStartCal);
         setEndTime(mEndCal);
 
         if (mSaveTxt != null) {
-            mSaveTxt.setText(isEdit ? "DONE" : (mTimeslot == null ? "SAVE" : "ADD"));
+            mSaveTxt.setText(!isEdit ? "DONE" : (mTimeslot != null ? "SAVE" : "ADD"));
         }
 
         hasMadeChanges = false;
@@ -153,18 +147,27 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     @Override
-    public void setStartTime(Calendar startTime) {
-        // if the newly selected start date is after the start date
-        if (startTime.getTimeInMillis() > mEndCal.getTimeInMillis()) {
-            getBaseActivity().showDialog("End date cannot be before start date", false);
-            return;
+    public void setStartTime(@NonNull Calendar startTime) {
+        long currentLength = 0L;
+        if (mEndCal != null && mStartCal != null) {
+            currentLength = mEndCal.getTimeInMillis() - mStartCal.getTimeInMillis();
         }
 
         mStartCal = startTime;
+
         hasMadeChanges = true;
 
         if (mStartDateTxt != null) mStartDateTxt.setText(TimeUtils.getShortDateString(mStartCal));
         if (mStartTimeTxt != null) mStartTimeTxt.setText(TimeUtils.getShortTimeString(mStartCal));
+
+        // if the newly selected start date is after the end date
+        if (mEndCal == null || mStartCal.getTimeInMillis() > mEndCal.getTimeInMillis()) {
+            // automatically set the end time after the new start time
+            mEndCal = Calendar.getInstance();
+            mEndCal.setTimeInMillis(mStartCal.getTimeInMillis() + (currentLength > 0 ? currentLength : TimeUtils.getHoursInMillis(1)));
+            if (mEndDateTxt != null) mEndDateTxt.setText(TimeUtils.getShortDateString(mEndCal));
+            if (mEndTimeTxt != null) mEndTimeTxt.setText(TimeUtils.getShortTimeString(mEndCal));
+        }
     }
 
     @Override
@@ -175,7 +178,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     @Override
     public void setEndTime(Calendar endTime) {
         // if the newly selected end date is before the start date
-        if (endTime.getTimeInMillis() < mStartCal.getTimeInMillis()) {
+        if (mStartCal != null && endTime.getTimeInMillis() < mStartCal.getTimeInMillis()) {
             getBaseActivity().showDialog("End date cannot be before start date", false);
             return;
         }
@@ -204,7 +207,10 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         hasMadeChanges = false;
         isEdit = false;
         if (timeslot != null) setTimeslot(timeslot); // update the timeslot
-        getBaseActivity().supportInvalidateOptionsMenu();
+        if (getBaseActivity() != null) {
+            getBaseActivity().supportInvalidateOptionsMenu();
+            getBaseActivity().invalidateOptionsMenu();
+        }
         setupView();
     }
 

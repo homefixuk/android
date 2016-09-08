@@ -151,6 +151,8 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     // Fresco
     compile 'com.facebook.fresco:fresco:0.13.0'
+    // PDF view https://github.com/barteksc/AndroidPdfViewer
+    compile 'com.github.barteksc:android-pdf-viewer:2.0.3'
     // test
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'

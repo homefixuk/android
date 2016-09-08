@@ -18,7 +18,7 @@
         app:hourHeight="@dimen/base_padding_quad"
         app:noOfVisibleDays="3"
         app:textSize="@dimen/text_size_extra_small"
-        app:todayBackgroundColor="@color/black_20_percent" />
+        app:todayBackgroundColor="@color/white" />
 
     <View
         android:id="@+id/cover"

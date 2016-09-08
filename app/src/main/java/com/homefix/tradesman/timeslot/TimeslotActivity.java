@@ -13,10 +13,13 @@ import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
-import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.own_job.OwnJobFragment;
 import com.samdroid.common.IntentHelper;
+import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
+
+import java.sql.Time;
+import java.util.Calendar;
 
 /**
  * Created by samuel on 7/13/2016.
@@ -34,6 +37,8 @@ public class TimeslotActivity extends BaseCloseActivity {
         Intent i = getIntent();
         String timeslotKey = IntentHelper.getStringSafely(i, "timeslotKey");
         String typeStr = IntentHelper.getStringSafely(i, "type");
+        long startTime = IntentHelper.getLongSafely(i, "startTime", 0L);
+        boolean goIntoEditMode = IntentHelper.getBooleanSafely(i, "goIntoEditMode", false);
 
         type = Timeslot.TYPE.getTypeEnum(typeStr);
 
@@ -49,13 +54,38 @@ public class TimeslotActivity extends BaseCloseActivity {
                 hasTimeslot = true;
                 type = Timeslot.TYPE.getTypeEnum(timeslot.getType());
                 ((BaseTimeslotFragment) baseFragment).setTimeslot(timeslot);
+                ((BaseTimeslotFragment) baseFragment).setEditing(goIntoEditMode);
                 supportInvalidateOptionsMenu();
             }
         }
 
+        if (startTime > 0) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(startTime);
+            cal = TimeUtils.setToTopOfHour(cal);
+            ((BaseTimeslotFragment) baseFragment).setStartTime(cal);
+//
+//            cal.setTimeInMillis(cal.getTimeInMillis() + TimeUtils.getHoursInMillis(1));
+//            ((BaseTimeslotFragment) baseFragment).setEndTime(cal);
+        }
+
         ((BaseTimeslotFragment) baseFragment).setType(type);
 
-        String title = (timeslot != null ? "Edit" : "Add") + " ";
+        updateActionBarTitle();
+
+        // setup and show the fragment
+        replaceFragment(baseFragment);
+    }
+
+    private void updateActionBarTitle() {
+        if (baseFragment == null) {
+            setActionbarTitle("");
+            return;
+        }
+
+        Timeslot timeslot = ((BaseTimeslotFragment) baseFragment).getTimeslot();
+
+        String title = (timeslot != null ? (((BaseTimeslotFragment) baseFragment).isEditing() ? "Edit" : "") : "Add") + " ";
         if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
         else if (type == Timeslot.TYPE.BREAK) title += "Break";
         else if (type == Timeslot.TYPE.OWN_JOB) {
@@ -63,9 +93,6 @@ public class TimeslotActivity extends BaseCloseActivity {
             title += Strings.isEmpty(timeslotName) ? "Own Job" : timeslotName;
         } else title += "Event";
         setActionbarTitle(title);
-
-        // setup and show the fragment
-        replaceFragment(baseFragment);
     }
 
     @Override
@@ -82,6 +109,8 @@ public class TimeslotActivity extends BaseCloseActivity {
             itemEdit.setTitle(isEditing ? "Save" : "Edit");
         }
         if (itemOptions != null) itemOptions.setVisible(hasTimeslot);
+
+        updateActionBarTitle();
 
         return true;
     }

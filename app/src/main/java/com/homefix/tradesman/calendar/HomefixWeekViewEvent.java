@@ -3,6 +3,7 @@ package com.homefix.tradesman.calendar;
 import android.graphics.Color;
 
 import com.alamkanak.weekview.WeekViewEvent;
+import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.TimeUtils;
 
@@ -56,8 +57,14 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
                 else setName("Homefix");
                 break;
             case OWN_JOB:
-                if (timeslot.getService() != null) setName(timeslot.getService().getId());
-                else setName("Own Job");
+                if (timeslot.getService() != null) {
+                    Problem problem = timeslot.getService().getProblem();
+                    if (problem != null) setName(problem.getName());
+                    else setName(timeslot.getService().getId());
+
+                } else {
+                    setName("Own Job");
+                }
                 break;
 
             default:

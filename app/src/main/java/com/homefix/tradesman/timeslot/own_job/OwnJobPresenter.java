@@ -154,26 +154,26 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
             CustomerProperty customerProperty = service.getServiceSet().getCustomerProperty();
             if (customerProperty != null) {
                 if (!customerProperty.getType().equals(customerPropertyRelationship))
-                    changes.put("customer_property_relationship", customerPropertyRelationship);
+                    changes.put("customerPropertyRelationship", customerPropertyRelationship);
 
                 Customer customer = customerProperty.getCustomer();
                 if (customer != null) {
                     if (!customer.getName().equals(customerName))
-                        changes.put("customer_name", customerName);
+                        changes.put("customerName", customerName);
                     if (!customer.getEmail().equals(customerEmail))
-                        changes.put("customer_email", customerEmail);
+                        changes.put("customerEmail", customerEmail);
                     if (!customer.getMobile().equals(customerPhone))
-                        changes.put("customer_phone", customerPhone);
+                        changes.put("customerPhone", customerPhone);
                 }
 
                 Property property = customerProperty.getProperty();
                 if (property != null) {
                     if (!property.getAddressLine1().equals(addressLine1))
-                        changes.put("address_line_1", addressLine1);
+                        changes.put("addressLine1", addressLine1);
                     if (!property.getAddressLine2().equals(addressLine2))
-                        changes.put("address_line_1", addressLine2);
+                        changes.put("addressLine2", addressLine2);
                     if (!property.getAddressLine3().equals(addressLine3))
-                        changes.put("address_line_1", Strings.returnSafely(addressLine3));
+                        changes.put("addressLine3", Strings.returnSafely(addressLine3));
                     if (!property.getPostcode().equals(postcode)) changes.put("postcode", postcode);
                     if (!property.getCountry().equals(country)) changes.put("country", country);
                     if (latitude != null && !latitude.equals(property.getLatitude()))
@@ -185,15 +185,15 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
             Problem problem = service.getProblem();
             if (problem != null && !problem.getName().equals(jobType))
-                changes.put("problem_name", jobType);
+                changes.put("problemName", jobType);
 
             if (start.getTimeInMillis() > 0 && originalTimeslot.getStart() != start.getTimeInMillis())
-                changes.put("start_time", start.getTimeInMillis());
+                changes.put("startTime", start.getTimeInMillis());
             if (end.getTimeInMillis() > 0 && originalTimeslot.getEnd() != end.getTimeInMillis())
-                changes.put("end_time", end.getTimeInMillis());
+                changes.put("endTime", end.getTimeInMillis());
 
             if (!service.getTradesmanNotes().equals(description))
-                changes.put("tradesman_notes", description);
+                changes.put("tradesmanNotes", description);
         }
 
         Call<Service> call = HomeFix.getAPI().updateService(

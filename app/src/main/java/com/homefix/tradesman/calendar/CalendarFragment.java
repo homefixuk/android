@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -26,6 +27,7 @@ import com.homefix.tradesman.base.fragment.BaseFragment;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.network.NetworkManager;
@@ -183,7 +185,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
     @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
-        if (BuildConfig.FLAVOR.equals("apiary_mock") && newMonth != 7)
+        if (BuildConfig.FLAVOR.equals("apiary_mock") && newMonth != 9)
             return new ArrayList<>(); // TODO: remove! This is used while testing with Apiary mock server
 
         // if we have not yet fetched this month and we have a network connection
@@ -228,12 +230,18 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
+        // when the event is clicked, go to view it
+        goToEvent(event, eventRect, false);
+    }
+
+    private void goToEvent(WeekViewEvent event, RectF eventRect, boolean goIntoEditMode) {
         if (event == null) return;
 
         if (event instanceof HomefixWeekViewEvent) {
             HomefixWeekViewEvent hEvent = (HomefixWeekViewEvent) event;
 
-            if (hEvent.getTimeslot() == null) return;
+            Timeslot timeslot = hEvent.getTimeslot();
+            if (timeslot == null) return;
 
             Intent i = new Intent(getContext(), TimeslotActivity.class);
 
@@ -258,6 +266,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             if (i != null) {
                 i.putExtra("timeslotKey", Timeslot.getSenderReceiver().put(hEvent.getTimeslot()));
                 i.putExtra("type", type != null ? type.name() : Timeslot.TYPE.NONE.name());
+                i.putExtra("goIntoEditMode", goIntoEditMode);
                 startActivity(i);
                 getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
             }
@@ -265,7 +274,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     }
 
     @Override
-    public void onEmptyViewClicked(Calendar time) {
+    public void onEmptyViewClicked(@NonNull final Calendar time) {
         MaterialDialogWrapper.getListDialog(
                 getBaseActivity(),
                 "New...",
@@ -297,6 +306,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                         }
 
                         if (i != null) {
+                            Toast.makeText(getContext(), time.toString(), Toast.LENGTH_LONG).show();
+                            MyLog.e(TAG, time.toString());
+                            i.putExtra("startTime", time.getTimeInMillis());
                             startActivity(i);
                             getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
                         }
@@ -307,41 +319,13 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
-        if (event == null) return;
-
-        if (event instanceof HomefixWeekViewEvent) {
-            HomefixWeekViewEvent hEvent = (HomefixWeekViewEvent) event;
-
-            if (hEvent.getTimeslot() == null) return;
-
-            switch (Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType())) {
-
-                case AVAILABILITY:
-                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
-                    break;
-
-                case BREAK:
-                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
-                    break;
-
-                case SERVICE:
-                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
-                    break;
-
-                case OWN_JOB:
-                    Toast.makeText(getContext(), hEvent.getName() + " long touched", Toast.LENGTH_SHORT).show();
-                    break;
-
-                default:
-                    break;
-            }
-        }
+        // when the event is long pressed, go straight into editing the timeslot
+        goToEvent(event, eventRect, true);
     }
 
     /**
      * Update the calendar and week view to go to the current day
      */
-
     public void goToToday() {
         Calendar cal = Calendar.getInstance();
 
@@ -392,6 +376,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         mView.postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (mView == null) return;
+
                 mView.goToHour(TimeUtils.getCurrentHour());
             }
         }, 500);
