@@ -54,7 +54,7 @@ public class TimeslotActivity extends BaseCloseActivity {
                 hasTimeslot = true;
                 type = Timeslot.TYPE.getTypeEnum(timeslot.getType());
                 ((BaseTimeslotFragment) baseFragment).setTimeslot(timeslot);
-                ((BaseTimeslotFragment) baseFragment).setEditing(goIntoEditMode);
+                ((BaseTimeslotFragment) baseFragment).setStartInEditMode(goIntoEditMode);
                 supportInvalidateOptionsMenu();
             }
         }
@@ -152,5 +152,13 @@ public class TimeslotActivity extends BaseCloseActivity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void tryClose() {
+        if (baseFragment == null || !((BaseTimeslotFragment) baseFragment).isEditing()) {
+            finishWithAnimation();
+            return;
+        }
     }
 }

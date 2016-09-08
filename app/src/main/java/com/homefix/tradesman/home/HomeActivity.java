@@ -213,12 +213,6 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         }
     }
 
-    private void resetActionBarTitle() {
-        setActionbarTitle(R.string.app_name);
-        setTitleIconRight(0);
-        setActionBarTitleClickListener(null);
-    }
-
     private void showHome() {
         if (homeFragment == null) homeFragment = new HomeFragment();
 
@@ -296,31 +290,39 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_today) {
-            if (calendarFragment != null) {
-                calendarFragment.goToToday();
-                supportInvalidateOptionsMenu(); // update toolbar
-            }
-            return true;
+        switch (item.getItemId()) {
 
-        } else if (item.getItemId() == R.id.action_one_day) {
-            if (calendarFragment != null) calendarFragment.setNumberDays(1);
-            return true;
+            case R.id.action_today:
+                if (calendarFragment != null) {
+                    calendarFragment.goToToday();
+                    supportInvalidateOptionsMenu(); // update toolbar
+                }
+                return true;
 
-        } else if (item.getItemId() == R.id.action_three_days) {
-            if (calendarFragment != null) calendarFragment.setNumberDays(3);
-            return true;
+            case R.id.action_one_day:
+                if (calendarFragment != null) calendarFragment.setNumberDays(1);
+                return true;
 
-        } else if (item.getItemId() == R.id.action_five_days) {
-            if (calendarFragment != null) calendarFragment.setNumberDays(5);
-            return true;
+            case R.id.action_three_days:
+                if (calendarFragment != null) calendarFragment.setNumberDays(3);
+                return true;
 
-        } else if (mCurrentPage == R.string.action_profile && item.getItemId() == R.id.action_settings) {
-            // go to the settings page
-            Intent i = new Intent(this, SettingsActivity.class);
-            startActivity(i);
-            overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
-            return true;
+            case R.id.action_five_days:
+                if (calendarFragment != null) calendarFragment.setNumberDays(5);
+                return true;
+
+            case R.id.action_seven_days:
+                if (calendarFragment != null) calendarFragment.setNumberDays(7);
+                return true;
+
+            case R.id.action_settings:
+                if (mCurrentPage != R.string.action_profile) return false;
+
+                // go to the settings page
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

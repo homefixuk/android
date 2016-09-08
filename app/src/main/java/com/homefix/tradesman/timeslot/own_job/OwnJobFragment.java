@@ -127,7 +127,13 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     }
 
     @Override
+    @OnClick(R.id.save)
     public void saveClicked() {
+        if (!isEdit) {
+            onCloseClicked();
+            return;
+        }
+
         // if the user has not made any changes
         if (!hasMadeChanges) {
             if (mTimeslot == null) {

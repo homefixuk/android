@@ -108,7 +108,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             if (service != null) {
                 CustomerProperty customerProperty = service.getServiceSet().getCustomerProperty();
 
-                if (customerProperty != null) {
+                if (mCustomerPropertyType != null && customerProperty != null) {
                     mCustomerPropertyType.setText(customerProperty.getType());
 
                     Property property = customerProperty.getProperty();
@@ -124,16 +124,19 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
                     Customer customer = customerProperty.getCustomer();
                     if (customer != null) {
-                        mPersonNameTxt.setText(customer.getName());
-                        mPersonEmailTxt.setText(customer.getEmail());
-                        mPersonPhoneNumberTxt.setText(customer.getMobile());
+                        if (mPersonNameTxt != null) mPersonNameTxt.setText(customer.getName());
+                        if (mPersonEmailTxt != null) mPersonEmailTxt.setText(customer.getEmail());
+                        if (mPersonPhoneNumberTxt != null)
+                            mPersonPhoneNumberTxt.setText(customer.getMobile());
                     }
 
-                    Problem problem = service.getProblem();
-                    mJobTypeTxt.setText(problem != null ? problem.getName() : "");
+                    if (mJobTypeTxt != null) {
+                        Problem problem = service.getProblem();
+                        mJobTypeTxt.setText(problem != null ? problem.getName() : "");
+                    }
                 }
 
-                mDescriptionTxt.setText(service.getTradesmanNotes());
+                if (mDescriptionTxt != null) mDescriptionTxt.setText(service.getTradesmanNotes());
                 updateLocationText();
             }
         }
@@ -145,40 +148,47 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         // if not in edit mode
         if (!isEdit) {
-            mLocationIcon.setImageResource(R.drawable.directions);
-            mEmailIcon.setVisibility(View.VISIBLE);
-            mPhoneIcon.setVisibility(View.VISIBLE);
+            if (mLocationIcon != null) mLocationIcon.setImageResource(R.drawable.directions);
+            if (mEmailIcon != null) mEmailIcon.setVisibility(View.VISIBLE);
+            if (mPhoneIcon != null) mPhoneIcon.setVisibility(View.VISIBLE);
 
             // setup locations
-            mLocationBar.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark));
+            if (mLocationBar != null)
+                mLocationBar.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark));
 
             BackgroundViewColourOnTouchListener listener = new BackgroundViewColourOnTouchListener(
                     mPersonEmailTxt,
                     ContextCompat.getColor(getContext(), R.color.transparent),
                     ContextCompat.getColor(getContext(), R.color.colorAccentDark));
-            mPersonEmailTxt.setOnTouchListener(listener);
-            mEmailIcon.setOnTouchListener(listener);
+            if (mPersonEmailTxt != null) mPersonEmailTxt.setOnTouchListener(listener);
+            if (mEmailIcon != null) mEmailIcon.setOnTouchListener(listener);
 
             BackgroundViewColourOnTouchListener phoneListener = new BackgroundViewColourOnTouchListener(
                     mPersonPhoneNumberTxt,
                     ContextCompat.getColor(getContext(), R.color.transparent),
                     ContextCompat.getColor(getContext(), R.color.colorAccentDark));
-            mPersonPhoneNumberTxt.setOnTouchListener(phoneListener);
-            mPhoneIcon.setOnTouchListener(phoneListener);
+            if (mPersonPhoneNumberTxt != null)
+                mPersonPhoneNumberTxt.setOnTouchListener(phoneListener);
+            if (mPhoneIcon != null) mPhoneIcon.setOnTouchListener(phoneListener);
             return;
         }
 
         // else in edit mode //
 
         // hide action buttons from non-edit mode (directions, email, phone)
-        mEmailIcon.setVisibility(View.GONE);
-        mEmailIcon.setOnTouchListener(null);
-        mPersonEmailTxt.setOnTouchListener(null);
-        mPersonPhoneNumberTxt.setOnTouchListener(null);
-        mPhoneIcon.setVisibility(View.GONE);
-        mPhoneIcon.setOnTouchListener(null);
+        if (mEmailIcon != null) {
+            mEmailIcon.setVisibility(View.GONE);
+            mEmailIcon.setOnTouchListener(null);
+        }
+        if (mPersonEmailTxt != null) mPersonEmailTxt.setOnTouchListener(null);
+        if (mPersonPhoneNumberTxt != null) mPersonPhoneNumberTxt.setOnTouchListener(null);
+        if (mPhoneIcon != null) {
+            mPhoneIcon.setVisibility(View.GONE);
+            mPhoneIcon.setOnTouchListener(null);
+        }
 
-        mLocationIcon.setImageResource(R.drawable.ic_map_marker_grey600_48dp);
+        if (mLocationIcon != null)
+            mLocationIcon.setImageResource(R.drawable.ic_map_marker_grey600_48dp);
     }
 
     /**

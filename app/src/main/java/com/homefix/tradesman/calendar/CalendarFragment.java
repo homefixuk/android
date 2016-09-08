@@ -107,7 +107,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         mView.setNowLineColor(Color.argb(255, 255, 255, 0));
         mView.setNowLineThickness(5);
 
-        setNumberDays(3); // default to 3 days showing
+        setNumberDays(5); // default to 5 days showing
 
         mView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)); // go to the current hour
 
@@ -345,7 +345,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
     public void setNumberDays(int numberDays) {
         if (mView == null) return;
 
-        numberDays = Math.min(numberDays, 5); // at most 5
+        numberDays = Math.min(numberDays, 7); // at most 7
 
         mView.setNumberOfVisibleDays(numberDays);
 
@@ -365,7 +365,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
             mView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
 
         } else {
-            // Lets change some dimensions to best fit the view.
+            // change some dimensions to best fit the view
             mView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
             mView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
             mView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));

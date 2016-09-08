@@ -98,6 +98,10 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         }
     }
 
+    public void setStartInEditMode(boolean startInEditMode) {
+        isEdit = startInEditMode;
+    }
+
     public void setupView() {
         if (mIcon != null) {
             if (mType == Timeslot.TYPE.BREAK)
@@ -234,7 +238,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     @Override
     public void onCloseClicked() {
         if (!hasMadeChanges) {
-            getBaseActivity().finishWithAnimation();
+            if (getBaseActivity() != null) getBaseActivity().finishWithAnimation();
             return;
         }
 

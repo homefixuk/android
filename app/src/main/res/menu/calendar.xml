@@ -21,6 +21,9 @@
                     android:title="@string/action_three_days" />
                 <item
                     android:id="@+id/action_five_days"
+                    android:title="@string/action_five_days" />
+                <item
+                    android:id="@+id/action_seven_days"
                     android:title="@string/action_seven_days" />
             </group>
         </menu>

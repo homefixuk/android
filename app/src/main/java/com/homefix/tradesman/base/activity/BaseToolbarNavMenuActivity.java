@@ -151,6 +151,12 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         setupUser();
     }
 
+    protected void resetActionBarTitle() {
+        setActionbarTitle(R.string.app_name);
+        setTitleIconRight(0);
+        setActionBarTitleClickListener(null);
+    }
+
     protected void onNavigationProfileClicked() {
         if (mProfileFragment == null) {
             mProfileFragment = new ProfileFragment<>();
@@ -158,6 +164,7 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
 
         replaceFragment(mProfileFragment);
 
+        resetActionBarTitle();
         setActionbarTitle("My Profile");
         supportInvalidateOptionsMenu();
 

@@ -15,7 +15,8 @@
     <string name="action_week_view"># Days</string>
     <string name="action_one_day">1 day</string>
     <string name="action_three_days">3 days</string>
-    <string name="action_seven_days">5 days</string>
+    <string name="action_five_days">5 days</string>
+    <string name="action_seven_days">7 days</string>
     <string name="action_today">Today</string>
     <string name="action_options">Options</string>
     <string name="action_delete">Delete</string>
