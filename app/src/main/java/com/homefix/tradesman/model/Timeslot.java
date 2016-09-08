@@ -20,8 +20,7 @@ public class Timeslot extends BaseModel {
         NONE, AVAILABILITY, BREAK, SERVICE, OWN_JOB;
 
         public boolean equals(String type) {
-            return !Strings.isEmpty(type) && name().equals(type);
-
+            return !Strings.isEmpty(type) && (name().equals(type) || name().equals(type.toLowerCase()));
         }
 
         public static TYPE getTypeEnum(String type) {
@@ -45,6 +44,7 @@ public class Timeslot extends BaseModel {
     private String type;
     private Tradesman tradesman;
     private Service service;
+    private boolean canBeSplit;
 
     public long getStart() {
         return start;
@@ -92,6 +92,14 @@ public class Timeslot extends BaseModel {
 
     public void setService(Service service) {
         this.service = service;
+    }
+
+    public boolean isCanBeSplit() {
+        return canBeSplit;
+    }
+
+    public void setCanBeSplit(boolean canBeSplit) {
+        this.canBeSplit = canBeSplit;
     }
 
     public static void printList(List<Timeslot> list) {

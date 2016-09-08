@@ -139,6 +139,30 @@ public class Service extends BaseModel {
         return isOwnJob;
     }
 
+    public void setServiceSet(ServiceSet serviceSet) {
+        this.serviceSet = serviceSet;
+    }
+
+    public void setOwnJob(boolean ownJob) {
+        isOwnJob = ownJob;
+    }
+
+    public void setIncompleteReason(String incompleteReason) {
+        this.incompleteReason = incompleteReason;
+    }
+
+    public void setActualDiagnosis(String actualDiagnosis) {
+        this.actualDiagnosis = actualDiagnosis;
+    }
+
+    public void setWorkCompletedDescription(String workCompletedDescription) {
+        this.workCompletedDescription = workCompletedDescription;
+    }
+
+    public void setPartsUsed(List<Part> partsUsed) {
+        this.partsUsed = partsUsed;
+    }
+
     public String getIncompleteReason() {
         return Strings.returnSafely(incompleteReason);
     }
