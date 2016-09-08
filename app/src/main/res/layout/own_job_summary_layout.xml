@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shadow_box_white_rounded_bordered"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/service_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_padding"
+        android:textAppearance="@style/SingleLineTheme.Large.Bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/light_grey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:padding="@dimen/base_padding_half">
+
+        <RelativeLayout
+            android:id="@+id/start_time_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/base_padding_half">
+
+            <TextView
+                android:id="@+id/start_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/icon"
+                android:layout_toStartOf="@+id/start_time"
+                android:gravity="start|center_vertical"
+                android:padding="@dimen/base_padding_half"
+                android:textAppearance="@style/TextTheme" />
+
+            <TextView
+                android:id="@+id/start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/start_date"
+                android:layout_alignParentEnd="true"
+                android:gravity="end|center_vertical"
+                android:textAppearance="@style/TextTheme" />
+
+            <TextView
+                android:id="@+id/end_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/start_date"
+                android:layout_below="@+id/start_date"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/end_time"
+                android:gravity="start|center_vertical"
+                android:padding="@dimen/base_padding_half"
+                android:textAppearance="@style/TextTheme" />
+
+            <TextView
+                android:id="@+id/end_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/end_date"
+                android:layout_alignStart="@+id/start_time"
+                android:layout_below="@+id/start_time"
+                android:layout_centerVertical="true"
+                android:gravity="end|center_vertical"
+                android:textAppearance="@style/TextTheme" />
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/base_padding_double"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_av_timer_grey600_48dp" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey" />
+
+        <RelativeLayout
+            android:id="@+id/location_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/base_padding_half">
+
+            <ImageView
+                android:id="@+id/location_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/base_padding_double"
+                android:layout_alignBottom="@+id/hidden_location_txt"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignTop="@+id/hidden_location_txt"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_map_marker_grey600_48dp" />
+
+            <TextView
+                android:id="@+id/hidden_location_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/location_icon"
+                android:gravity="start|top"
+                android:padding="@dimen/base_padding_half"
+                android:textAppearance="@style/TextTheme.White"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/location_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/location_icon"
+                android:gravity="start|top"
+                android:hint="@string/add_location"
+                android:padding="@dimen/base_padding_half"
+                android:textAppearance="@style/TextTheme" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey" />
+
+        <RelativeLayout
+            android:id="@+id/person_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/base_padding_half">
+
+            <ImageView
+                android:id="@+id/person_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/base_padding_double"
+                android:layout_alignBottom="@+id/person_name_txt"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignTop="@+id/person_name_txt"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_account_grey600_48dp" />
+
+            <EditText
+                android:id="@+id/person_name_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/person_icon"
+                android:background="@android:color/transparent"
+                android:gravity="start|top"
+                android:hint="@string/name"
+                android:inputType="textPersonName"
+                android:padding="@dimen/base_padding_half"
+                android:textAppearance="@style/TextTheme" />
+
+            <EditText
+                android:id="@+id/person_email_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/person_name_txt"
+                android:layout_below="@+id/person_name_txt"
+                android:background="@android:color/transparent"
+                android:gravity="start|top"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:padding="@dimen/base_padding_half"
+                android:textAppearance="@style/TextTheme" />
+
+            <ImageView
+                android:id="@+id/email_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/base_padding_double"
+                android:layout_alignBottom="@+id/person_email_txt"
+                android:layout_alignEnd="@+id/person_icon"
+                android:layout_alignStart="@+id/person_icon"
+                android:layout_alignTop="@+id/person_email_txt"
+                android:scaleType="fitXY"
+                android:src="@drawable/email" />
+
+            <EditText
+                android:id="@+id/person_phone_number_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/person_email_txt"
+                android:layout_below="@+id/person_email_txt"
+                android:background="@android:color/transparent"
+                android:gravity="start|top"
+                android:hint="@string/phone_number"
+                android:inputType="phone"
+                android:padding="@dimen/base_padding_half"
+                android:textAppearance="@style/TextTheme" />
+
+            <ImageView
+                android:id="@+id/phone_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/base_padding_double"
+                android:layout_alignBottom="@+id/person_phone_number_txt"
+                android:layout_alignEnd="@+id/email_icon"
+                android:layout_alignStart="@+id/email_icon"
+                android:layout_alignTop="@+id/person_phone_number_txt"
+                android:scaleType="fitXY"
+                android:src="@drawable/phone" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -101,7 +101,7 @@ public interface API {
     @POST("tradesman/timeslot")
     Call<Timeslot> addTimeslot(
             @Header("Authorization") String token,
-            @Query("timeSlot") HomeFix.TimeslotMap timeslotMap);
+            @QueryMap HomeFix.TimeslotMap timeslotMap);
 
     @PATCH("tradesman/timeslot/{timeslotId}")
     Call<Timeslot> updateTimeslot(
