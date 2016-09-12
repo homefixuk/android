@@ -64,6 +64,8 @@
     <string name="total_hours_worked_this_week">Total hours worked this week</string>
     <string name="work_areas">Work Areas</string>
     <string name="action_done">Done</string>
+    <string name="current_job">Current Job</string>
+    <string name="next_job">Next Job</string>
 
     <string-array name="payment_types">
         <item>cash</item>

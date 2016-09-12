@@ -7,7 +7,6 @@ import android.location.Geocoder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.Html;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,12 +21,14 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
+import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
@@ -47,7 +48,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
-import butterknife.OnTouch;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -249,7 +249,15 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
                     @Override
                     public void run() {
-                        Address address = getAddress(getContext(), getReadableLocationString(","));
+                        Address address = getAddress(
+                                getContext(),
+                                HomefixServiceHelper.getReadableLocationString(
+                                        ",",
+                                        addressLine1,
+                                        addressLine2,
+                                        addressLine3,
+                                        postcode,
+                                        country));
                         if (address != null) {
                             latitude = address.getLatitude();
                             longitude = address.getLongitude();
@@ -265,27 +273,13 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
     private void updateLocationText() {
         if (mLocationTxt == null) return;
 
-        if (!Strings.isEmpty(addressLine1)) addressLine1 = addressLine1.replace(postcode, "");
-        if (!Strings.isEmpty(addressLine2)) addressLine2 = addressLine2.replace(postcode, "");
-        if (!Strings.isEmpty(addressLine3)) addressLine3 = addressLine3.replace(postcode, "");
-
-        mLocationTxt.setText(Html.fromHtml(getReadableLocationString("<br/>")));
-    }
-
-    protected String getReadableLocationString(String delimiter) {
-        String s = "";
-
-        delimiter = Strings.returnSafely(delimiter);
-
-        s += !Strings.isEmpty(addressLine1) ? addressLine1 + delimiter : "";
-        s += !Strings.isEmpty(addressLine2) ? addressLine2 + delimiter : "";
-        s += !Strings.isEmpty(addressLine3) ? addressLine3 + delimiter : "";
-        s += !Strings.isEmpty(postcode) ? postcode + delimiter : "";
-        s += !Strings.isEmpty(country) ? country : "";
-
-        if (s.endsWith(delimiter)) s = s.substring(0, s.length() - 1);
-
-        return s;
+        mLocationTxt.setText(HtmlHelper.fromHtml(HomefixServiceHelper.getReadableLocationString(
+                "<br/>",
+                addressLine1,
+                addressLine2,
+                addressLine3,
+                postcode,
+                country)));
     }
 
     @Override
@@ -425,11 +419,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             return;
         }
 
-        // else get directions //
-        if (latitude != null && longitude != null)
-            IntentHelper.googleMapsDirections(getActivity(), latitude, longitude);
-        else
-            IntentHelper.googleMapsDirections(getActivity(), getReadableLocationString(","));
+        HomefixServiceHelper.onLocationClicked(getActivity(), latitude, longitude, addressLine1, addressLine2, addressLine3, postcode, country);
     }
 
     @OnLongClick
@@ -451,12 +441,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             return;
         }
 
-        ShareCompat.IntentBuilder.from(getActivity())
-                .setType("message/rfc822")
-                .addEmailTo(email)
-                .setSubject("Homefix")
-                .setText("")
-                .startChooser();
+        HomefixServiceHelper.onEmailClicked(getActivity(), email, "");
     }
 
     @OnClick({R.id.phone_icon, R.id.person_phone_number_txt})
@@ -465,30 +450,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         String phone = mPersonPhoneNumberTxt.getText().toString();
 
-        if (Strings.isEmpty(phone)) {
-            MaterialDialogWrapper.getConfirmationDialog(
-                    getActivity(),
-                    "No phone number for the customer. Open the dialer anyway?",
-                    "OPEN DIALER",
-                    "CANCEL",
-                    new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            dialog.dismiss();
-
-                            IntentHelper.callPhoneNumber(getContext(), "");
-                        }
-                    },
-                    new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            dialog.dismiss();
-                        }
-                    }).show();
-            return;
-        }
-
-        IntentHelper.callPhoneNumber(getContext(), phone);
+       HomefixServiceHelper.onPhoneClicked(getActivity(), phone);
     }
 
     @OnClick(R.id.property_type_txt)

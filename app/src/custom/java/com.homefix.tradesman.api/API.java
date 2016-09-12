@@ -145,10 +145,10 @@ public interface API {
             @Query("changes") Map<String, Object> changes);
 
     @GET("service/current")
-    Call<Service> getCurrentService(@Header("Authorization") String token);
+    Call<Timeslot> getCurrentService(@Header("Authorization") String token);
 
     @GET("service/next")
-    Call<Service> getNextService(@Header("Authorization") String token);
+    Call<Timeslot> getNextService(@Header("Authorization") String token);
 
     @GET("service/types")
     Call<List<Problem>> getServiceTypes(@Header("Authorization") String token);

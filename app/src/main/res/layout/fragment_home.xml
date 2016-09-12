@@ -1,17 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.samdroid.layout.MyRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent"
-    android:theme="@style/AppTheme">
+    android:background="@color/light_grey">
 
-    <TextView
-        android:id="@+id/text"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:padding="@dimen/base_padding"
-        android:textAppearance="@style/TextTheme" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</com.samdroid.layout.MyRelativeLayout>
+        <TextView
+            android:id="@+id/current_job_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:padding="@dimen/base_padding"
+            android:text="@string/current_job"
+            android:textAppearance="@style/TextTheme.Large.Bold.Grey" />
+
+        <include
+            android:id="@+id/current_job_layout"
+            layout="@layout/own_job_summary_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/next_job_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/base_padding"
+            android:gravity="start|center_vertical"
+            android:padding="@dimen/base_padding"
+            android:text="@string/next_job"
+            android:textAppearance="@style/TextTheme.Large.Bold.Grey" />
+
+        <include
+            android:id="@+id/next_job_layout"
+            layout="@layout/own_job_summary_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</ScrollView>

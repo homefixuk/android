@@ -2,18 +2,22 @@ package com.homefix.tradesman.timeslot;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.own_job.OwnJobFragment;
+import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
@@ -156,9 +160,32 @@ public class TimeslotActivity extends BaseCloseActivity {
 
     @Override
     public void tryClose() {
-        if (baseFragment == null || !((BaseTimeslotFragment) baseFragment).isEditing()) {
+        // if we can close right away
+        if (baseFragment == null || baseFragment.canClose()) {
             finishWithAnimation();
             return;
         }
+
+        // else show a confirm close dialog //
+        MaterialDialogWrapper.getNegativeConfirmationDialog(
+                this,
+                "Are you sure you want to close? Changes will be lost",
+                "DELETE CHANGES",
+                "CANCEL",
+                new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                        finishWithAnimation();
+                        return;
+                    }
+                },
+                new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+
+                }).show();
     }
 }

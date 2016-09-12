@@ -25,6 +25,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.MyLog;
@@ -239,37 +240,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
         if (event instanceof HomefixWeekViewEvent) {
             HomefixWeekViewEvent hEvent = (HomefixWeekViewEvent) event;
-
-            Timeslot timeslot = hEvent.getTimeslot();
-            if (timeslot == null) return;
-
-            Intent i = new Intent(getContext(), TimeslotActivity.class);
-
-            Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(hEvent.getTimeslot().getType());
-
-            switch (type) {
-
-                case SERVICE:
-                    i = null;
-                    break;
-
-                case AVAILABILITY:
-                case BREAK:
-                case OWN_JOB:
-                    break;
-
-                default:
-                    i = null;
-                    break;
-            }
-
-            if (i != null) {
-                i.putExtra("timeslotKey", Timeslot.getSenderReceiver().put(hEvent.getTimeslot()));
-                i.putExtra("type", type != null ? type.name() : Timeslot.TYPE.NONE.name());
-                i.putExtra("goIntoEditMode", goIntoEditMode);
-                startActivity(i);
-                getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
-            }
+            HomefixServiceHelper.goToTimeslot(getActivity(), hEvent.getTimeslot(), goIntoEditMode);
         }
     }
 
@@ -306,8 +277,6 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                         }
 
                         if (i != null) {
-                            Toast.makeText(getContext(), time.toString(), Toast.LENGTH_LONG).show();
-                            MyLog.e(TAG, time.toString());
                             i.putExtra("startTime", time.getTimeInMillis());
                             startActivity(i);
                             getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);

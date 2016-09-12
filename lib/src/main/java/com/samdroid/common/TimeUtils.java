@@ -55,6 +55,19 @@ public class TimeUtils {
         return "" + hours + " HOURS " + minutes + " MINUTES " + seconds + " SECONDS";
     }
 
+    public static String formatShortDateToHoursMinutes(long millis) {
+        int minutes = (int) ((millis / (1000 * 60)) % 60);
+        int hours = (int) ((millis / (1000 * 60 * 60)) % 24);
+
+        // make sure the time does not go below 0
+        minutes = Math.max(minutes, 0);
+        hours = Math.max(hours, 0);
+
+        if (hours < 60) return minutes + " mins";
+        if (minutes == 30) return (hours + 0.5) + " hours";
+        return hours + " hours " + minutes + " mins";
+    }
+
     public static String formatDateToHoursMinutes(long millis) {
         int minutes = (int) ((millis / (1000 * 60)) % 60);
         int hours = (int) ((millis / (1000 * 60 * 60)) % 24);
@@ -238,6 +251,20 @@ public class TimeUtils {
 
         return calA.get(Calendar.YEAR) == c.get(Calendar.YEAR)
                 && calA.get(Calendar.DAY_OF_YEAR) == c.get(Calendar.DAY_OF_YEAR);
+    }
+
+    public static Calendar getCal(long timeInMillis) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timeInMillis);
+        return cal;
+    }
+
+    public static String getShortDateString(long timeInMillis) {
+        return getShortDateString(getCal(timeInMillis));
+    }
+
+    public static String getShortTimeString(long timeInMillis) {
+        return getShortTimeString(getCal(timeInMillis));
     }
 
     public static String getShortDateString(Calendar cal) {
