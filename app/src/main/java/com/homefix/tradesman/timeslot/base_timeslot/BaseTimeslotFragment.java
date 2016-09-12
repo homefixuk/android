@@ -31,7 +31,7 @@ import butterknife.OnClick;
 public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTimeslotView, P extends BaseTimeslotFragmentPresenter<V>> extends BaseCloseFragment<A, V, P> implements BaseTimeslotView {
 
     protected Timeslot.TYPE mType;
-    protected boolean isEdit = false, hasMadeChanges = false;
+    protected boolean isEdit = false, hasMadeChanges = false, didMakeChanges = false;
     protected Timeslot mTimeslot;
 
     @BindView(R.id.icon)
@@ -180,6 +180,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     @Override
+    public boolean didMakeChanges() {
+        return didMakeChanges;
+    }
+
+    @Override
     public void setEndTime(Calendar endTime) {
         // if the newly selected end date is before the start date
         if (mStartCal != null && endTime.getTimeInMillis() < mStartCal.getTimeInMillis()) {
@@ -209,6 +214,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         hideDialog();
 
         hasMadeChanges = false;
+        didMakeChanges = true;
         isEdit = false;
         if (timeslot != null) setTimeslot(timeslot); // update the timeslot
         if (getBaseActivity() != null) {

@@ -19,6 +19,8 @@ public interface BaseTimeslotView extends BaseFragmentView {
 
     boolean hasMadeChanges();
 
+    boolean didMakeChanges();
+
     void setTimeslot(Timeslot timeslot);
 
     Timeslot getTimeslot();

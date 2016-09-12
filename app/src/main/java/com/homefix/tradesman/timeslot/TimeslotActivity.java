@@ -14,6 +14,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.common.Ids;
+import com.homefix.tradesman.model.Problem;
+import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.own_job.OwnJobFragment;
@@ -93,9 +95,23 @@ public class TimeslotActivity extends BaseCloseActivity {
         if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
         else if (type == Timeslot.TYPE.BREAK) title += "Break";
         else if (type == Timeslot.TYPE.OWN_JOB) {
-            String timeslotName = timeslot != null && timeslot.getService() != null ? Strings.returnSafely(timeslot.getService().getId()) : "";
+            String timeslotName = "";
+            if (timeslot != null) {
+                Service service = timeslot.getService();
+                if (service != null) {
+                    Problem problem = service.getProblem();
+                    if (problem == null) {
+                        timeslotName = service.getId();
+
+                    } else {
+                        timeslotName = problem.getName();
+                    }
+                }
+            }
+
             title += Strings.isEmpty(timeslotName) ? "Own Job" : timeslotName;
-        } else title += "Event";
+        }
+
         setActionbarTitle(title);
     }
 
@@ -161,7 +177,16 @@ public class TimeslotActivity extends BaseCloseActivity {
     @Override
     public void tryClose() {
         // if we can close right away
-        if (baseFragment == null || baseFragment.canClose()) {
+        if (baseFragment == null) {
+            finishWithAnimation();
+            return;
+        }
+
+        if (baseFragment.canClose()) {
+            // set to results ok when they made a change
+            if (baseFragment instanceof BaseTimeslotFragment) {
+                setResult(((BaseTimeslotFragment) baseFragment).didMakeChanges() ? RESULT_OK : RESULT_CANCELED);
+            }
             finishWithAnimation();
             return;
         }
@@ -188,4 +213,6 @@ public class TimeslotActivity extends BaseCloseActivity {
 
                 }).show();
     }
+
+
 }

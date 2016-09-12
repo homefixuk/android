@@ -3,7 +3,6 @@ package com.homefix.tradesman.home.home_fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
@@ -31,10 +30,10 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
     protected TextView nextJobView;
 
     @BindView(R.id.current_job_layout)
-    protected LinearLayout currentJobLayout;
+    protected View currentJobLayout;
 
     @BindView(R.id.next_job_layout)
-    protected LinearLayout nextJobLayout;
+    protected View nextJobLayout;
 
     private Timeslot currentTimeslot, nextTimeslot;
 
@@ -58,19 +57,24 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        refresh();
+    }
+
+    @Override
+    public void refresh() {
+        setCurrentJob(currentTimeslot);
+        setNextJob(nextTimeslot);
+
+        // if we need to refresh the jobs
         HomeFix.getAPI().getCurrentService(UserController.getToken()).enqueue(new Callback<Timeslot>() {
             @Override
             public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-                if (response == null || response.body() == null) {
+                if (response == null) {
                     onFailure(call, new Throwable());
                     return;
                 }
 
-                if (currentJobLayout == null) return;
-
-                currentTimeslot = response.body();
-                OwnJobViewHolder viewHolder = new OwnJobViewHolder(currentJobLayout);
-                viewHolder.bind(getActivity(), currentTimeslot);
+                setCurrentJob(response.body());
             }
 
             @Override
@@ -82,16 +86,12 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         HomeFix.getAPI().getCurrentService(UserController.getToken()).enqueue(new Callback<Timeslot>() {
             @Override
             public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-                if (response == null || response.body() == null) {
+                if (response == null) {
                     onFailure(call, new Throwable());
                     return;
                 }
 
-                if (nextJobLayout == null) return;
-
-                nextTimeslot = response.body();
-                OwnJobViewHolder viewHolder = new OwnJobViewHolder(nextJobLayout);
-                viewHolder.bind(getActivity(), nextTimeslot);
+                setNextJob(response.body());
             }
 
             @Override
@@ -99,6 +99,42 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
                 // TODO: handle error
             }
         });
+    }
+
+    private void setCurrentJob(Timeslot timeslot) {
+        currentTimeslot = timeslot;
+
+        if (currentJobLayout == null) return;
+
+        if (currentTimeslot == null) {
+            currentJobLayout.setVisibility(View.GONE);
+            currentJobView.setVisibility(View.GONE);
+            return;
+        }
+
+        currentJobLayout.setVisibility(View.VISIBLE);
+        if (currentJobView != null) currentJobView.setVisibility(View.VISIBLE);
+
+        OwnJobViewHolder viewHolder = new OwnJobViewHolder(currentJobLayout);
+        viewHolder.bind(getActivity(), currentTimeslot, getPresenter());
+    }
+
+    private void setNextJob(Timeslot timeslot) {
+        nextTimeslot = timeslot;
+
+        if (nextJobLayout == null) return;
+
+        if (nextTimeslot == null) {
+            nextJobLayout.setVisibility(View.GONE);
+            nextJobView.setVisibility(View.GONE);
+            return;
+        }
+
+        nextJobLayout.setVisibility(View.VISIBLE);
+        if (nextJobView != null) nextJobView.setVisibility(View.VISIBLE);
+
+        OwnJobViewHolder viewHolder = new OwnJobViewHolder(nextJobLayout);
+        viewHolder.bind(getActivity(), nextTimeslot, getPresenter());
     }
 
 }

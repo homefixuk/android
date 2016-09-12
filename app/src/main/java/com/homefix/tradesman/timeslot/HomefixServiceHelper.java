@@ -10,6 +10,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.ActivityHelper;
+import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.IntentHelper;
@@ -128,7 +129,7 @@ public class HomefixServiceHelper {
             i.putExtra("timeslotKey", Timeslot.getSenderReceiver().put(timeslot));
             i.putExtra("type", type != null ? type.name() : Timeslot.TYPE.NONE.name());
             i.putExtra("goIntoEditMode", goIntoEditMode);
-            activity.startActivity(i);
+            activity.startActivityForResult(i, Ids.TIMESLOT_CHANGE);
             activity.overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
         }
     }

@@ -9,6 +9,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.ActivityHelper;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
+import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
@@ -51,21 +52,31 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    public void bind(final Activity activity, final Timeslot timeslot) {
+    public interface TimeslotClickedListener {
+
+        void onTimeslotClicked(Timeslot timeslot, boolean longClick);
+
+    }
+
+    public void bind(final Activity activity, final Timeslot timeslot, final TimeslotClickedListener clickedListener) {
         if (!ActivityHelper.canActivityDo(activity) || timeslot == null) return;
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                HomefixServiceHelper.goToTimeslot(activity, timeslot, false);
+                if (clickedListener != null) clickedListener.onTimeslotClicked(timeslot, false);
             }
         });
 
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                HomefixServiceHelper.goToTimeslot(activity, timeslot, true);
-                return true;
+                if (clickedListener != null) {
+                    clickedListener.onTimeslotClicked(timeslot, false);
+                    return true;
+                }
+
+                return false;
             }
         });
 
@@ -77,18 +88,24 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
             startDateTimeView.setText(startDateTime);
 
             if (timeslot.getLength() > 0) {
-                String duration = TimeUtils.formatShortDateToHoursMinutes(timeslot.getLength());
+                String duration = TimeUtils.formatShortDateToHoursMinutes((int) timeslot.getLength());
 
-                if (Strings.isEmpty(startDateTime)) {
-                    startDateTimeView.setText(duration);
-                } else {
-                    durationView.setText(duration);
-                }
+                if (Strings.isEmpty(startDateTime)) startDateTimeView.setText(duration);
+                else durationView.setText(duration);
             }
         }
 
         Service service = timeslot.getService();
         if (service != null) {
+            if (serviceNameView != null) {
+                String timeslotName = "";
+                Problem problem = service.getProblem();
+                if (problem == null) timeslotName = service.getId();
+                else timeslotName = problem.getName();
+
+                serviceNameView.setText(Strings.isEmpty(timeslotName) ? "Own Job" : timeslotName);
+            }
+
             CustomerProperty customerProperty = service.getServiceSet().getCustomerProperty();
 
             if (customerProperty != null) {

@@ -7,4 +7,7 @@ import com.homefix.tradesman.base.view.BaseFragmentView;
  */
 
 public interface HomeFragmentView extends BaseFragmentView {
+
+    void refresh();
+
 }

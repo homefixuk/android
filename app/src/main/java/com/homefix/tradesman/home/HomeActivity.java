@@ -263,11 +263,17 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mCurrentPage == R.string.action_calendar) {
+        MenuInflater inflater = getMenuInflater();
+
+        if (mCurrentPage == R.string.action_home) {
+            // inflate the profile menu
+            inflater.inflate(R.menu.home, menu);
+            return true;
+
+        } else if (mCurrentPage == R.string.action_calendar) {
             // update the title
             if (calendarFragment != null) setActionbarTitle(calendarFragment.getMonthShowing());
 
-            MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.calendar, menu);
 
             if (menu != null) {
@@ -280,7 +286,6 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
 
         } else if (mCurrentPage == R.string.action_profile) {
             // inflate the profile menu
-            MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.profile, menu);
             return true;
         }
@@ -291,6 +296,10 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
+            case R.id.action_refresh:
+                if (homeFragment != null) homeFragment.refresh();
+                return true;
 
             case R.id.action_today:
                 if (calendarFragment != null) {
@@ -336,6 +345,11 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             return;
         }
 
-        super.onBackPressed();
+        showConfirmDialog("Exit app?", "EXIT", "CANCEL", new ConfirmDialogCallback() {
+            @Override
+            public void onPositive() {
+                finish();
+            }
+        });
     }
 }
