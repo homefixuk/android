@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -58,6 +59,8 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
 
     @BindView(R.id.call_cca_text)
     protected TextView mCallCcaTxt;
+
+    protected Snackbar snackbar;
 
     private String ccaPhoneNumber;
 
@@ -294,5 +297,16 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
             mProfileFragment.onNewWorkAreasReturned(list);
             return;
         }
+    }
+
+    protected void makeSnackbar(String internetStatus) {
+        snackbar = Snackbar
+                .make(drawerLayout, internetStatus, Snackbar.LENGTH_LONG)
+                .setAction("X", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        snackbar.dismiss();
+                    }
+                });
     }
 }

@@ -2,6 +2,8 @@ package com.homefix.tradesman;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -18,6 +20,8 @@ import com.samdroid.listener.interfaces.OnGotObjectListener;
  */
 public class HomeFixApplication extends MultiDexApplication {
 
+    private static HomeFixApplication instance;
+
     private static final String TAG = HomeFixApplication.class.getSimpleName();
 
     public HomeFixApplication() {
@@ -27,6 +31,9 @@ public class HomeFixApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        instance = this;
+
         // configure CacheUtilsLibrary
         CacheUtils.configureCache(this);
 
@@ -59,4 +66,19 @@ public class HomeFixApplication extends MultiDexApplication {
             }
         });
     }
+
+    public static HomeFixApplication getInstance() {
+        return instance;
+    }
+
+    public static boolean hasNetwork() {
+        return instance != null ? instance.checkIfHasNetwork() : false;
+    }
+
+    public boolean checkIfHasNetwork() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
 }

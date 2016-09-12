@@ -1,14 +1,23 @@
 package com.homefix.tradesman.home;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
@@ -21,6 +30,7 @@ import com.homefix.tradesman.task.LogoutTask;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 import com.samdroid.thread.MyThreadPool;
 
@@ -28,6 +38,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.List;
+
+import butterknife.ButterKnife;
 
 /**
  * Created by samuel on 6/22/2016.
@@ -38,6 +50,11 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     private int mCurrentPage;
     private HomeFragment homeFragment;
     private CalendarFragment<HomeActivity> calendarFragment;
+
+    // internet
+    public static int TYPE_WIFI = 1, TYPE_MOBILE = 2, TYPE_NOT_CONNECTED = 0;
+    private boolean internetConnected = true;
+    private boolean clickedNoNetworkConnection = false;
 
     public HomeActivity() {
         super(HomeActivity.class.getSimpleName());
@@ -352,4 +369,134 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             }
         });
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (clickedNoNetworkConnection) {
+            setSnackbarMessage(getConnectivityStatus(getContext()), true);
+            clickedNoNetworkConnection = false;
+        }
+        registerInternetCheckReceiver();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+    }
+
+    /**
+     * Method to register runtime broadcast receiver to show snackbar alert for internet connection..
+     */
+    private void registerInternetCheckReceiver() {
+        IntentFilter internetFilter = new IntentFilter();
+        internetFilter.addAction("android.net.wifi.STATE_CHANGE");
+        internetFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(broadcastReceiver, internetFilter);
+    }
+
+    /**
+     * Runtime Broadcast receiver inner class to capture internet connectivity events
+     */
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int status = getConnectivityStatus(context);
+            setSnackbarMessage(status, true);
+        }
+    };
+
+    public static int getConnectivityStatus(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (null != activeNetwork) {
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) return TYPE_WIFI;
+
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) return TYPE_MOBILE;
+        }
+        return TYPE_NOT_CONNECTED;
+    }
+
+    public static String getConnectivityStatusString(Context context) {
+        int conn = getConnectivityStatus(context);
+        String status = null;
+        if (conn == TYPE_WIFI) status = "Wifi enabled";
+        else if (conn == TYPE_MOBILE) status = "Mobile data enabled";
+        else if (conn == TYPE_NOT_CONNECTED) status = "Not connected to Internet";
+
+        return status;
+    }
+
+    private void setSnackbarMessage(int status, boolean showBar) {
+        if (status == -1) return;
+
+        String internetStatus = "";
+        if (status == TYPE_WIFI || status == TYPE_MOBILE) {
+            internetStatus = "Internet Connected";
+        } else {
+            internetStatus = "No Network Connection";
+        }
+
+        snackbar = Snackbar.make(drawerLayout, internetStatus, Snackbar.LENGTH_LONG);
+        snackbar.setAction("X", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                snackbar.dismiss();
+            }
+        });
+
+        // Changing message text color
+        snackbar.setActionTextColor(Color.WHITE);
+        // Changing action button text color
+        View sbView = snackbar.getView();
+        TextView textView = ButterKnife.findById(sbView, android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.WHITE);
+
+        if (status == TYPE_WIFI || status == TYPE_MOBILE) {
+            if (!internetConnected) {
+                internetConnected = true;
+                if (showBar) {
+                    sbView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.green));
+                    sbView.setOnClickListener(null);
+                    snackbar.setDuration(Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                }
+            }
+
+        } else {
+            if (internetConnected) {
+                internetConnected = false;
+                if (showBar) {
+                    sbView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.red));
+                    sbView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // open their network connection settings
+                            try {
+                                Intent intent = new Intent(Intent.ACTION_MAIN);
+                                intent.setClassName("com.android.phone", "com.android.phone.NetworkSetting");
+                                startActivity(intent);
+
+                            } catch (Exception e1) {
+                                try {
+                                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                                    intent.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings$DataUsageSummaryActivity"));
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                } catch (Exception e2) {
+                                }
+                            }
+
+                            clickedNoNetworkConnection = true;
+                        }
+                    });
+                    snackbar.setDuration(Snackbar.LENGTH_INDEFINITE);
+                    snackbar.show();
+                }
+            }
+        }
+    }
+
 }
