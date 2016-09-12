@@ -14,6 +14,7 @@ import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.IntentHelper;
+import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
 
 /**
@@ -105,6 +106,8 @@ public class HomefixServiceHelper {
     public static void goToTimeslot(Activity activity, Timeslot timeslot, boolean goIntoEditMode) {
         if (activity == null || timeslot == null) return;
 
+        MyLog.e(HomefixServiceHelper.class.getSimpleName(), "[goToTimeslot]");
+
         Intent i = new Intent(activity, TimeslotActivity.class);
 
         Timeslot.TYPE type = Timeslot.TYPE.getTypeEnum(timeslot.getType());
@@ -113,6 +116,7 @@ public class HomefixServiceHelper {
 
             case SERVICE:
                 i = null;
+                MyLog.e(HomefixServiceHelper.class.getSimpleName(), "[goToTimeslot] i = null Service");
                 break;
 
             case AVAILABILITY:
@@ -122,12 +126,13 @@ public class HomefixServiceHelper {
 
             default:
                 i = null;
+                MyLog.e(HomefixServiceHelper.class.getSimpleName(), "[goToTimeslot] i = null DEFAULT");
                 break;
         }
 
         if (i != null) {
             i.putExtra("timeslotKey", Timeslot.getSenderReceiver().put(timeslot));
-            i.putExtra("type", type != null ? type.name() : Timeslot.TYPE.NONE.name());
+            i.putExtra("type", type.name());
             i.putExtra("goIntoEditMode", goIntoEditMode);
             activity.startActivityForResult(i, Ids.TIMESLOT_CHANGE);
             activity.overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);

@@ -54,9 +54,9 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
     }
 
     @Override
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+    public void onResume() {
+        super.onResume();
+        presenter.attachView(this);
         refresh();
     }
 
@@ -117,6 +117,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
         OwnJobViewHolder viewHolder = new OwnJobViewHolder(currentJobLayout);
         viewHolder.bind(getActivity(), currentTimeslot, getPresenter());
+        currentJobLayout.requestLayout();
     }
 
     private void setNextJob(Timeslot timeslot) {
@@ -135,6 +136,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
         OwnJobViewHolder viewHolder = new OwnJobViewHolder(nextJobLayout);
         viewHolder.bind(getActivity(), nextTimeslot, getPresenter());
+        nextJobLayout.requestLayout();
     }
 
 }

@@ -70,9 +70,6 @@ public class TimeslotActivity extends BaseCloseActivity {
             cal.setTimeInMillis(startTime);
             cal = TimeUtils.setToTopOfHour(cal);
             ((BaseTimeslotFragment) baseFragment).setStartTime(cal);
-//
-//            cal.setTimeInMillis(cal.getTimeInMillis() + TimeUtils.getHoursInMillis(1));
-//            ((BaseTimeslotFragment) baseFragment).setEndTime(cal);
         }
 
         ((BaseTimeslotFragment) baseFragment).setType(type);

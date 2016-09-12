@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.ActivityHelper;
@@ -47,6 +48,9 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.location_txt)
     public TextView addressView;
 
+    private Timeslot mTimeslot;
+    private TimeslotClickedListener mClickedListener;
+
     public OwnJobViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
@@ -58,21 +62,24 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bind(final Activity activity, final Timeslot timeslot, final TimeslotClickedListener clickedListener) {
+    public void bind(final Activity activity, Timeslot timeslot, TimeslotClickedListener clickedListener) {
         if (!ActivityHelper.canActivityDo(activity) || timeslot == null) return;
+
+        mTimeslot = timeslot;
+        mClickedListener = clickedListener;
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (clickedListener != null) clickedListener.onTimeslotClicked(timeslot, false);
+                if (mClickedListener != null) mClickedListener.onTimeslotClicked(mTimeslot, false);
             }
         });
 
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                if (clickedListener != null) {
-                    clickedListener.onTimeslotClicked(timeslot, false);
+                if (mClickedListener != null) {
+                    mClickedListener.onTimeslotClicked(mTimeslot, false);
                     return true;
                 }
 
