@@ -2,7 +2,6 @@ package com.homefix.tradesman.timeslot.own_job;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,11 +10,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.pdf.PdfViewActivity;
 import com.homefix.tradesman.common.HtmlHelper;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanPrivate;
+import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.own_job.charges.ChargesActivity;
@@ -227,7 +227,10 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                                     }
                                     content += "\n\n";
                                     content += "Kind Regards,\n";
-                                    content += UserController.getCurrentUser().getName();
+
+                                    Tradesman tradesman = TradesmanController.getCurrentTradesman();
+                                    User user = tradesman != null ? tradesman.getUser() : null;
+                                    content += user != null ? user.getName() : "Your Homefix Tradesman";
 
                                     IntentHelper.openEmailWithAttachment(
                                             getContext(),
@@ -259,7 +262,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     }
 
     private void generateInvoice(@NonNull final OnGotObjectListener<OwnJobInvoice> callback) {
-        UserController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
+        TradesmanController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
             @Override
             public void onGotThing(TradesmanPrivate o) {
                 OwnJobInvoice invoice = new OwnJobInvoice(

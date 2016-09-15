@@ -23,7 +23,7 @@ import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.home.HomeActivity;
 import com.homefix.tradesman.login.LoginActivity;
 import com.homefix.tradesman.model.CCA;
@@ -146,7 +146,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
             };
 
-            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY_resId), UserController.getToken()).enqueue(callback);
+            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY_resId), TradesmanController.getToken()).enqueue(callback);
         }
 
         if (checkPermissions && !calledPermissionResult) {
@@ -304,7 +304,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
     public void goToApp() {
         MyLog.e(TAG, "[goToApp]");
         // check if user logged in
-        Tradesman tradesman = UserController.getCurrentUser();
+        Tradesman tradesman = TradesmanController.getCurrentTradesman();
 
         Intent i;
 

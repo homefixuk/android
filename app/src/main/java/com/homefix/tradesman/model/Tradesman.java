@@ -11,13 +11,26 @@ import java.util.Map;
  * Created by samuel on 6/15/2016.
  */
 
-public class Tradesman extends User {
+public class Tradesman extends BaseModel {
 
+    private User user;
     private String type, picture;
     private double rating, experience;
     private List<String> workAreas;
     private Location currentLocation;
     private String settings;
+
+    public Tradesman() {
+        super();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public String getType() {
         return Strings.returnSafely(type);

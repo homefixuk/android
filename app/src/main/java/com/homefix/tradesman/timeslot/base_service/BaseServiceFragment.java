@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.EditText;
@@ -28,12 +27,12 @@ import com.homefix.tradesman.model.CustomerProperty;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
+import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.IntentHelper;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.BackgroundViewColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -123,11 +122,12 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                     }
 
                     Customer customer = customerProperty.getCustomer();
-                    if (customer != null) {
-                        if (mPersonNameTxt != null) mPersonNameTxt.setText(customer.getName());
-                        if (mPersonEmailTxt != null) mPersonEmailTxt.setText(customer.getEmail());
+                    User user = customer != null ? customer.getUser() : null;
+                    if (user != null) {
+                        if (mPersonNameTxt != null) mPersonNameTxt.setText(user.getName());
+                        if (mPersonEmailTxt != null) mPersonEmailTxt.setText(user.getEmail());
                         if (mPersonPhoneNumberTxt != null)
-                            mPersonPhoneNumberTxt.setText(customer.getMobile());
+                            mPersonPhoneNumberTxt.setText(user.getMobile());
                     }
 
                     if (mJobTypeTxt != null) {
@@ -450,7 +450,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         String phone = mPersonPhoneNumberTxt.getText().toString();
 
-       HomefixServiceHelper.onPhoneClicked(getActivity(), phone);
+        HomefixServiceHelper.onPhoneClicked(getActivity(), phone);
     }
 
     @OnClick(R.id.property_type_txt)

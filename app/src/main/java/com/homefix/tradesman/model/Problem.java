@@ -1,7 +1,7 @@
 package com.homefix.tradesman.model;
 
 import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
 
@@ -59,13 +59,13 @@ public class Problem extends BaseModel {
     final private static List<Problem> M_PROBLEMs = new ArrayList<>();
 
     public static void loadServiceTypes() {
-        if (!UserController.hasToken()) {
+        if (!TradesmanController.hasToken()) {
             MyLog.e("Problem", "[loadServiceTypes] no user token");
             return;
         }
 
         // get the service types from the server
-        HomeFix.getAPI().getServiceTypes(UserController.getToken()).enqueue(new Callback<List<Problem>>() {
+        HomeFix.getAPI().getServiceTypes(TradesmanController.getToken()).enqueue(new Callback<List<Problem>>() {
 
             @Override
             public void onResponse(Call<List<Problem>> call, Response<List<Problem>> response) {

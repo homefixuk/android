@@ -3,9 +3,8 @@ package com.homefix.tradesman.calendar;
 import android.content.Context;
 import android.util.SparseArray;
 
-import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Timeslot;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
@@ -356,7 +355,7 @@ public class HomeFixCal {
 
         MyCallback callback = new MyCallback(year, month, listener);
 
-        HomeFix.getAPI().getTradesmanEvents(UserController.getToken(), params).enqueue(callback);
+        HomeFix.getAPI().getTradesmanEvents(TradesmanController.getToken(), params).enqueue(callback);
     }
 
     private static class MyCallback implements Callback<List<Timeslot>> {

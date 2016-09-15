@@ -14,10 +14,9 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
-import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.common.PermissionsHelper;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.listener.OnNewLocationListener;
 import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.MyLog;
@@ -239,7 +238,7 @@ public class LocationService extends Service {
      * Called after the new location received
      */
     private static void OnNewLocationReceived(Location location) {
-        if (location != null && UserController.hasToken()) {
+        if (location != null && TradesmanController.hasToken()) {
 
             // send the update to the server
             HashMap<String, Object> locationMap = new HashMap<>();
@@ -260,7 +259,7 @@ public class LocationService extends Service {
                 }
             };
 
-            HomeFix.getAPI().updateLocation(UserController.getToken(), locationMap).enqueue(callback);
+            HomeFix.getAPI().updateLocation(TradesmanController.getToken(), locationMap).enqueue(callback);
         }
 
         notifyListeners(location);

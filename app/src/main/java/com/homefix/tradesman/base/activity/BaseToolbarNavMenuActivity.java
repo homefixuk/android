@@ -12,11 +12,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
@@ -25,12 +23,11 @@ import com.homefix.tradesman.base.view.BaseToolbarNavMenuActivityView;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.CCA;
+import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.profile.ProfileFragment;
-import com.homefix.tradesman.profile.settings.SettingsFragment;
-import com.homefix.tradesman.profile.settings.SettingsPresenter;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
 
@@ -198,8 +195,8 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     }
 
     public void setupUser() {
-        User user = UserController.getCurrentUser();
-
+        Tradesman tradesman = TradesmanController.getCurrentTradesman();
+        User user = tradesman != null ? tradesman.getUser() : null;
         if (user == null) return;
 
         if (mUserNameTxt != null) mUserNameTxt.setText(user.getName());

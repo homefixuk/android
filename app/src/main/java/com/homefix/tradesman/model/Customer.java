@@ -7,8 +7,9 @@ import java.util.List;
  * Created by samuel on 6/15/2016.
  */
 
-public class Customer extends User {
+public class Customer extends BaseModel {
 
+    private User user;
     private String priority;
     private List<Tradesman> preferredTradesman;
 
@@ -24,5 +25,9 @@ public class Customer extends User {
         if (preferredTradesman == null) preferredTradesman = new ArrayList<>();
 
         return preferredTradesman;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

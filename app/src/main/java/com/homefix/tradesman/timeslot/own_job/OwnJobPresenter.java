@@ -2,13 +2,14 @@ package com.homefix.tradesman.timeslot.own_job;
 
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
 import com.samdroid.string.Strings;
@@ -58,7 +59,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
                 timeslot.setStart(getView().getStartTime().getTimeInMillis());
                 timeslot.setEnd(getView().getEndTime().getTimeInMillis());
                 timeslot.setLength(getView().getEndTime().getTimeInMillis() - getView().getStartTime().getTimeInMillis());
-                timeslot.setTradesman(UserController.getCurrentUser());
+                timeslot.setTradesman(TradesmanController.getCurrentTradesman());
                 timeslot.setType(Timeslot.TYPE.OWN_JOB.getName());
                 timeslot.setService(service);
 
@@ -78,7 +79,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
         //noinspection UnnecessaryUnboxing
         HomeFix.getAPI().createService(
-                UserController.getToken(),
+                TradesmanController.getToken(),
                 customerName,
                 customerEmail,
                 customerPhone,
@@ -122,7 +123,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
                 timeslot.setStart(getView().getStartTime().getTimeInMillis());
                 timeslot.setEnd(getView().getEndTime().getTimeInMillis());
                 timeslot.setLength(getView().getEndTime().getTimeInMillis() - getView().getStartTime().getTimeInMillis());
-                timeslot.setTradesman(UserController.getCurrentUser());
+                timeslot.setTradesman(TradesmanController.getCurrentTradesman());
                 timeslot.setType(Timeslot.TYPE.OWN_JOB.getName());
                 timeslot.setService(service);
 
@@ -157,12 +158,13 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
                     changes.put("customerPropertyRelationship", customerPropertyRelationship);
 
                 Customer customer = customerProperty.getCustomer();
+                User user = customer != null ? customer.getUser() : null;
                 if (customer != null) {
-                    if (!customer.getName().equals(customerName))
+                    if (!user.getName().equals(customerName))
                         changes.put("customerName", customerName);
-                    if (!customer.getEmail().equals(customerEmail))
+                    if (!user.getEmail().equals(customerEmail))
                         changes.put("customerEmail", customerEmail);
-                    if (!customer.getMobile().equals(customerPhone))
+                    if (!user.getMobile().equals(customerPhone))
                         changes.put("customerPhone", customerPhone);
                 }
 
@@ -198,7 +200,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
         Call<Service> call = HomeFix.getAPI().updateService(
                 originalTimeslot.getId(),
-                UserController.getToken(),
+                TradesmanController.getToken(),
                 changes);
 
         call.enqueue(callback);

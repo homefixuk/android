@@ -1,7 +1,5 @@
 package com.homefix.tradesman.home.home_fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,7 +7,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Timeslot;
 
 import butterknife.BindView;
@@ -66,7 +64,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         setNextJob(nextTimeslot);
 
         // if we need to refresh the jobs
-        HomeFix.getAPI().getCurrentService(UserController.getToken()).enqueue(new Callback<Timeslot>() {
+        HomeFix.getAPI().getCurrentService(TradesmanController.getToken()).enqueue(new Callback<Timeslot>() {
             @Override
             public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
                 if (response == null) {
@@ -83,7 +81,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
             }
         });
 
-        HomeFix.getAPI().getCurrentService(UserController.getToken()).enqueue(new Callback<Timeslot>() {
+        HomeFix.getAPI().getCurrentService(TradesmanController.getToken()).enqueue(new Callback<Timeslot>() {
             @Override
             public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
                 if (response == null) {

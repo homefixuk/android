@@ -20,7 +20,7 @@ import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.base.presenter.DefaultFragementPresenter;
 import com.homefix.tradesman.base.view.BaseFragmentView;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Charge;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
@@ -181,7 +181,7 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
             }
         };
 
-        HomeFix.getAPI().deleteCharge(UserController.getToken(), charge.getId()).enqueue(callback);
+        HomeFix.getAPI().deleteCharge(TradesmanController.getToken(), charge.getId()).enqueue(callback);
     }
 
     @Override
@@ -279,9 +279,9 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
 
         // send the request to the server
         if (originalCharge == null) {
-            HomeFix.getAPI().addCharge(UserController.getToken(), newCharge).enqueue(callback);
+            HomeFix.getAPI().addCharge(TradesmanController.getToken(), newCharge).enqueue(callback);
         } else {
-            HomeFix.getAPI().updateCharge(UserController.getToken(), originalCharge.getId(), newCharge).enqueue(callback);
+            HomeFix.getAPI().updateCharge(TradesmanController.getToken(), originalCharge.getId(), newCharge).enqueue(callback);
         }
 
         return true;

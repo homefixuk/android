@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Tradesman;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
@@ -97,7 +97,7 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
                 CacheUtils.writeFile("token", (String) results.get("token"));
 
                 // load the current user
-                UserController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
+                TradesmanController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
                     @Override
                     public void onGotThing(Tradesman tradesman) {
                         if (tradesman == null) {

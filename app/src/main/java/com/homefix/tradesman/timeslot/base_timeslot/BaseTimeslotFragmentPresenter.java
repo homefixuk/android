@@ -7,7 +7,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.calendar.HomeFixCal;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.MyLog;
@@ -86,11 +86,11 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
 
         // if the user was adding a timeslot
         if (timeslot == null) {
-            HomeFix.getAPI().addTimeslot(UserController.getToken(), map).enqueue(callback);
+            HomeFix.getAPI().addTimeslot(TradesmanController.getToken(), map).enqueue(callback);
 
         } else {
             // else the user was editing a timeslot //
-            HomeFix.getAPI().updateTimeslot(UserController.getToken(), timeslot.getId(), map).enqueue(callback);
+            HomeFix.getAPI().updateTimeslot(TradesmanController.getToken(), timeslot.getId(), map).enqueue(callback);
         }
     }
 
@@ -143,7 +143,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
 
                         };
 
-                        HomeFix.getAPI().deleteTimeslot(UserController.getToken(), timeslot.getId()).enqueue(callback);
+                        HomeFix.getAPI().deleteTimeslot(TradesmanController.getToken(), timeslot.getId()).enqueue(callback);
 
                     }
 

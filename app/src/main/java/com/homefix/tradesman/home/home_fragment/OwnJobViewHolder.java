@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.ActivityHelper;
@@ -14,6 +13,7 @@ import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
@@ -140,13 +140,14 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
                 // set the customer info
                 Customer customer = customerProperty.getCustomer();
-                if (customer != null) {
+                User user = customer != null ? customer.getUser() : null;
+                if (user != null) {
                     if (contactNameView != null) {
-                        contactNameView.setText(customer.getName());
+                        contactNameView.setText(user.getName());
                     }
 
                     if (contactEmailView != null) {
-                        final String email = Strings.returnSafely(customer.getEmail());
+                        final String email = Strings.returnSafely(user.getEmail());
                         contactEmailView.setText(email);
                         contactEmailView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -157,9 +158,9 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
                     }
 
                     if (contactPhoneView != null) {
-                        String phone = Strings.returnSafely(customer.getHomePhone());
+                        String phone = Strings.returnSafely(user.getHomePhone());
                         if (Strings.isEmpty(phone))
-                            phone = Strings.returnSafely(customer.getMobile());
+                            phone = Strings.returnSafely(user.getMobile());
                         contactPhoneView.setText(phone);
                         final String finalPhone = phone;
                         contactPhoneView.setOnClickListener(new View.OnClickListener() {

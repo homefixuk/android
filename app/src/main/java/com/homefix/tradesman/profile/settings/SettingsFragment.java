@@ -12,13 +12,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.activity.BaseToolbarActivity;
 import com.homefix.tradesman.base.adapter.MyListAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
@@ -202,7 +201,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                         changes.put("standardHourlyRate", d);
                         HomeFix.getAPI()
                                 .updateTradesmanPrivateDetails(
-                                        UserController.getToken(),
+                                        TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
                                 .enqueue(new Callback<Tradesman>() {
@@ -273,7 +272,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                         changes.put("vatNumber", s);
                         HomeFix.getAPI()
                                 .updateTradesmanPrivateDetails(
-                                        UserController.getToken(),
+                                        TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
                                 .enqueue(new Callback<Tradesman>() {
@@ -359,7 +358,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                         // send the updates to the server
                         HomeFix.getAPI()
                                 .updateTradesmanPrivateDetails(
-                                        UserController.getToken(),
+                                        TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
                                 .enqueue(new Callback<Tradesman>() {
@@ -427,7 +426,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                         changes.put("businessName", s);
                         HomeFix.getAPI()
                                 .updateTradesmanPrivateDetails(
-                                        UserController.getToken(),
+                                        TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
                                 .enqueue(new Callback<Tradesman>() {
@@ -460,7 +459,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
     }
 
     private void refreshView() {
-        UserController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
+        TradesmanController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
             @Override
             public void onGotThing(Tradesman o) {
                 tradesman = o;
@@ -469,7 +468,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
             }
         });
 
-        UserController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
+        TradesmanController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
             @Override
             public void onGotThing(TradesmanPrivate o) {
                 tradesmanPrivate = o;

@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.base.view.BaseView;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.splashscreen.SplashScreenActivity;
 
 import io.nlopez.smartlocation.SmartLocation;
@@ -56,9 +56,9 @@ public class LogoutTask extends AsyncTask<Void, Void, Boolean> {
         }
 
         // clear the current user
-        UserController.clearCurrentUser();
+        TradesmanController.clearCurrentUser();
 
-        return UserController.getCurrentUser() == null;
+        return TradesmanController.getCurrentTradesman() == null;
     }
 
     @Override

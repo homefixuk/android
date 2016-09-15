@@ -5,7 +5,7 @@ package com.homefix.tradesman.timeslot.own_job.invoice;
  */
 
 import com.homefix.tradesman.common.file.BasePdf;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Charge;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
@@ -14,6 +14,7 @@ import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanPrivate;
+import com.homefix.tradesman.model.User;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
@@ -61,11 +62,12 @@ public class OwnJobInvoice extends BasePdf {
 
         // Tradesman
         Tradesman tradesman = service.getTradesman();
+        User user = tradesman != null ? tradesman.getUser() : null;
         String name = tradesmanPrivate != null ? tradesmanPrivate.getBusinessName() : null;
-        if (Strings.isEmpty(name)) name = tradesman != null ? tradesman.getName() : null;
+        if (Strings.isEmpty(name)) name = user != null ? user.getName() : null;
         if (Strings.isEmpty(name))
             name = tradesmanPrivate != null ? tradesmanPrivate.getNameOnAccount() : null;
-        String email = tradesman != null ? tradesman.getEmail() : null;
+        String email = user != null ? user.getEmail() : null;
         if (!Strings.isEmpty(name) || !Strings.isEmpty(email)) {
             Paragraph pFrom = new Paragraph("From", subFont);
             document.add(pFrom);
@@ -87,12 +89,14 @@ public class OwnJobInvoice extends BasePdf {
         if (customerProperty != null) {
             Customer customer = customerProperty.getCustomer();
             Property property = customerProperty.getProperty();
-            if (customer != null) {
-                customerFirstName = customer.getFirstName();
-                if (Strings.isEmpty(customerFirstName)) customerFirstName = customer.getName();
 
-                if (!Strings.isEmpty(customer.getName()))
-                    pCustomer.add(new Paragraph(customer.getName(), subGrayFont));
+            User customerUser = customer != null ? customer.getUser() : null;
+            if (customerUser != null) {
+                customerFirstName = customerUser.getFirstName();
+                if (Strings.isEmpty(customerFirstName)) customerFirstName = customerUser.getName();
+
+                if (!Strings.isEmpty(customerUser.getName()))
+                    pCustomer.add(new Paragraph(customerUser.getName(), subGrayFont));
             }
 
             if (property != null) {
@@ -108,12 +112,12 @@ public class OwnJobInvoice extends BasePdf {
                     pCustomer.add(new Paragraph(property.getPostcode(), subGrayFont));
             }
 
-            if (customer != null) {
-                if (!Strings.isEmpty(customer.getMobile()))
-                    pCustomer.add(new Paragraph(customer.getMobile(), subGrayFont));
-                if (!Strings.isEmpty(customer.getEmail())) {
-                    customerEmail = customer.getEmail();
-                    pCustomer.add(new Paragraph(customer.getEmail(), subGrayFont));
+            if (customerUser != null) {
+                if (!Strings.isEmpty(customerUser.getMobile()))
+                    pCustomer.add(new Paragraph(customerUser.getMobile(), subGrayFont));
+                if (!Strings.isEmpty(customerUser.getEmail())) {
+                    customerEmail = customerUser.getEmail();
+                    pCustomer.add(new Paragraph(customerUser.getEmail(), subGrayFont));
                 }
             }
         }
@@ -131,7 +135,7 @@ public class OwnJobInvoice extends BasePdf {
         }
 
         // add Tradesman bank details
-        TradesmanPrivate tradesmanPrivate = UserController.getCurrentTradesmanPrivate();
+        TradesmanPrivate tradesmanPrivate = TradesmanController.getCurrentTradesmanPrivate();
         if (tradesmanPrivate != null) {
             Paragraph pBank = new Paragraph("Bank Information", subFont);
             addEmptyLine(document);

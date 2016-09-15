@@ -7,7 +7,7 @@ import android.net.NetworkInfo;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.homefix.tradesman.data.UserController;
+import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.service.LocationService;
@@ -59,7 +59,7 @@ public class HomeFixApplication extends MultiDexApplication {
     public static void setupAppAfterLogin(Context context) {
         Problem.loadServiceTypes();
 
-        UserController.loadTradesmanPrivate(context, new OnGotObjectListener<TradesmanPrivate>() {
+        TradesmanController.loadTradesmanPrivate(context, new OnGotObjectListener<TradesmanPrivate>() {
             @Override
             public void onGotThing(TradesmanPrivate o) {
 
