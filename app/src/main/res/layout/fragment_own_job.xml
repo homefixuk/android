@@ -104,17 +104,18 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_format_list_bulleted_type_grey600_48dp" />
 
-            <TextView
+            <EditText
                 android:id="@+id/job_type_txt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/job_type_icon"
                 android:layout_toRightOf="@+id/job_type_icon"
+                android:background="@android:color/transparent"
                 android:gravity="start|center_vertical"
-                android:hint="@string/select_job_type"
+                android:hint="@string/job_type"
+                android:inputType="textAutoCorrect|textAutoComplete"
                 android:padding="@dimen/base_padding"
-                android:paddingRight="@dimen/base_padding_six"
-                android:textAppearance="@style/TextTheme.Large" />
+                android:textAppearance="@style/SingleLineTheme.Large" />
         </RelativeLayout>
 
         <View
@@ -195,7 +196,7 @@
                 android:layout_toRightOf="@+id/person_icon"
                 android:background="@android:color/transparent"
                 android:gravity="start|top"
-                android:hint="@string/name"
+                android:hint="@string/customer_name"
                 android:inputType="textPersonName"
                 android:padding="@dimen/base_padding"
                 android:textAppearance="@style/TextTheme.Large" />
@@ -209,7 +210,7 @@
                 android:layout_below="@+id/person_name_txt"
                 android:background="@android:color/transparent"
                 android:gravity="start|top"
-                android:hint="@string/email"
+                android:hint="@string/customer_email"
                 android:inputType="textEmailAddress"
                 android:padding="@dimen/base_padding"
                 android:textAppearance="@style/TextTheme.Large" />
@@ -236,7 +237,7 @@
                 android:layout_below="@+id/person_email_txt"
                 android:background="@android:color/transparent"
                 android:gravity="start|top"
-                android:hint="@string/phone_number"
+                android:hint="@string/customer_phone_number"
                 android:inputType="phone"
                 android:padding="@dimen/base_padding"
                 android:textAppearance="@style/TextTheme.Large" />
@@ -247,8 +248,6 @@
                 android:layout_height="@dimen/base_padding_triple"
                 android:layout_alignBottom="@+id/person_phone_number_txt"
                 android:layout_alignEnd="@+id/email_icon"
-                android:layout_alignLeft="@+id/email_icon"
-                android:layout_alignRight="@+id/email_icon"
                 android:layout_alignStart="@+id/email_icon"
                 android:layout_alignTop="@+id/person_phone_number_txt"
                 android:scaleType="fitXY"
@@ -271,7 +270,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/base_padding_triple"
                 android:layout_alignBottom="@+id/property_type_txt"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignTop="@+id/property_type_txt"
@@ -283,9 +281,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/property_type_icon"
-                android:layout_toRightOf="@+id/property_type_icon"
                 android:gravity="start|center_vertical"
-                android:hint="@string/property_type"
+                android:hint="@string/customer_property_relationship"
                 android:padding="@dimen/base_padding"
                 android:textAppearance="@style/TextTheme.Large" />
         </RelativeLayout>
@@ -306,7 +303,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/base_padding_triple"
                 android:layout_alignBottom="@+id/hidden_description_txt"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignTop="@+id/hidden_description_txt"
@@ -318,7 +314,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/description_icon"
-                android:layout_toRightOf="@+id/description_icon"
                 android:gravity="start|top"
                 android:padding="@dimen/base_padding"
                 android:textAppearance="@style/TextTheme.White.Caps.Large"
@@ -329,7 +324,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/description_icon"
-                android:layout_toRightOf="@+id/description_icon"
                 android:background="@android:color/transparent"
                 android:gravity="start|top"
                 android:hint="@string/add_description"
@@ -354,7 +348,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/base_padding_triple"
                 android:layout_alignBottom="@+id/charges_total_txt"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignTop="@+id/charges_total_txt"
@@ -367,7 +360,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/charges_icon"
-                android:layout_toRightOf="@+id/charges_icon"
                 android:gravity="start|center_vertical"
                 android:padding="@dimen/base_padding"
                 android:text="@string/charges"
@@ -378,7 +370,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:gravity="end|center_vertical"
                 android:padding="@dimen/base_padding"

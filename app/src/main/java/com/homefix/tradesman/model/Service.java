@@ -16,6 +16,7 @@ public class Service extends BaseModel {
     private Tradesman tradesman;
     private Problem problem;
     private String status;
+    private String serviceType;
     private long requestTime, arrivalTime, departTime, estimatedDuration;
     private int estimatedCost, actualDuration, actualCost;
     private String tradesmanNotes;
@@ -179,6 +180,14 @@ public class Service extends BaseModel {
         if (partsUsed == null) partsUsed = new ArrayList<>();
 
         return partsUsed;
+    }
+
+    public String getServiceType() {
+        return Strings.returnSafely(serviceType);
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
     private static final SendReceiver<Service> senderReceiver = new SendReceiver<>(Service.class);

@@ -6,6 +6,7 @@ import com.alamkanak.weekview.WeekViewEvent;
 import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.TimeUtils;
+import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -58,8 +59,8 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
                 break;
             case OWN_JOB:
                 if (timeslot.getService() != null) {
-                    Problem problem = timeslot.getService().getProblem();
-                    if (problem != null) setName(problem.getName());
+                    String serviceType = timeslot.getService().getServiceType();
+                    if (!Strings.isEmpty(serviceType)) setName(serviceType);
                     else setName(timeslot.getService().getId());
 
                 } else {

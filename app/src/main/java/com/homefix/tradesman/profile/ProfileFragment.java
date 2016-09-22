@@ -113,7 +113,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
         nameView.setText(Strings.returnSafely(user != null ? user.getName() : "No Name"));
         emailView.setText(Strings.returnSafely(user != null ? user.getEmail() : "no@email.com"));
         homePhoneView.setText(Strings.returnSafely(user != null ? user.getHomePhone() : "Long hold here to set your home phone"));
-        mobilePhoneView.setText(Strings.returnSafely(user != null ? user.getMobile() :  "Long hold here to set your mobile phone"));
+        mobilePhoneView.setText(Strings.returnSafely(user != null ? user.getMobile() : "Long hold here to set your mobile phone"));
         addressView.setText(Strings.returnSafely(getReadableLocationString(", "), "Long hold here to set your address"));
         yearsExperienceView.setText(Strings.formatRaised(mCurrentTradesman.getExperience()));
 
@@ -356,7 +356,12 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
 
         // send the updates to the server
         Map<String, Object> changes = new HashMap<>();
-        changes.put("workAreas", workAreas);
+        String params = "";
+        for (int i = 0; i < workAreas.size(); i++) {
+            if (i > 0) params += "&workAreas[]=";
+            params += workAreas.get(i);
+        }
+        changes.put("workAreas[]", params);
         HomeFix.getAPI()
                 .updateTradesmanDetails(TradesmanController.getToken(), changes)
                 .enqueue(new Callback<Tradesman>() {

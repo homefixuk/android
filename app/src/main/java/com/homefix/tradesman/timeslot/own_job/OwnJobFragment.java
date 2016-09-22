@@ -2,6 +2,7 @@ package com.homefix.tradesman.timeslot.own_job;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -104,7 +105,15 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
             }
         }
 
-        BackgroundColourOnTouchListener touchListener = new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark);
+        BackgroundColourOnTouchListener touchListener = new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark) {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return mTimeslot != null && super.onTouch(v, event);
+            }
+
+        };
+
         if (mInvoiceBar != null) mInvoiceBar.setOnTouchListener(touchListener);
         if (mChargesBar != null) mChargesBar.setOnTouchListener(touchListener);
         if (mPaymentsBar != null) mPaymentsBar.setOnTouchListener(touchListener);
@@ -191,11 +200,21 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
     @OnClick(R.id.charges_bar)
     public void onChargesClicked() {
+        if (mTimeslot == null) {
+            Toast.makeText(getContext(), "Please create the job before adding charges", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         goToActivitySendingService(ChargesActivity.class);
     }
 
     @OnClick(R.id.invoice_bar)
     public void onInvoiceClicked() {
+        if (mTimeslot == null) {
+            Toast.makeText(getContext(), "Please create the job before invoicing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         MaterialDialogWrapper.getListDialog(
                 getActivity(),
                 "Customer Invoice",
@@ -277,6 +296,11 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
     @OnClick(R.id.payments_bar)
     public void onPaymentsClicked() {
+        if (mTimeslot == null) {
+            Toast.makeText(getContext(), "Please create the job before adding payments", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         goToActivitySendingService(PaymentsActivity.class);
     }
 

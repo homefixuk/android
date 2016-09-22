@@ -60,7 +60,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
     protected View mLocationBar;
 
     @BindView(R.id.job_type_txt)
-    protected TextView mJobTypeTxt;
+    protected EditText mJobTypeTxt;
 
     @BindView(R.id.location_txt)
     protected TextView mLocationTxt;
@@ -130,10 +130,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                             mPersonPhoneNumberTxt.setText(user.getMobile());
                     }
 
-                    if (mJobTypeTxt != null) {
-                        Problem problem = service.getProblem();
-                        mJobTypeTxt.setText(problem != null ? problem.getName() : "");
-                    }
+                    if (mJobTypeTxt != null) mJobTypeTxt.setText(service.getServiceType());
                 }
 
                 if (mDescriptionTxt != null) mDescriptionTxt.setText(service.getTradesmanNotes());
@@ -393,24 +390,24 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             return null;
     }
 
-    @OnClick(R.id.job_type_txt)
-    public void onJobTypeClicked() {
-        if (!isEdit) return;
-
-        // show list of service type names
-        List<String> namesList = Problem.getProblemTypeNames();
-        CharSequence[] array = namesList.toArray(new String[namesList.size()]);
-
-        MaterialDialogWrapper.getListDialog(getActivity(), "Select service type", array, new MaterialDialog.ListCallback() {
-            @Override
-            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                hasMadeChanges = true;
-
-                // set the job type text from the one they selected
-                mJobTypeTxt.setText(text);
-            }
-        }).show();
-    }
+//    @OnClick(R.id.job_type_txt)
+//    public void onJobTypeClicked() {
+//        if (!isEdit) return;
+//
+//        // show list of service type names
+//        List<String> namesList = Problem.getProblemTypeNames();
+//        CharSequence[] array = namesList.toArray(new String[namesList.size()]);
+//
+//        MaterialDialogWrapper.getListDialog(getActivity(), "Select service type", array, new MaterialDialog.ListCallback() {
+//            @Override
+//            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+//                hasMadeChanges = true;
+//
+//                // set the job type text from the one they selected
+//                mJobTypeTxt.setText(text);
+//            }
+//        }).show();
+//    }
 
     @OnClick(R.id.location_bar)
     public void onLocationClicked() {

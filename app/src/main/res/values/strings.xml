@@ -68,6 +68,11 @@
     <string name="current_job">Current Job</string>
     <string name="next_job">Next Job</string>
     <string name="action_refresh">Refresh</string>
+    <string name="job_type">Job Type</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_email">Customer Email</string>
+    <string name="customer_phone_number">Customer Phone Number</string>
+    <string name="customer_property_relationship">Customer Property Relationship</string>
 
     <string-array name="payment_types">
         <item>cash</item>
