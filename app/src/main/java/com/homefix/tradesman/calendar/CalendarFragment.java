@@ -11,7 +11,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.alamkanak.weekview.DateTimeInterpreter;
@@ -28,7 +27,6 @@ import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.network.NetworkManager;
@@ -240,7 +238,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
 
         if (event instanceof HomefixWeekViewEvent) {
             HomefixWeekViewEvent hEvent = (HomefixWeekViewEvent) event;
-            HomefixServiceHelper.goToTimeslot(getActivity(), hEvent.getTimeslot(), goIntoEditMode);
+            HomefixServiceHelper.goToTimeslot(getBaseActivity(), hEvent.getTimeslot(), goIntoEditMode);
         }
     }
 
@@ -350,6 +348,13 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
                 mView.goToHour(TimeUtils.getCurrentHour());
             }
         }, 500);
+    }
+
+    public void removeTimeslot(Timeslot timeslot) {
+        if (timeslot == null || timeslot.getStart() == 0) return;
+
+        HomeFixCal.removeEvent(timeslot);
+        if (mView != null) mView.notifyDatasetChanged();
     }
 
     /**

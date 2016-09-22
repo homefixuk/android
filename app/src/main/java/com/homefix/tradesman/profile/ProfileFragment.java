@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.api.API;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.base.activity.EditListActivity;
@@ -19,6 +20,7 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
+import com.samdroid.string.ToCommaParameters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -349,42 +351,49 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
         return true;
     }
 
+    public static class WorkArea {
+
+        public String workArea;
+
+        public WorkArea(String workArea) {
+            this.workArea = workArea;
+        }
+
+    }
+
     public void onNewWorkAreasReturned(ArrayList<String> workAreas) {
         if (workAreas == null) workAreas = new ArrayList<>();
 
         showDialog("Updating Work Areas...", true);
 
-        // send the updates to the server
-        Map<String, Object> changes = new HashMap<>();
-        String params = "";
-        for (int i = 0; i < workAreas.size(); i++) {
-            if (i > 0) params += "&workAreas[]=";
-            params += workAreas.get(i);
-        }
-        changes.put("workAreas[]", params);
-        HomeFix.getAPI()
-                .updateTradesmanDetails(TradesmanController.getToken(), changes)
-                .enqueue(new Callback<Tradesman>() {
-                    @Override
-                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
-                        if (response == null || response.body() == null) {
-                            showErrorDialog();
-                            return;
-                        }
+        // convert to comma separated parameters
+        ToCommaParameters.run(new ToCommaParameters.ToCommaParametersCallback() {
+            @Override
+            public void onToCommaParametersCalled(String... s) {
+                HomeFix.getAPI().updateTradesmanWorkAreas2(TradesmanController.getToken(), s)
+                        .enqueue(new Callback<Tradesman>() {
+                            @Override
+                            public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
+                                if (response == null || response.body() == null) {
+                                    showErrorDialog();
+                                    return;
+                                }
 
-                        mCurrentTradesman = response.body();
-                        hideDialog();
-                        setupView();
-                    }
+                                mCurrentTradesman = response.body();
+                                hideDialog();
+                                setupView();
+                            }
 
-                    @Override
-                    public void onFailure(Call<Tradesman> call, Throwable t) {
-                        if (t != null && MyLog.isIsLogEnabled())
-                            t.printStackTrace();
+                            @Override
+                            public void onFailure(Call<Tradesman> call, Throwable t) {
+                                if (t != null && MyLog.isIsLogEnabled())
+                                    t.printStackTrace();
 
-                        showErrorDialog();
-                    }
-                });
+                                showErrorDialog();
+                            }
+                        });
+            }
+        }, workAreas);
     }
 
 }

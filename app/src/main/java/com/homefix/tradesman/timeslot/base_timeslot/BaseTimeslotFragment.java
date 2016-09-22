@@ -2,6 +2,7 @@ package com.homefix.tradesman.timeslot.base_timeslot;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -230,10 +231,19 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     @Override
-    public void onDeleteComplete() {
+    public void onDeleteComplete(Timeslot timeslot) {
         hideDialog();
 
-        getBaseActivity().finishWithAnimation();
+        if (timeslot == null) {
+            getBaseActivity().finishWithAnimation();
+            return;
+        }
+
+        Timeslot.getSenderReceiver().put(timeslot.getId(), timeslot);
+        Intent data = new Intent();
+        data.putExtra("timeslotId", timeslot.getId());
+        data.putExtra("deleted", true);
+        getBaseActivity().finishWithIntentAndAnimation(data);
     }
 
     @Override

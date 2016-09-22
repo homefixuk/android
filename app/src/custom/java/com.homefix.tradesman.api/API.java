@@ -15,13 +15,17 @@ import com.homefix.tradesman.model.TradesmanFinances;
 import com.homefix.tradesman.model.TradesmanNotification;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.model.TradesmanReview;
+import com.homefix.tradesman.profile.ProfileFragment;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.QueryParam;
+
 import retrofit2.Call;
 import retrofit2.http.DELETE;
+import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.PATCH;
@@ -61,6 +65,16 @@ public interface API {
     Call<Tradesman> updateTradesmanDetails(
             @Header("Authorization") String token,
             @QueryMap Map<String, Object> params);
+
+    @PATCH("tradesman/me")
+    Call<Tradesman> updateTradesmanWorkAreas(
+            @Header("Authorization") String token,
+            @Field("workAreas[]") List<ProfileFragment.WorkArea> workAreas);
+
+    @PATCH("tradesman/me")
+    Call<Tradesman> updateTradesmanWorkAreas2(
+            @Header("Authorization") String token,
+            @Query("workAreas[]") String... workArea);
 
     @GET("tradesman/me/private")
     Call<TradesmanPrivate> getTradesmanPrivate(

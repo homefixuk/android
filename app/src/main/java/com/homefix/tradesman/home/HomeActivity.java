@@ -23,15 +23,16 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.calendar.CalendarFragment;
 import com.homefix.tradesman.common.CheckatraderScraper;
+import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.home.home_fragment.HomeFragment;
+import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.profile.settings.SettingsActivity;
-import com.homefix.tradesman.profile.settings.SettingsFragment;
 import com.homefix.tradesman.recent_services.RecentServicesFragment;
 import com.homefix.tradesman.task.LogoutTask;
+import com.samdroid.common.IntentHelper;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
-import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 import com.samdroid.thread.MyThreadPool;
 
@@ -510,4 +511,21 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (calendarFragment != null && requestCode == Ids.TIMESLOT_CHANGE && resultCode == RESULT_OK && data != null) {
+            boolean deleted = data.getBooleanExtra("deleted", false);
+            if (deleted) {
+                String timeslotId = IntentHelper.getStringSafely(data, "timeslotId");
+                if (!Strings.isEmpty(timeslotId)) {
+                    Timeslot timeslot = Timeslot.getSenderReceiver().get(timeslotId);
+                    if (timeslot != null) {
+                        calendarFragment.removeTimeslot(timeslot);
+                    }
+                }
+            }
+        }
+    }
 }

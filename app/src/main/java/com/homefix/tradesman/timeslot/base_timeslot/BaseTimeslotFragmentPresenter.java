@@ -131,7 +131,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                                 // remove the original timeslot
                                 HomeFixCal.changeEvent(timeslot, null);
 
-                                getView().onDeleteComplete();
+                                getView().onDeleteComplete(timeslot);
                             }
 
                             @Override

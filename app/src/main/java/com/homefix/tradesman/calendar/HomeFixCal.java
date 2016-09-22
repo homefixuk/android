@@ -11,6 +11,7 @@ import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.network.NetworkManager;
+import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,7 +64,6 @@ public class HomeFixCal {
             if (timeslot == null) return false;
 
             List<Timeslot> evs = getEvents();
-
             if (evs == null) evs = new ArrayList<>();
 
             Calendar cal = Timeslot.getStartCalender(timeslot);
@@ -75,6 +75,10 @@ public class HomeFixCal {
                 evs.add(timeslot);
                 return true;
             }
+
+            // if it already exists, do not add it again
+            Timeslot ev = getFromId(timeslot.getId());
+            if (ev != null) return true;
 
             Timeslot temp;
             for (int i = 0; i < evs.size(); i++) {
@@ -89,7 +93,8 @@ public class HomeFixCal {
                 }
             }
 
-            evs.add(timeslot); // here in case it wasn't added
+            // add it normally otherwise
+            evs.add(timeslot);
             return true;
         }
 
@@ -98,25 +103,60 @@ public class HomeFixCal {
          *
          * @param original
          * @param changed
-         *
          * @return if the changed time slot was added
          */
         public boolean updateEvent(Timeslot original, Timeslot changed) {
             List<Timeslot> evs = getEvents();
-
             if (evs == null) {
-                if (changed != null) return addEvent(changed);
-                return false;
+                return changed != null && addEvent(changed);
             }
 
-            int index = original != null ? evs.indexOf(original) : -1;
-
-            if (index != -1) {
-                evs.remove(original);
-                if (changed != null) return addEvent(changed);
+            // if the original event does not already exist, add the changed one
+            Timeslot ev = getFromId(original.getId());
+            if (ev == null) {
+                addEvent(changed);
+                return true;
             }
+
+            evs.remove(ev); // remove the original event
+
+            // add the changed one in the appropriate place
+            if (changed != null) return addEvent(changed);
 
             return false;
+        }
+
+        /**
+         * Remove an event in the month
+         *
+         * @param original
+         * @return if the changed time slot was added
+         */
+        public boolean removeEvent(Timeslot original) {
+            List<Timeslot> evs = getEvents();
+            if (evs == null) return true;
+
+            if (original == null || Strings.isEmpty(original.getId())) return false;
+
+            Timeslot ev = getFromId(original.getId());
+            return ev != null && evs.remove(ev);
+        }
+
+        /**
+         * @param timeslotId
+         * @return the Timeslot from its ID
+         */
+        public Timeslot getFromId(String timeslotId) {
+            if (Strings.isEmpty(timeslotId)) return null;
+
+            List<Timeslot> evs = getEvents();
+            for (Timeslot ev : evs) {
+                if (ev == null) continue;
+
+                if (timeslotId.equals(ev.getId())) return ev;
+            }
+
+            return null;
         }
 
         public int getNumberEvents() {
@@ -321,6 +361,20 @@ public class HomeFixCal {
 
         CalendarFragment.setNeedsNotifying();
         return addEvent(changed);
+    }
+
+    /**
+     * Remove an event time slot
+     *
+     * @param original
+     * @return the month the remove time slot was in, or null if the timeslot was null
+     */
+    public static Month removeEvent(Timeslot original) {
+        Month month = getMonth(original);
+        if (month == null) return null;
+
+        if (month.removeEvent(original)) CalendarFragment.setNeedsNotifying();
+        return month;
     }
 
     public static void loadMonth(Context context, int year, int month, OnGetListListener<Timeslot> listener) {

@@ -39,6 +39,6 @@ public interface BaseTimeslotView extends BaseFragmentView {
 
     void onDeleteClicked();
 
-    void onDeleteComplete();
+    void onDeleteComplete(Timeslot timeslot);
 
 }
