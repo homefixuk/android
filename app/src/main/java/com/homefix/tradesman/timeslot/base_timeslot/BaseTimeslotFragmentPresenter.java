@@ -123,7 +123,37 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                                 }
 
                                 if (Timeslot.TYPE.OWN_JOB.name().equals(timeslot.getType()) && timeslot.getService() != null) {
-                                    // TODO: call deleteService
+                                    // call deleteService
+                                    HomeFix.getAPI().deleteService(TradesmanController.getToken(), timeslot.getId())
+                                            .enqueue(new Callback<Map<String, Object>>() {
+                                                @Override
+                                                public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                                                    Map<String, Object> map = response.body();
+
+                                                    if (map == null || !(boolean) map.get("success")) {
+                                                        onFailure(call, null);
+                                                        return;
+                                                    }
+
+                                                    MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
+
+                                                    // remove the original timeslot
+                                                    HomeFixCal.changeEvent(timeslot, null);
+
+                                                    getView().onDeleteComplete(timeslot);
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                                                    if (t != null && MyLog.isIsLogEnabled())
+                                                        t.printStackTrace();
+
+                                                    if (!isViewAttached()) return;
+
+                                                    getView().showErrorDialog();
+                                                }
+                                            });
+                                    return;
                                 }
 
                                 MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
@@ -139,8 +169,6 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                                 if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
 
                                 if (!isViewAttached()) return;
-
-                                // TODO: check error contents
 
                                 getView().showErrorDialog();
                             }

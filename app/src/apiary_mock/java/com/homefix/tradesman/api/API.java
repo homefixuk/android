@@ -73,6 +73,10 @@ public interface API {
             @Query("apikey") String apikey,
             @QueryMap Map<String, Object> params);
 
+    @GET("/tradesman/location")
+    Call<Timeslot> getCurrentLocation(
+            @Header("Authorization") String token);
+
     @POST("/tradesman/location")
     Call<Timeslot> updateLocation(
             @Header("Authorization") String token,
@@ -143,6 +147,11 @@ public interface API {
             @Path("serviceId") String timeslotId,
             @Header("Authorization") String token,
             @Query("changes") Map<String, Object> changes);
+
+    @DELETE("/service/{serviceId}")
+    Call<Map<String, Object>> deleteService(
+            @Header("Authorization") String token,
+            @Path("serviceId") String originalServiceId);
 
     @GET("/service/current")
     Call<Timeslot> getCurrentService(@Header("Authorization") String token);

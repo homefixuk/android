@@ -27,7 +27,9 @@ import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.network.NetworkManager;
 
@@ -44,7 +46,10 @@ import butterknife.BindView;
  * Created by samuel on 7/5/2016.
  */
 
-public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragment<A, CalendarView, CalendarPresenter> implements CalendarView, WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewClickListener {
+public class CalendarFragment<A extends HomeFixBaseActivity>
+        extends BaseFragment<A, CalendarView, CalendarPresenter>
+        implements CalendarView, WeekView.EventClickListener, MonthLoader.MonthChangeListener,
+        WeekView.EventLongPressListener, WeekView.EmptyViewClickListener {
 
     @BindView(R.id.cover)
     protected View mCover;
@@ -187,10 +192,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         if (BuildConfig.FLAVOR.equals("apiary_mock") && newMonth != 9)
             return new ArrayList<>(); // TODO: remove! This is used while testing with Apiary mock server
 
-        // if we have not yet fetched this month and we have a network connection
-        if (!monthsFromServer.get(HomeFixCal.getMonthKey(newYear, newMonth), false)
-                && NetworkManager.hasConnection(getContext())) {
-            monthsFromServer.append(HomeFixCal.getMonthKey(newYear, newMonth), true);
+        // if we have not yet fetched this month
+        if (!monthsFromServer.get(HomeFixCal.getMonthKey(newYear, newMonth), false)) {
+            monthsFromServer.put(HomeFixCal.getMonthKey(newYear, newMonth), true);
 
             HomeFixCal.loadMonth(getContext(), newYear, newMonth, new OnGetListListener<Timeslot>() {
                 @Override
@@ -210,7 +214,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity> extends BaseFragmen
         if (compactCalendarView != null) {
             List<Event> calendarEvents = getCalendarMonthEvents(events);
 
-            // remove the calendar events for this month
+            // remove the calendar events for this month to prevent duplicates from showing
             Calendar monthCal = Calendar.getInstance();
             monthCal.set(newYear, newMonth, 0, 0, 0, 0); // set to beginning of this month
             int monthLastDay = monthCal.getActualMaximum(Calendar.DAY_OF_MONTH);

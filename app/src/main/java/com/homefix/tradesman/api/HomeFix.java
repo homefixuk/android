@@ -1,5 +1,7 @@
 package com.homefix.tradesman.api;
 
+import android.support.annotation.NonNull;
+
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.model.Service;
@@ -215,11 +217,11 @@ public class HomeFix {
 
     public static class TimeslotMap extends HashMap<String, Object> {
 
-        public TimeslotMap(long startTimeInMillis, long endTimeInMillis, boolean isAvailable, Timeslot.TYPE type) {
+        public TimeslotMap(long startTimeInMillis, long endTimeInMillis, boolean isAvailable, @NonNull Timeslot.TYPE type) {
             put("start", "" + startTimeInMillis);
             put("end", "" + endTimeInMillis);
             put("isAvailable", isAvailable);
-            put("type", type.name());
+            put("type", type.name().toLowerCase());
             init(startTimeInMillis, endTimeInMillis);
         }
 
@@ -227,7 +229,7 @@ public class HomeFix {
             put("start", "" + startTimeInMillis);
             put("end", "" + endTimeInMillis);
             put("isAvailable", false);
-            put("type", Timeslot.TYPE.OWN_JOB.name());
+            put("type", Timeslot.TYPE.OWN_JOB.name().toLowerCase());
             put("service", service != null ? service.getId() : "");
             init(startTimeInMillis, endTimeInMillis);
         }

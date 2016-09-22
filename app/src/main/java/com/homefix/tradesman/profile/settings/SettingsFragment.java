@@ -176,8 +176,11 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
 
         @Override
         public void onFailure(Call<TradesmanPrivate> call, Throwable t) {
-            if (t != null && MyLog.isIsLogEnabled())
-                t.printStackTrace();
+            if (t != null) {
+                if (MyLog.isIsLogEnabled()) t.printStackTrace();
+
+                MyLog.e(TAG, t.getMessage());
+            }
 
             showErrorDialog();
         }

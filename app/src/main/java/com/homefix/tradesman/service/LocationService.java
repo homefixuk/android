@@ -234,6 +234,24 @@ public class LocationService extends Service {
         arrOnNewLocationListener.clear();
     }
 
+    private static String getDetectedActivtyName(DetectedActivity detectedActivity) {
+        String s = DetectedActivity.zzhR(detectedActivity.getType());
+
+        switch (s) {
+            case "IN_VEHICLE":
+                return "in_vehicle";
+            case "STILL":
+                return "still";
+            case "WALKING":
+            case "ON_FOOT":
+                return "walking";
+            case "RUNNING":
+                return "running";
+            default:
+                return "unknown";
+        }
+    }
+
     /**
      * Called after the new location received
      */
@@ -246,7 +264,7 @@ public class LocationService extends Service {
             locationMap.put("longitude", location.getLongitude());
 
             if (currentActivity != null)
-                locationMap.put("activity", currentActivity.toString().toLowerCase());
+                locationMap.put("activity", getDetectedActivtyName(currentActivity));
 
             Callback<Timeslot> callback = new Callback<Timeslot>() {
                 @Override
