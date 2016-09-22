@@ -142,17 +142,20 @@ public class EditListActivity extends BaseToolbarActivity<BaseToolbarActivityVie
 
             @Override
             public void add(String object) {
+                object = Strings.returnSafely(object).trim();
+
                 if (Strings.isEmpty(object)) return;
 
                 // do not add duplicates
                 for (int i = 0, len = mAdapter.getCount(); i < len; i++) {
-                    if (object.equals(mAdapter.getItem(i))) return;
+                    if (object.equalsIgnoreCase(mAdapter.getItem(i))) return;
                 }
 
                 super.add(object);
             }
 
         };
+
         mListView.setAdapter(mAdapter);
     }
 
