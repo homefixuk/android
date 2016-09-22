@@ -26,6 +26,7 @@ import com.homefix.tradesman.common.CheckatraderScraper;
 import com.homefix.tradesman.home.home_fragment.HomeFragment;
 import com.homefix.tradesman.profile.settings.SettingsActivity;
 import com.homefix.tradesman.profile.settings.SettingsFragment;
+import com.homefix.tradesman.recent_services.RecentServicesFragment;
 import com.homefix.tradesman.task.LogoutTask;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
@@ -50,6 +51,7 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     private int mCurrentPage;
     private HomeFragment homeFragment;
     private CalendarFragment<HomeActivity> calendarFragment;
+    private RecentServicesFragment<HomeActivity> recentServicesFragment;
 
     // internet
     public static int TYPE_WIFI = 1, TYPE_MOBILE = 2, TYPE_NOT_CONNECTED = 0;
@@ -112,7 +114,7 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             return true;
 
         } else if (name.equals(getString(R.string.action_recent))) {
-//            scrape();
+            showRecentJobs();
             return true;
 
         } else if (name.equals(getString(R.string.action_help))) {
@@ -275,6 +277,15 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             }
         });
 
+        supportInvalidateOptionsMenu();
+    }
+
+    private void showRecentJobs() {
+        if (recentServicesFragment == null) recentServicesFragment = new RecentServicesFragment<>();
+
+        replaceFragment(recentServicesFragment);
+        setCurrentPage(R.string.action_recent_jobs);
+        resetActionBarTitle();
         supportInvalidateOptionsMenu();
     }
 

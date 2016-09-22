@@ -18,7 +18,6 @@ import com.homefix.tradesman.base.activity.BaseToolbarActivity;
 import com.homefix.tradesman.base.adapter.MyListAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.data.TradesmanController;
-import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.MyLog;
@@ -50,13 +49,11 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
 
     protected ArrayAdapter<String> mAdapter;
 
-    protected Tradesman tradesman;
     protected TradesmanPrivate tradesmanPrivate;
 
     public SettingsFragment() {
         super(SettingsFragment.class.getSimpleName());
     }
-
 
     @Override
     protected SettingsPresenter getPresenter() {
@@ -153,8 +150,38 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
         };
         mListView.setAdapter(mAdapter);
 
-        refreshView();
+        TradesmanController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
+            @Override
+            public void onGotThing(TradesmanPrivate o) {
+                tradesmanPrivate = o;
+
+                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+            }
+        });
     }
+
+    private final Callback<TradesmanPrivate> privateCallback = new Callback<TradesmanPrivate>() {
+        @Override
+        public void onResponse(Call<TradesmanPrivate> call, Response<TradesmanPrivate> response) {
+            TradesmanPrivate tp = response != null ? response.body() : null;
+            if (tp == null) {
+                showErrorDialog();
+                return;
+            }
+
+            tradesmanPrivate = tp;
+            if (mAdapter != null) mAdapter.notifyDataSetChanged();
+            hideDialog();
+        }
+
+        @Override
+        public void onFailure(Call<TradesmanPrivate> call, Throwable t) {
+            if (t != null && MyLog.isIsLogEnabled())
+                t.printStackTrace();
+
+            showErrorDialog();
+        }
+    };
 
     private void onStandardHourlyRateClicked() {
         MaterialDialogWrapper.getEditTextDialog(
@@ -204,26 +231,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                         TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
-                                .enqueue(new Callback<Tradesman>() {
-                                    @Override
-                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
-                                        if (response == null || response.body() == null) {
-                                            showErrorDialog();
-                                            return;
-                                        }
-
-                                        hideDialog();
-                                        refreshView();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Tradesman> call, Throwable t) {
-                                        if (t != null && MyLog.isIsLogEnabled())
-                                            t.printStackTrace();
-
-                                        showErrorDialog();
-                                    }
-                                });
+                                .enqueue(privateCallback);
                     }
 
                     @Override
@@ -275,26 +283,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                         TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
-                                .enqueue(new Callback<Tradesman>() {
-                                    @Override
-                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
-                                        if (response == null || response.body() == null) {
-                                            showErrorDialog();
-                                            return;
-                                        }
-
-                                        hideDialog();
-                                        refreshView();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Tradesman> call, Throwable t) {
-                                        if (t != null && MyLog.isIsLogEnabled())
-                                            t.printStackTrace();
-
-                                        showErrorDialog();
-                                    }
-                                });
+                                .enqueue(privateCallback);
                     }
 
                     @Override
@@ -361,26 +350,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                         TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
-                                .enqueue(new Callback<Tradesman>() {
-                                    @Override
-                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
-                                        if (response == null || response.body() == null) {
-                                            showErrorDialog();
-                                            return;
-                                        }
-
-                                        hideDialog();
-                                        refreshView();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Tradesman> call, Throwable t) {
-                                        if (t != null && MyLog.isIsLogEnabled())
-                                            t.printStackTrace();
-
-                                        showErrorDialog();
-                                    }
-                                });
+                                .enqueue(privateCallback);
                     }
                 }
 
@@ -429,26 +399,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                         TradesmanController.getToken(),
                                         getString(HomeFix.API_KEY_resId),
                                         changes)
-                                .enqueue(new Callback<Tradesman>() {
-                                    @Override
-                                    public void onResponse(Call<Tradesman> call, Response<Tradesman> response) {
-                                        if (response == null || response.body() == null) {
-                                            showErrorDialog();
-                                            return;
-                                        }
-
-                                        hideDialog();
-                                        refreshView();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Tradesman> call, Throwable t) {
-                                        if (t != null && MyLog.isIsLogEnabled())
-                                            t.printStackTrace();
-
-                                        showErrorDialog();
-                                    }
-                                });
+                                .enqueue(privateCallback);
                     }
 
                     @Override
@@ -456,26 +407,6 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                     }
 
                 }).show();
-    }
-
-    private void refreshView() {
-        TradesmanController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
-            @Override
-            public void onGotThing(Tradesman o) {
-                tradesman = o;
-
-                if (mAdapter != null) mAdapter.notifyDataSetChanged();
-            }
-        });
-
-        TradesmanController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
-            @Override
-            public void onGotThing(TradesmanPrivate o) {
-                tradesmanPrivate = o;
-
-                if (mAdapter != null) mAdapter.notifyDataSetChanged();
-            }
-        });
     }
 
 }

@@ -1,19 +1,28 @@
 package com.homefix.tradesman.model;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class Location extends BaseModel {
+public class Location extends JSONObject {
 
-    private double latitude, longitude;
+    public double getDoubleSafely(String name) {
+        try {
+            return getDouble(name);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 
     public double getLatitude() {
-        return latitude;
+        return getDoubleSafely("latitude");
     }
 
     public double getLongitude() {
-        return longitude;
+        return getDoubleSafely("longitude");
     }
 
 }

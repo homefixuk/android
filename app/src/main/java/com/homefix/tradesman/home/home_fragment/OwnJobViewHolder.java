@@ -94,8 +94,8 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
             startDateTime += TimeUtils.getShortTimeString(timeslot.getStart());
             startDateTimeView.setText(startDateTime);
 
-            if (timeslot.getLength() > 0) {
-                String duration = TimeUtils.formatShortDateToHoursMinutes((int) timeslot.getLength());
+            if (timeslot.getSlotLength() > 0) {
+                String duration = TimeUtils.formatShortDateToHoursMinutes(timeslot.getSlotLength());
 
                 if (Strings.isEmpty(startDateTime)) startDateTimeView.setText(duration);
                 else durationView.setText(duration);

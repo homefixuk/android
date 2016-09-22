@@ -2,8 +2,10 @@ package com.homefix.tradesman.api;
 
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.MyLog;
+import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
 
 import org.json.JSONException;
@@ -213,11 +215,25 @@ public class HomeFix {
 
     public static class TimeslotMap extends HashMap<String, Object> {
 
-        public TimeslotMap(long start_time, long end_time, boolean is_available, Timeslot.TYPE type) {
-            put("start_time", "" + start_time);
-            put("end_time", "" + end_time);
-            put("is_available", is_available);
+        public TimeslotMap(long startTimeInMillis, long endTimeInMillis, boolean isAvailable, Timeslot.TYPE type) {
+            put("start", "" + startTimeInMillis);
+            put("end", "" + endTimeInMillis);
+            put("isAvailable", isAvailable);
             put("type", type.name());
+            init(startTimeInMillis, endTimeInMillis);
+        }
+
+        public TimeslotMap(long startTimeInMillis, long endTimeInMillis, Service service) {
+            put("start", "" + startTimeInMillis);
+            put("end", "" + endTimeInMillis);
+            put("isAvailable", false);
+            put("type", Timeslot.TYPE.OWN_JOB.name());
+            put("service", service != null ? service.getId() : "");
+            init(startTimeInMillis, endTimeInMillis);
+        }
+
+        public void init(long startTimeInMillis, long endTimeInMillis) {
+            put("slotLength", TimeUtils.getMillisInMinutes(endTimeInMillis - startTimeInMillis));
         }
     }
 

@@ -55,8 +55,7 @@ public class TimeUtils {
         return "" + hours + " HOURS " + minutes + " MINUTES " + seconds + " SECONDS";
     }
 
-    public static String formatShortDateToHoursMinutes(int mins) {
-        long millis = TimeUtils.getMinutesInMillis(mins);
+    public static String formatShortDateToHoursMinutes(long millis) {
         int minutes = (int) ((millis / (1000 * 60)) % 60);
         int hours = (int) ((millis / (1000 * 60 * 60)) % 24);
 

@@ -17,8 +17,8 @@ public class Tradesman extends BaseModel {
     private String type, picture;
     private double rating, experience;
     private List<String> workAreas;
-    private Location currentLocation;
     private String settings;
+//    private TradesmanLocation currentLocation;
 
     public Tradesman() {
         super();
@@ -54,10 +54,6 @@ public class Tradesman extends BaseModel {
         return workAreas;
     }
 
-    public Location getCurrentLocation() {
-        return currentLocation;
-    }
-
     public String getSettings() {
         return Strings.returnSafely(settings);
     }
@@ -82,11 +78,15 @@ public class Tradesman extends BaseModel {
         this.workAreas = workAreas;
     }
 
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
-    }
-
     public void setSettings(String settings) {
         this.settings = settings;
     }
+
+//    public TradesmanLocation getCurrentLocation() {
+//        return currentLocation;
+//    }
+//
+//    public void setCurrentLocation(TradesmanLocation currentLocation) {
+//        this.currentLocation = currentLocation;
+//    }
 }

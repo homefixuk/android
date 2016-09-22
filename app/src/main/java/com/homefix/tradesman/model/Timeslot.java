@@ -40,7 +40,7 @@ public class Timeslot extends BaseModel {
 
     }
 
-    private long start, end, length;
+    private long start, end, slotLength;
     private String type;
     private Tradesman tradesman;
     private Service service;
@@ -54,8 +54,8 @@ public class Timeslot extends BaseModel {
         return end;
     }
 
-    public long getLength() {
-        return length;
+    public long getSlotLength() {
+        return slotLength;
     }
 
     public String getType() {
@@ -78,8 +78,8 @@ public class Timeslot extends BaseModel {
         this.end = end;
     }
 
-    public void setLength(long length) {
-        this.length = length;
+    public void setSlotLength(long slotLength) {
+        this.slotLength = slotLength;
     }
 
     public void setType(String type) {

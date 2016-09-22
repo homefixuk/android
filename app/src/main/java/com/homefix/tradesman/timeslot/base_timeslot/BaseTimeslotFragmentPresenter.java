@@ -54,7 +54,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
             public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
                 Timeslot ts = response.body();
 
-                if (ts == null) {
+                if (ts == null || ts.getType().isEmpty() || ts.getStart() == 0 || ts.getEnd() == 0) {
                     onFailure(call, null);
                     return;
                 }
@@ -120,6 +120,10 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                                 if (map == null || !(boolean) map.get("success")) {
                                     onFailure(call, null);
                                     return;
+                                }
+
+                                if (Timeslot.TYPE.OWN_JOB.name().equals(timeslot.getType()) && timeslot.getService() != null) {
+                                    // TODO: call deleteService
                                 }
 
                                 MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);

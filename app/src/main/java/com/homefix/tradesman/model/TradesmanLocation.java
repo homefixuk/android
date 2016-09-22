@@ -1,15 +1,18 @@
 package com.homefix.tradesman.model;
 
+import com.samdroid.string.Strings;
+
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanLocation extends Location {
+public class TradesmanLocation {
 
     private Tradesman tradesman;
     private boolean isGoingToJob;
     private long timestmap;
     private String activity;
+    private Location location;
 
     public Tradesman getTradesman() {
         return tradesman;
@@ -36,10 +39,18 @@ public class TradesmanLocation extends Location {
     }
 
     public String getActivity() {
-        return activity;
+        return Strings.returnSafely(activity);
     }
 
     public void setActivity(String activity) {
         this.activity = activity;
+    }
+
+    public Location getLocation() {
+        return location != null ? location : new Location();
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

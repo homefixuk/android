@@ -245,7 +245,8 @@ public class LocationService extends Service {
             locationMap.put("latitude", location.getLatitude());
             locationMap.put("longitude", location.getLongitude());
 
-            if (currentActivity != null) locationMap.put("activity", currentActivity.toString());
+            if (currentActivity != null)
+                locationMap.put("activity", currentActivity.toString().toLowerCase());
 
             Callback<Timeslot> callback = new Callback<Timeslot>() {
                 @Override

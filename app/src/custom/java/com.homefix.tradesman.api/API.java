@@ -68,7 +68,7 @@ public interface API {
             @Header("Authorization") String token);
 
     @PATCH("tradesman/me/private")
-    Call<Tradesman> updateTradesmanPrivateDetails(
+    Call<TradesmanPrivate> updateTradesmanPrivateDetails(
             @Header("Authorization") String token,
             @Query("apikey") String apikey,
             @QueryMap Map<String, Object> params);

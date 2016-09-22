@@ -41,34 +41,24 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
         getView().showDialog("Creating new job...", true);
 
-        Callback<Service> callback = new Callback<Service>() {
+        Callback<Service> serviceCallback = new Callback<Service>() {
             @Override
             public void onResponse(Call<Service> call, Response<Service> response) {
                 Service service = response.body();
 
+                // if no service was created, handle it as an error
                 if (service == null) {
                     onFailure(call, null);
                     return;
                 }
 
-                // update the service in the timeslot being shown
-                Timeslot timeslot = getView().getTimeslot();
-
-                if (timeslot == null) timeslot = new Timeslot();
-
-                timeslot.setStart(getView().getStartTime().getTimeInMillis());
-                timeslot.setEnd(getView().getEndTime().getTimeInMillis());
-                timeslot.setLength(getView().getEndTime().getTimeInMillis() - getView().getStartTime().getTimeInMillis());
-                timeslot.setTradesman(TradesmanController.getCurrentTradesman());
-                timeslot.setType(Timeslot.TYPE.OWN_JOB.getName());
-                timeslot.setService(service);
-
-                // update the view
-                getView().setTimeslot(timeslot);
-                getView().setEditing(false);
-                getView().setupView();
-
-                getView().hideDialog();
+                // now create the Timeslot for the service
+                HomeFix.getAPI().addTimeslot(TradesmanController.getToken(),
+                        new HomeFix.TimeslotMap(
+                                getView().getStartTime().getTimeInMillis(),
+                                getView().getEndTime().getTimeInMillis(),
+                                service))
+                        .enqueue(new TimeslotCallback(service));
             }
 
             @Override
@@ -94,15 +84,52 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
                 jobType,
                 start.getTimeInMillis(),
                 end.getTimeInMillis(),
-                Strings.returnSafely(description)).enqueue(callback);
+                Strings.returnSafely(description))
+                .enqueue(serviceCallback);
     }
 
+    public class TimeslotCallback implements Callback<Timeslot> {
+        private Service service;
+
+        public TimeslotCallback(Service service) {
+            this.service = service;
+        }
+
+        @Override
+        public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
+            Timeslot timeslot = response.body();
+
+            if (timeslot == null) {
+                onFailure(call, null);
+                return;
+            }
+
+            // update the view
+            getView().setTimeslot(timeslot);
+            getView().setEditing(false);
+            getView().setupView();
+
+            getView().hideDialog();
+        }
+
+        @Override
+        public void onFailure(Call<Timeslot> call, Throwable t) {
+            getView().showDialog("Sorry, something went wrong", false);
+        }
+    }
+
+
     public void updateJob(
-            Timeslot originalTimeslot, Calendar start, Calendar end, String jobType, String addressLine1, String addressLine2,
+            final Timeslot originalTimeslot, final Calendar start, final Calendar end, String jobType, String addressLine1, String addressLine2,
             String addressLine3, String postcode, String country, Double latitude, Double longitude,
             String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description) {
 
         if (!isViewAttached()) return;
+
+        if (originalTimeslot == null) {
+            getView().showDialog("Unable to update your job...", false);
+            return;
+        }
 
         getView().showDialog("Updating job...", true);
 
@@ -116,23 +143,14 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
                     return;
                 }
 
-                Timeslot timeslot = getView().getTimeslot();
-
-                if (timeslot == null) timeslot = new Timeslot();
-
-                timeslot.setStart(getView().getStartTime().getTimeInMillis());
-                timeslot.setEnd(getView().getEndTime().getTimeInMillis());
-                timeslot.setLength(getView().getEndTime().getTimeInMillis() - getView().getStartTime().getTimeInMillis());
-                timeslot.setTradesman(TradesmanController.getCurrentTradesman());
-                timeslot.setType(Timeslot.TYPE.OWN_JOB.getName());
-                timeslot.setService(service);
-
-                // update the view
-                getView().setTimeslot(timeslot);
-                getView().setEditing(false);
-                getView().setupView();
-
-                getView().hideDialog();
+                // now update the Timeslot for the service
+                HomeFix.getAPI().updateTimeslot(TradesmanController.getToken(),
+                        originalTimeslot.getId(),
+                        new HomeFix.TimeslotMap(
+                                start.getTimeInMillis(),
+                                end.getTimeInMillis(),
+                                service))
+                        .enqueue(new TimeslotCallback(service));
             }
 
             @Override
@@ -143,7 +161,6 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
                 getView().setEditing(false);
                 getView().setupView();
-                getView().hideDialog();
             }
         };
 
@@ -202,7 +219,6 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
                 originalTimeslot.getId(),
                 TradesmanController.getToken(),
                 changes);
-
         call.enqueue(callback);
     }
 
