@@ -113,6 +113,11 @@ public class Timeslot extends BaseModel {
         for (int i = 0; i < list.size(); i++) {
             t = list.get(i);
 
+            if (t == null) {
+                MyLog.e("Timeslot", i + ": is NULL");
+                continue;
+            }
+
             Date d = new Date();
             d.setTime(t.getStart());
             String start = TimeUtils.formatDataFormal(d) + " " + TimeUtils.formatDateToHoursMinutes(t.getStart());

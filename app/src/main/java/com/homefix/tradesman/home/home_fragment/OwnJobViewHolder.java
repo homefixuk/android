@@ -1,6 +1,7 @@
 package com.homefix.tradesman.home.home_fragment;
 
 import android.app.Activity;
+import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -97,8 +98,13 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
             if (timeslot.getSlotLength() > 0) {
                 String duration = TimeUtils.formatShortDateToHoursMinutes(timeslot.getSlotLength());
 
-                if (Strings.isEmpty(startDateTime)) startDateTimeView.setText(duration);
-                else durationView.setText(duration);
+                if ("0 mins".equals(duration)) {
+                    durationView.setText("NOW");
+
+                } else {
+                    if (Strings.isEmpty(startDateTime)) startDateTimeView.setText(duration);
+                    else durationView.setText(duration);
+                }
             }
         }
 

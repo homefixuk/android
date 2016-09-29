@@ -130,7 +130,11 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                             mPersonPhoneNumberTxt.setText(user.getMobile());
                     }
 
-                    if (mJobTypeTxt != null) mJobTypeTxt.setText(service.getServiceType());
+                    if (mJobTypeTxt != null) {
+                        Problem problem = service.getProblem();
+                        if (problem != null) mJobTypeTxt.setText(problem.getName());
+                        else mJobTypeTxt.setText(service.getServiceType());
+                    }
                 }
 
                 if (mDescriptionTxt != null) mDescriptionTxt.setText(service.getTradesmanNotes());
@@ -142,6 +146,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
         ViewUtils.setEditTextEditable(mPersonEmailTxt, isEdit);
         ViewUtils.setEditTextEditable(mPersonPhoneNumberTxt, isEdit);
         ViewUtils.setEditTextEditable(mDescriptionTxt, isEdit);
+        ViewUtils.setEditTextEditable(mJobTypeTxt, isEdit);
 
         // if not in edit mode
         if (!isEdit) {

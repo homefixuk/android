@@ -76,7 +76,7 @@ public class TimeslotActivity extends BaseCloseActivity {
 
         updateActionBarTitle();
 
-        // setup and show the fragmentgit
+        // setup and show the fragment
         replaceFragment(baseFragment);
     }
 

@@ -151,7 +151,7 @@ public interface API {
     Call<Service> updateService(
             @Path("serviceId") String timeslotId,
             @Header("Authorization") String token,
-            @Query("changes") Map<String, Object> changes);
+            @QueryMap Map<String, Object> changes);
 
     @DELETE("/service/{serviceId}")
     Call<Map<String, Object>> deleteService(

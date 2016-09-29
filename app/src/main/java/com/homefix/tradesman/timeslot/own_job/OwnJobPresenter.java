@@ -206,17 +206,12 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
             if (problem != null && !problem.getName().equals(jobType))
                 changes.put("problemName", jobType);
 
-            if (start.getTimeInMillis() > 0 && originalTimeslot.getStart() != start.getTimeInMillis())
-                changes.put("startTime", start.getTimeInMillis());
-            if (end.getTimeInMillis() > 0 && originalTimeslot.getEnd() != end.getTimeInMillis())
-                changes.put("endTime", end.getTimeInMillis());
-
             if (!service.getTradesmanNotes().equals(description))
                 changes.put("tradesmanNotes", description);
         }
 
         Call<Service> call = HomeFix.getAPI().updateService(
-                originalTimeslot.getId(),
+                originalTimeslot.getService().getId(),
                 TradesmanController.getToken(),
                 changes);
         call.enqueue(callback);

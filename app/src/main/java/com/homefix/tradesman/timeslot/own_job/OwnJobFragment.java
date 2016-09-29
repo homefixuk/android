@@ -12,6 +12,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.pdf.PdfViewActivity;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
@@ -76,10 +77,9 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     public void setupView() {
         super.setupView();
 
-        if (mTimeslot != null) {
-            Service service = mTimeslot.getService();
-            ServiceSet serviceSet = service != null ? service.getServiceSet() : null;
-
+        Service service = mTimeslot != null ? mTimeslot.getService() : null;
+        if (service != null) {
+            ServiceSet serviceSet = service.getServiceSet();
             if (serviceSet != null) {
                 if (mChargesTxt != null) {
                     mChargesTxt.setText(HtmlHelper.fromHtml("£" + Strings.priceToString(serviceSet.getTotalCost()) + " total"));
@@ -149,11 +149,6 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                 Toast.makeText(getContext(), "Job is empty", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            // go back into viewing mode
-            setEditing(false);
-            setupView();
-            return;
         }
 
         // if the user is creating a new job

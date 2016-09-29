@@ -2,6 +2,8 @@ package com.homefix.tradesman.model;
 
 import com.samdroid.string.Strings;
 
+import java.util.Map;
+
 /**
  * Created by samuel on 7/27/2016.
  */
@@ -37,5 +39,15 @@ public class Payment extends BaseModel {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        if (serviceSet != null && !Strings.isEmpty(serviceSet.getId()))
+            map.put("serviceSet", serviceSet.getId());
+        map.put("amount", getAmount());
+        map.put("type", getType());
+        return map;
     }
 }

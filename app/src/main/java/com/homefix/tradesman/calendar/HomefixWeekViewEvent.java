@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.alamkanak.weekview.WeekViewEvent;
 import com.homefix.tradesman.model.Problem;
+import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
@@ -58,9 +59,13 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
                 else setName("Homefix");
                 break;
             case OWN_JOB:
-                if (timeslot.getService() != null) {
-                    String serviceType = timeslot.getService().getServiceType();
-                    if (!Strings.isEmpty(serviceType)) setName(serviceType);
+                Service service = timeslot.getService();
+                if (service != null) {
+                    Problem problem = service.getProblem();
+                    if (problem != null && !Strings.isEmpty(problem.getName()))
+                        setName(problem.getName());
+                    else if (!Strings.isEmpty(service.getServiceType()))
+                        setName(service.getServiceType());
                     else setName(timeslot.getService().getId());
 
                 } else {

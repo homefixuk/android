@@ -279,9 +279,9 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
 
         // send the request to the server
         if (originalCharge == null) {
-            HomeFix.getAPI().addCharge(TradesmanController.getToken(), newCharge).enqueue(callback);
+            HomeFix.getAPI().addCharge(TradesmanController.getToken(), newCharge.toMap()).enqueue(callback);
         } else {
-            HomeFix.getAPI().updateCharge(TradesmanController.getToken(), originalCharge.getId(), newCharge).enqueue(callback);
+            HomeFix.getAPI().updateCharge(TradesmanController.getToken(), originalCharge.getId(), newCharge.toMap()).enqueue(callback);
         }
 
         return true;

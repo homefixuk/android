@@ -12,7 +12,11 @@ import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.samdroid.common.IntentHelper;
+import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -116,6 +120,8 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         if (currentJobLayout == null) return;
 
         if (currentTimeslot == null || currentTimeslot.isEmpty()) {
+            if (MyLog.isIsLogEnabled())
+                Timeslot.printList(Collections.singletonList(currentTimeslot));
             currentJobLayout.setVisibility(View.GONE);
             currentJobView.setVisibility(View.GONE);
             return;
@@ -136,6 +142,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         if (nextJobLayout == null) return;
 
         if (nextTimeslot == null || nextTimeslot.isEmpty()) {
+            if (MyLog.isIsLogEnabled()) Timeslot.printList(Collections.singletonList(nextTimeslot));
             nextJobLayout.setVisibility(View.GONE);
             nextJobView.setVisibility(View.GONE);
             return;

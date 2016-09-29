@@ -135,7 +135,7 @@ public interface API {
     @GET("services")
     Call<List<Service>> getServices(
             @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
+            @QueryMap Map<String, Object> filter);
 
     @POST("services")
     Call<Service> createService(
@@ -165,7 +165,7 @@ public interface API {
     Call<Service> updateService(
             @Path("serviceId") String timeslotId,
             @Header("Authorization") String token,
-            @Query("changes") Map<String, Object> changes);
+            @QueryMap Map<String, Object> changes);
 
     @DELETE("service/{serviceId}")
     Call<Map<String, Object>> deleteService(
@@ -213,13 +213,13 @@ public interface API {
     @POST("charge")
     Call<Charge> addCharge(
             @Header("Authorization") String token,
-            @Query("charge") Charge charge);
+            @QueryMap Map<String, Object> charge);
 
     @PATCH("charge/{chargeId}")
     Call<Charge> updateCharge(
             @Header("Authorization") String token,
             @Path("chargeId") String originalChargeId,
-            @Query("charge") Charge charge);
+            @QueryMap Map<String, Object> charge);
 
     @DELETE("charge/{chargeId}")
     Call<Map<String, Object>> deleteCharge(
@@ -229,13 +229,13 @@ public interface API {
     @POST("payment")
     Call<Payment> addPayment(
             @Header("Authorization") String token,
-            @Query("payment") Payment payment);
+            @QueryMap Map<String, Object> payment);
 
     @PATCH("payment/{paymentId}")
     Call<Payment> updatePayment(
             @Header("Authorization") String token,
             @Path("paymentId") String originalPaymentId,
-            @Query("payment") Payment payment);
+            @QueryMap Map<String, Object> payment);
 
     @DELETE("payment/{paymentId}")
     Call<Map<String, Object>> deletePayment(

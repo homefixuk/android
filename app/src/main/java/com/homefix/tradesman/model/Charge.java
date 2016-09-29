@@ -2,13 +2,14 @@ package com.homefix.tradesman.model;
 
 import com.samdroid.string.Strings;
 
+import java.util.Map;
+
 /**
  * Created by samuel on 7/27/2016.
  */
 
 public class Charge extends BaseModel {
 
-    private String id;
     private Service service;
     private double amount = 0;
     private String description; // labour/part/other
@@ -18,14 +19,6 @@ public class Charge extends BaseModel {
     private boolean markupBeforeVat = false;
 
     public Charge() {
-    }
-
-    public String getId() {
-        return Strings.returnSafely(id);
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Service getService() {
@@ -103,6 +96,19 @@ public class Charge extends BaseModel {
     @Override
     public boolean equals(Object o) {
         return super.equals(o) || (o != null && o instanceof Charge && getId().equals(((Charge) o).getId()));
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        if (service != null && !Strings.isEmpty(service.getId())) map.put("service", service.getId());
+        map.put("amount", getAmount());
+        if (!Strings.isEmpty(description)) map.put("description", description);
+        map.put("quantity", getQuantity());
+        map.put("withVat", isWithVat());
+        map.put("markup", getMarkup());
+        map.put("markupBeforeVat", isMarkupBeforeVat());
+        return map;
     }
 
 }

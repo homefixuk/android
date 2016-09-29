@@ -201,11 +201,11 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
                 if (BuildConfig.DEBUG && t != null) t.printStackTrace();
 
                 hideDialog();
-                Toast.makeText(getContext(), "Sorry, unable to remove the charge right now. Please try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Sorry, unable to remove the payment right now. Please try again", Toast.LENGTH_SHORT).show();
             }
         };
 
-        HomeFix.getAPI().deleteCharge(TradesmanController.getToken(), payment.getId()).enqueue(callback);
+        HomeFix.getAPI().deletePayment(TradesmanController.getToken(), payment.getId()).enqueue(callback);
     }
 
     @Override
@@ -291,9 +291,9 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
 
         // send the request to the server
         if (originalPayment == null) {
-            HomeFix.getAPI().addPayment(TradesmanController.getToken(), newPayment).enqueue(callback);
+            HomeFix.getAPI().addPayment(TradesmanController.getToken(), newPayment.toMap()).enqueue(callback);
         } else {
-            HomeFix.getAPI().updatePayment(TradesmanController.getToken(), originalPayment.getId(), newPayment).enqueue(callback);
+            HomeFix.getAPI().updatePayment(TradesmanController.getToken(), originalPayment.getId(), newPayment.toMap()).enqueue(callback);
         }
 
         return true;
