@@ -122,32 +122,32 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
         super.onResume();
         getPresenter().onResume();
 
-        // make sure we have the CCA
-        if (checkCCA && mCca == null) {
-            Callback<CCA> callback = new Callback<CCA>() {
-
-                @Override
-                public void onResponse(Call<CCA> call, Response<CCA> response) {
-                    mCca = response != null ? response.body() : null;
-
-                    if (mCca == null) mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
-
-                    onGotThing(mCca);
-                }
-
-                @Override
-                public void onFailure(Call<CCA> call, Throwable t) {
-                    if (MyLog.isIsLogEnabled()) t.printStackTrace();
-
-                    // if it fails, get the cca from the cache
-                    mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
-                    onGotThing(mCca);
-                }
-
-            };
-
-            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY_resId), TradesmanController.getToken()).enqueue(callback);
-        }
+//        // make sure we have the CCA
+//        if (checkCCA && mCca == null) {
+//            Callback<CCA> callback = new Callback<CCA>() {
+//
+//                @Override
+//                public void onResponse(Call<CCA> call, Response<CCA> response) {
+//                    mCca = response != null ? response.body() : null;
+//
+//                    if (mCca == null) mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
+//
+//                    onGotThing(mCca);
+//                }
+//
+//                @Override
+//                public void onFailure(Call<CCA> call, Throwable t) {
+//                    if (MyLog.isIsLogEnabled()) t.printStackTrace();
+//
+//                    // if it fails, get the cca from the cache
+//                    mCca = CacheUtils.readObjectFile("my_cca", CCA.class);
+//                    onGotThing(mCca);
+//                }
+//
+//            };
+//
+//            HomeFix.getAPI().getCCA(getString(HomeFix.API_KEY_resId), TradesmanController.getToken()).enqueue(callback);
+//        }
 
         if (checkPermissions && !calledPermissionResult) {
             new Handler().postDelayed(new Runnable() {

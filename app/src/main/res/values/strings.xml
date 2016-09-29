@@ -73,6 +73,9 @@
     <string name="customer_email">Customer Email</string>
     <string name="customer_phone_number">Customer Phone Number</string>
     <string name="customer_property_relationship">Customer Property Relationship</string>
+    <string name="add_availability">Add Availability</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="add_own_job">Add Own Job</string>
 
     <string-array name="payment_types">
         <item>cash</item>

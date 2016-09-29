@@ -295,13 +295,19 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                         @Override
                         public void run() {
                             int maxAddressLine = address.getMaxAddressLineIndex();
-                            if (maxAddressLine >= 0) addressLine1 = address.getAddressLine(0);
-                            if (maxAddressLine >= 1) addressLine2 = address.getAddressLine(1);
-                            if (maxAddressLine >= 2) addressLine3 = address.getAddressLine(2);
-                            country = address.getCountryName();
-                            postcode = address.getPostalCode();
+                            if (maxAddressLine >= 0)
+                                addressLine1 = Strings.returnSafely(address.getAddressLine(0));
+                            if (maxAddressLine >= 1)
+                                addressLine2 = Strings.returnSafely(address.getAddressLine(1));
+                            if (maxAddressLine >= 2)
+                                addressLine3 = Strings.returnSafely(address.getAddressLine(2));
+                            country = Strings.returnSafely(address.getCountryName());
+                            postcode = Strings.returnSafely(address.getPostalCode());
                             latitude = address.getLatitude();
                             longitude = address.getLongitude();
+
+                            // make sure the postcode is not repeated
+                            addressLine3 = addressLine3.replace(postcode, "");
 
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
@@ -323,7 +329,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                     new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            if (dialog != null) dialog.dismiss();
+                            dialog.dismiss();
 
                             showPlacePicker();
                         }
@@ -331,7 +337,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                     new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            if (dialog != null) dialog.dismiss();
+                            dialog.dismiss();
 
                             showManualLocationInput();
                         }
@@ -419,7 +425,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
         HomefixServiceHelper.onLocationClicked(getActivity(), latitude, longitude, addressLine1, addressLine2, addressLine3, postcode, country);
     }
 
-    @OnLongClick
+    @OnLongClick(R.id.location_bar)
     public boolean onLocationLongTouch() {
         if (!isEdit) return false;
 

@@ -75,6 +75,9 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
 
         getView().showAttemptingLogin();
 
+        // cache the email
+        CacheUtils.writeObjectFile("email", email);
+
         Callback<HashMap<String, Object>> callback = new Callback<HashMap<String, Object>>() {
             @Override
             public void onResponse(Call<HashMap<String, Object>> call, Response<HashMap<String, Object>> response) {

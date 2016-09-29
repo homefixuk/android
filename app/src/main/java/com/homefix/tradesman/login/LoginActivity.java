@@ -5,6 +5,7 @@ import android.text.InputType;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
+import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.rey.material.widget.EditText;
 import com.samdroid.input.AsteriskPasswordTransformationMethod;
 import com.samdroid.resource.ColourUtils;
@@ -55,6 +56,13 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
         mEmailEdt.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         mEmailEdt.setHint("Email");
         mEmailEdt.setHintTextColor(ColourUtils.getColour(getContext(), R.color.greyLight));
+
+        try {
+            // try and set the last email used
+            String lastEmail = CacheUtils.readObjectFile("email", String.class);
+            mEmailEdt.setText(Strings.returnSafely(lastEmail).trim().toLowerCase());
+        } catch (Exception e) {
+        }
 
         mPasswordEdt.setTextColor(ColourUtils.getColour(getContext(), R.color.colorAccent));
         mPasswordEdt.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);

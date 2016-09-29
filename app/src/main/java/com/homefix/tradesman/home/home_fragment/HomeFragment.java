@@ -1,5 +1,6 @@
 package com.homefix.tradesman.home.home_fragment;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,8 +10,12 @@ import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
 import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Timeslot;
+import com.homefix.tradesman.timeslot.TimeslotActivity;
+import com.samdroid.common.IntentHelper;
+import com.samdroid.string.Strings;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,6 +39,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
     protected View nextJobLayout;
 
     private Timeslot currentTimeslot, nextTimeslot;
+    private boolean isRefreshingCurrentJob, isRefreshingNextJob = false;
 
     public HomeFragment() {
         super(HomeFragment.class.getSimpleName());
@@ -63,6 +69,9 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         setCurrentJob(currentTimeslot);
         setNextJob(nextTimeslot);
 
+        isRefreshingCurrentJob = true;
+        isRefreshingNextJob = true;
+
         // if we need to refresh the jobs
         HomeFix.getAPI().getCurrentService(TradesmanController.getToken()).enqueue(new Callback<Timeslot>() {
             @Override
@@ -77,11 +86,12 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
             @Override
             public void onFailure(Call<Timeslot> call, Throwable t) {
-                // TODO: handle error
+                // handle error
+                setCurrentJob(null);
             }
         });
 
-        HomeFix.getAPI().getCurrentService(TradesmanController.getToken()).enqueue(new Callback<Timeslot>() {
+        HomeFix.getAPI().getNextService(TradesmanController.getToken()).enqueue(new Callback<Timeslot>() {
             @Override
             public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
                 if (response == null) {
@@ -94,7 +104,8 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
             @Override
             public void onFailure(Call<Timeslot> call, Throwable t) {
-                // TODO: handle error
+                // handle error
+                setNextJob(null);
             }
         });
     }
@@ -104,7 +115,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
         if (currentJobLayout == null) return;
 
-        if (currentTimeslot == null) {
+        if (currentTimeslot == null || currentTimeslot.isEmpty()) {
             currentJobLayout.setVisibility(View.GONE);
             currentJobView.setVisibility(View.GONE);
             return;
@@ -116,6 +127,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         OwnJobViewHolder viewHolder = new OwnJobViewHolder(currentJobLayout);
         viewHolder.bind(getActivity(), currentTimeslot, getPresenter());
         currentJobLayout.requestLayout();
+        setRefreshingCurrentJob(false);
     }
 
     private void setNextJob(Timeslot timeslot) {
@@ -123,7 +135,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
         if (nextJobLayout == null) return;
 
-        if (nextTimeslot == null) {
+        if (nextTimeslot == null || nextTimeslot.isEmpty()) {
             nextJobLayout.setVisibility(View.GONE);
             nextJobView.setVisibility(View.GONE);
             return;
@@ -135,6 +147,49 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         OwnJobViewHolder viewHolder = new OwnJobViewHolder(nextJobLayout);
         viewHolder.bind(getActivity(), nextTimeslot, getPresenter());
         nextJobLayout.requestLayout();
+        setRefreshingNextJob(false);
+    }
+
+    public synchronized boolean isRefreshingCurrentJob() {
+        return isRefreshingCurrentJob;
+    }
+
+    public synchronized void setRefreshingCurrentJob(boolean refreshingCurrentJob) {
+        isRefreshingCurrentJob = refreshingCurrentJob;
+    }
+
+    public synchronized boolean isRefreshingNextJob() {
+        return isRefreshingNextJob;
+    }
+
+    public synchronized void setRefreshingNextJob(boolean refreshingNextJob) {
+        isRefreshingNextJob = refreshingNextJob;
+    }
+
+    private void onFinishRefreshingJobs() {
+        if (isRefreshingCurrentJob() || isRefreshingNextJob()) return;
+
+        // TODO: show loading has finished
+    }
+
+    @OnClick(R.id.add_availability_button)
+    public void onAddAvailabilityClicked() {
+        // go to new timeslot activity for new availability
+        Intent i = new Intent(getContext(), TimeslotActivity.class);
+        i.putExtra("type", Timeslot.TYPE.AVAILABILITY.name());
+        i.putExtra("goIntoEditMode", true);
+        startActivity(i);
+        getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+    }
+
+    @OnClick(R.id.add_own_job_button)
+    public void onAddOwnJobClicked() {
+        // go to new timeslot activity for new job
+        Intent i = new Intent(getContext(), TimeslotActivity.class);
+        i.putExtra("type", Timeslot.TYPE.OWN_JOB.name());
+        i.putExtra("goIntoEditMode", true);
+        startActivity(i);
+        getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
     }
 
 }

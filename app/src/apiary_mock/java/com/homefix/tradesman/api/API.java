@@ -118,12 +118,12 @@ public interface API {
             @Header("Authorization") String token,
             @Path("timeslotId") String originalTimeslotId);
 
-    @GET("/service/{serviceId}")
-    Call<Service> getService(
+    @GET("/services")
+    Call<List<Service>> getServices(
             @Header("Authorization") String token,
-            @Path("serviceId") String id);
+            @Query("filter") Map<String, Object> filter);
 
-    @POST("/service")
+    @POST("/services")
     Call<Service> createService(
             @Header("Authorization") String token,
             @Query("customerName") String customerName,
@@ -138,9 +138,14 @@ public interface API {
             @Query("latitude") double latitude,
             @Query("longitude") double longitude,
             @Query("problemName") String problemName,
-            @Query("startTime") double startTime,
-            @Query("endTime") double endTime,
+            @Query("startTime") long startTime,
+            @Query("endTime") long endTime,
             @Query("tradesmanNotes") String tradesmanNote);
+
+    @GET("/service/{serviceId}")
+    Call<Service> getService(
+            @Header("Authorization") String token,
+            @Path("serviceId") String id);
 
     @PATCH("/service/{serviceId}")
     Call<Service> updateService(
@@ -164,11 +169,6 @@ public interface API {
 
     @GET("/service/statuses")
     Call<List<ServiceStatusFlow>> getServiceStatusFlow(@Header("Authorization") String token);
-
-    @GET("/services")
-    Call<List<Service>> getServices(
-            @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
 
     @GET("/activities")
     Call<List<Activity>> getActivities(

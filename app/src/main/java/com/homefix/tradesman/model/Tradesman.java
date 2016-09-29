@@ -18,7 +18,7 @@ public class Tradesman extends BaseModel {
     private double rating, experience;
     private List<String> workAreas;
     private String settings;
-//    private TradesmanLocation currentLocation;
+    private Object currentLocation;
 
     public Tradesman() {
         super();

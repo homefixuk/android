@@ -102,6 +102,10 @@ public class Timeslot extends BaseModel {
         this.canBeSplit = canBeSplit;
     }
 
+    public boolean isEmpty() {
+        return tradesman == null || start == 0 || end == 0 || Strings.isEmpty(getId());
+    }
+
     public static void printList(List<Timeslot> list) {
         if (list == null) return;
 

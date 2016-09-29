@@ -78,7 +78,7 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkCCA = true;
+//        checkCCA = true;
         checkPermissions = true;
 
         showHome();
@@ -115,6 +115,7 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
             return true;
 
         } else if (name.equals(getString(R.string.action_recent))) {
+            hideNavMenu();
             showRecentJobs();
             return true;
 
@@ -288,6 +289,7 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         setCurrentPage(R.string.action_recent_jobs);
         resetActionBarTitle();
         supportInvalidateOptionsMenu();
+        setActionbarTitle(R.string.action_recent_jobs);
     }
 
     @Override

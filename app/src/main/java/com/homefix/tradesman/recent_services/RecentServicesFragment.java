@@ -1,10 +1,13 @@
 package com.homefix.tradesman.recent_services;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.homefix.tradesman.R;
@@ -64,15 +67,15 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
 
             @Override
             public void loadMore(int page, int totalItemsCount) {
-                getData(page);
+                getData();
             }
 
         });
 
-        getData(0);
+        getData();
     }
 
-    private void getData(int page) {
+    private void getData() {
         if (isLoading) return;
 
         isLoading = true;
@@ -80,7 +83,7 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
         if (NetworkManager.hasConnection(getActivity())) {
 
             HashMap<String, Object> params = new HashMap<>();
-            params.put("page", page);
+            params.put("skip", adapter != null ? adapter.getCount() : 0);
 
             HomeFix.getAPI().getServices(TradesmanController.getToken(), params).enqueue(new Callback<List<Service>>() {
                 @Override
@@ -89,7 +92,20 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
                     if (list == null) list = new ArrayList<>();
 
                     if (adapter == null) {
-                        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, list);
+                        adapter = new ArrayAdapter<Service>(getActivity(), android.R.layout.simple_list_item_1, list) {
+
+                            @NonNull
+                            @Override
+                            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                                View view = super.getView(position, convertView, parent);
+
+                                // TODO: setup view
+                                TextView tv = (TextView) view;
+                                tv.setText(getItem(position).getId());
+
+                                return view;
+                            }
+                        };
                         listView.setAdapter(adapter);
 
                     } else {
