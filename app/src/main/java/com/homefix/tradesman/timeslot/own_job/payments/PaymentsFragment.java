@@ -226,7 +226,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
 
         if (isEmpty) {
             payment = new Payment();
-            payment.setServiceSet(service.getServiceSet());
+            payment.setServiceSet(service.getServiceSet().getId());
         }
 
         final Payment finalPayment = payment;

@@ -7,4 +7,5 @@ import com.homefix.tradesman.base.view.BaseFragmentView;
  */
 
 public interface RecentServicesView extends BaseFragmentView {
+    void refresh();
 }

@@ -1,7 +1,6 @@
 package com.homefix.tradesman.home.home_fragment;
 
 import android.app.Activity;
-import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -52,6 +51,8 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
     private Timeslot mTimeslot;
     private TimeslotClickedListener mClickedListener;
 
+    public boolean showTimeUntil = true, setHelperClickListeners = true;
+
     public OwnJobViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
@@ -95,13 +96,14 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
             startDateTime += TimeUtils.getShortTimeString(timeslot.getStart());
             startDateTimeView.setText(startDateTime);
 
-            if (timeslot.getSlotLength() > 0) {
+            if (showTimeUntil && timeslot.getSlotLength() > 0) {
                 String duration = TimeUtils.formatShortDateToHoursMinutes(timeslot.getSlotLength());
-
+                
                 if ("0 mins".equals(duration)) {
-                    durationView.setText("NOW");
+                    durationView.setVisibility(View.GONE);
 
                 } else {
+                    durationView.setVisibility(View.VISIBLE);
                     if (Strings.isEmpty(startDateTime)) startDateTimeView.setText(duration);
                     else durationView.setText(duration);
                 }
@@ -133,14 +135,18 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
                     if (addressView != null) {
                         addressView.setText(HomefixServiceHelper.getReadableLocationString(", ", addressLine1, addressLine2, addressLine3, postcode, country));
 
-                        final double latitude = property.getLatitude();
-                        final double longitude = property.getLongitude();
-                        addressView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                HomefixServiceHelper.onLocationClicked(activity, latitude, longitude, addressLine1, addressLine2, addressLine3, postcode, country);
-                            }
-                        });
+                        if (setHelperClickListeners) {
+                            final double latitude = property.getLatitude();
+                            final double longitude = property.getLongitude();
+                            addressView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    HomefixServiceHelper.onLocationClicked(activity, latitude, longitude, addressLine1, addressLine2, addressLine3, postcode, country);
+                                }
+                            });
+                        } else {
+                            addressView.setClickable(false);
+                        }
                     }
                 }
 
@@ -155,12 +161,17 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
                     if (contactEmailView != null) {
                         final String email = Strings.returnSafely(user.getEmail());
                         contactEmailView.setText(email);
-                        contactEmailView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                HomefixServiceHelper.onEmailClicked(activity, email, "");
-                            }
-                        });
+
+                        if (setHelperClickListeners) {
+                            contactEmailView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    HomefixServiceHelper.onEmailClicked(activity, email, "");
+                                }
+                            });
+                        } else {
+                            contactEmailView.setClickable(false);
+                        }
                     }
 
                     if (contactPhoneView != null) {
@@ -168,13 +179,18 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
                         if (Strings.isEmpty(phone))
                             phone = Strings.returnSafely(user.getMobile());
                         contactPhoneView.setText(phone);
-                        final String finalPhone = phone;
-                        contactPhoneView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                HomefixServiceHelper.onPhoneClicked(activity, finalPhone);
-                            }
-                        });
+
+                        if (setHelperClickListeners) {
+                            final String finalPhone = phone;
+                            contactPhoneView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    HomefixServiceHelper.onPhoneClicked(activity, finalPhone);
+                                }
+                            });
+                        } else {
+                            contactPhoneView.setClickable(false);
+                        }
                     }
                 }
             }

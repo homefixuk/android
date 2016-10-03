@@ -289,7 +289,6 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         setCurrentPage(R.string.action_recent_jobs);
         resetActionBarTitle();
         supportInvalidateOptionsMenu();
-        setActionbarTitle(R.string.action_recent_jobs);
     }
 
     @Override
@@ -299,6 +298,7 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         if (mCurrentPage == R.string.action_home) {
             // inflate the profile menu
             inflater.inflate(R.menu.home, menu);
+            setActionbarTitle(R.string.action_home);
             return true;
 
         } else if (mCurrentPage == R.string.action_calendar) {
@@ -318,7 +318,12 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
         } else if (mCurrentPage == R.string.action_profile) {
             // inflate the profile menu
             inflater.inflate(R.menu.profile, menu);
+            setActionbarTitle(R.string.action_profile);
             return true;
+
+        } else if (mCurrentPage == R.string.action_recent_jobs) {
+            setActionbarTitle(R.string.action_recent_jobs);
+            return false;
         }
 
         return super.onCreateOptionsMenu(menu);

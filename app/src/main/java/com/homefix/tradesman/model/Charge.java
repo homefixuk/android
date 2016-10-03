@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Charge extends BaseModel {
 
-    private Service service;
+    private Object service;
     private double amount = 0;
     private String description; // labour/part/other
     private double quantity = 1;
@@ -21,7 +21,7 @@ public class Charge extends BaseModel {
     public Charge() {
     }
 
-    public Service getService() {
+    public Object getService() {
         return service;
     }
 
@@ -57,7 +57,7 @@ public class Charge extends BaseModel {
         return markupBeforeVat;
     }
 
-    public void setService(Service service) {
+    public void setService(Object service) {
         this.service = service;
     }
 
@@ -101,7 +101,23 @@ public class Charge extends BaseModel {
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
-        if (service != null && !Strings.isEmpty(service.getId())) map.put("service", service.getId());
+
+        if (service != null) {
+            if (service instanceof String) {
+                String serviceId = (String) service;
+                if (!Strings.isEmpty(serviceId)) map.put("service", serviceId);
+
+            } else if (service instanceof Service) {
+                Service service1 = (Service) service;
+                if (!Strings.isEmpty(service1.getId())) map.put("service", service1.getId());
+
+            } else if (service instanceof Map) {
+                Map<String, Object> serviceMap = (Map<String, Object>) service;
+                if (serviceMap.containsKey("_id") && !Strings.isEmpty((String) serviceMap.get("_id")))
+                    map.put("service", serviceMap.get("_id"));
+            }
+        }
+
         map.put("amount", getAmount());
         if (!Strings.isEmpty(description)) map.put("description", description);
         map.put("quantity", getQuantity());

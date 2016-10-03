@@ -7,6 +7,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.rey.material.widget.EditText;
+import com.samdroid.common.IntentHelper;
 import com.samdroid.input.AsteriskPasswordTransformationMethod;
 import com.samdroid.resource.ColourUtils;
 import com.samdroid.string.Strings;
@@ -106,6 +107,20 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
     @Override
     public void hideAttemptingLogin() {
         hideDialog();
+    }
+
+    @Override
+    public void showNewUser() {
+        IntentHelper.openEmailWithAttachment(
+                this,
+                "contact@homefix.co.uk",
+                "New Tradesman for the app",
+                "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
+                        "Full Name: <insert_name>\n" +
+                        "Phone Number: <insert_phone_number>\n\n" +
+                        "Additional notes: <insert_any_additional_notes>\n\n" +
+                        "Kind Regards",
+                null);
     }
 
 }

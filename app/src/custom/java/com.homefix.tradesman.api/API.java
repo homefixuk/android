@@ -99,22 +99,22 @@ public interface API {
     @GET("tradesman/notifications")
     Call<List<TradesmanNotification>> getTradesmanNotifications(
             @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
+            @QueryMap Map<String, Object> filter);
 
     @GET("tradesman/finance")
     Call<TradesmanFinances> getTradesmanFinances(
             @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
+            @QueryMap Map<String, Object> filter);
 
     @GET("tradesman/reviews")
     Call<List<TradesmanReview>> getTradesmanReviews(
             @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
+            @QueryMap Map<String, Object> filter);
 
     @GET("tradesman/timeslots")
     Call<List<Timeslot>> getTradesmanEvents(
             @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
+            @QueryMap Map<String, Object> filter);
 
     @POST("tradesman/timeslot")
     Call<Timeslot> addTimeslot(
@@ -187,7 +187,7 @@ public interface API {
     @GET("activities")
     Call<List<Activity>> getActivities(
             @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
+            @QueryMap Map<String, Object> filter);
 
     @POST("attachment")
     Call<Service> createAttachment(
@@ -205,7 +205,7 @@ public interface API {
     @GET("attachments")
     Call<List<Attachment>> getAttachments(
             @Header("Authorization") String token,
-            @Query("filter") Map<String, Object> filter);
+            @QueryMap Map<String, Object> filter);
 
     @GET("cca")
     Call<CCA> getCCA(@Query("apikey") String apikey, @Header("Authorization") String token);

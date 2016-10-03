@@ -76,11 +76,11 @@
     <string name="add_availability">Add Availability</string>
     <string name="quick_actions">Quick Actions</string>
     <string name="add_own_job">Add Own Job</string>
+    <string name="need_an_account">Need an account?</string>
 
     <string-array name="payment_types">
         <item>cash</item>
-        <item>credit_card</item>
-        <item>debit_card</item>
+        <item>card</item>
         <item>cheque</item>
         <item>bank_transfer</item>
     </string-array>

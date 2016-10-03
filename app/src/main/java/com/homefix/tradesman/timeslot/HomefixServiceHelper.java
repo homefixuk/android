@@ -78,7 +78,7 @@ public class HomefixServiceHelper {
         if (!ActivityHelper.canActivityDo(activity)) return;
 
         // get directions
-        if (latitude != null && longitude != null)
+        if (latitude != null && longitude != null && latitude != 0 && longitude != 0)
             IntentHelper.googleMapsDirections(activity, latitude, longitude);
         else
             IntentHelper.googleMapsDirections(

@@ -124,19 +124,24 @@ public class IntentHelper {
         context.startActivity(intent);
     }
 
-    public static void openEmailWithAttachment(Context context, String toEmail, String subject, String content, String filePath) {
-        Intent email = new Intent(Intent.ACTION_SEND);
-        email.putExtra(Intent.EXTRA_EMAIL, new String[]{toEmail});
+    public static void openEmailWithAttachment(Activity activity, String toEmail, String subject, String content, String filePath) {
+        if (activity == null) return;
+        Intent email = new Intent(Intent.ACTION_SENDTO);
+        email.setData(Uri.parse("mailto:")); // only email apps should handle this
+        email.putExtra(Intent.EXTRA_EMAIL, toEmail);
         email.putExtra(Intent.EXTRA_SUBJECT, subject);
         email.putExtra(Intent.EXTRA_TEXT, content);
 
-        File file = new File(filePath);
-        Uri uri = Uri.fromFile(file);
-        email.putExtra(Intent.EXTRA_STREAM, uri);
-        email.setType("application/pdf");
-        email.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (!Strings.isEmpty(filePath)) {
+            File file = new File(filePath);
+            Uri uri = Uri.fromFile(file);
+            email.putExtra(Intent.EXTRA_STREAM, uri);
+            email.setType("application/pdf");
+        } else {
+            email.setType("text/plain");
+        }
 
-        context.startActivity(email);
+        activity.startActivity(email);
     }
 
 }

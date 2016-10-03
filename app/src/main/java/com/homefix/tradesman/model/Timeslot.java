@@ -55,7 +55,7 @@ public class Timeslot extends BaseModel {
     }
 
     public long getSlotLength() {
-        return slotLength;
+        return slotLength > 0 ? slotLength : end - start;
     }
 
     public String getType() {
@@ -102,6 +102,7 @@ public class Timeslot extends BaseModel {
         this.canBeSplit = canBeSplit;
     }
 
+    @Override
     public boolean isEmpty() {
         return tradesman == null || start == 0 || end == 0 || Strings.isEmpty(getId());
     }

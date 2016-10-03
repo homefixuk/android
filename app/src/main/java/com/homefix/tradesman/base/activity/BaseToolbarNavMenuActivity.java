@@ -226,8 +226,6 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
                 IntentHelper.callPhoneNumber(getContext(), ccaPhoneNumber);
             }
         });
-
-        mCallCcaTxt.setVisibility(View.GONE);
     }
 
     @Override

@@ -10,18 +10,18 @@ import java.util.Map;
 
 public class Payment extends BaseModel {
 
-    private ServiceSet serviceSet;
+    private Object serviceSet;
     private double amount;
     private String type; // cash/cheque/bank_transfer/card/stripe/etc.
 
     public Payment() {
     }
 
-    public ServiceSet getServiceSet() {
+    public Object getServiceSet() {
         return serviceSet;
     }
 
-    public void setServiceSet(ServiceSet serviceSet) {
+    public void setServiceSet(Object serviceSet) {
         this.serviceSet = serviceSet;
     }
 
@@ -44,8 +44,23 @@ public class Payment extends BaseModel {
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
-        if (serviceSet != null && !Strings.isEmpty(serviceSet.getId()))
-            map.put("serviceSet", serviceSet.getId());
+
+        if (serviceSet != null) {
+            if (serviceSet instanceof String) {
+                String serviceId = (String) serviceSet;
+                if (!Strings.isEmpty(serviceId)) map.put("serviceSet", serviceId);
+
+            } else if (serviceSet instanceof ServiceSet) {
+                ServiceSet service1 = (ServiceSet) serviceSet;
+                if (!Strings.isEmpty(service1.getId())) map.put("serviceSet", service1.getId());
+
+            } else if (serviceSet instanceof Map) {
+                Map<String, Object> serviceMap = (Map<String, Object>) serviceSet;
+                if (serviceMap.containsKey("_id") && !Strings.isEmpty((String) serviceMap.get("_id")))
+                    map.put("serviceSet", serviceMap.get("_id"));
+            }
+        }
+
         map.put("amount", getAmount());
         map.put("type", getType());
         return map;

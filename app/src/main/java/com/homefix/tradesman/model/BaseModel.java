@@ -35,4 +35,8 @@ public class BaseModel {
         return map;
     }
 
+    public boolean isEmpty() {
+        return Strings.isEmpty(_id);
+    }
+
 }

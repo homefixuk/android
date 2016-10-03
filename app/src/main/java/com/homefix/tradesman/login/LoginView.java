@@ -16,4 +16,5 @@ public interface LoginView extends BaseActivityView {
 
     void hideAttemptingLogin();
 
+    void showNewUser();
 }

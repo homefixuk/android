@@ -12,7 +12,6 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.pdf.PdfViewActivity;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.data.TradesmanController;
-import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
@@ -247,7 +246,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                                     content += user != null ? user.getName() : "Your Homefix Tradesman";
 
                                     IntentHelper.openEmailWithAttachment(
-                                            getContext(),
+                                            getBaseActivity(),
                                             invoice.getCustomerEmail(),
                                             invoice.getSubject(),
                                             content,

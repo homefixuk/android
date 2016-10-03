@@ -202,7 +202,7 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
 
         if (isEmpty) {
             charge = new Charge();
-            charge.setService(service);
+            charge.setService(service.getId());
         }
 
         final Charge finalCharge = charge;

@@ -8,6 +8,7 @@ import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Tradesman;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
+import com.samdroid.common.IntentHelper;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -142,7 +143,9 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
     }
 
     public void onContactUsClicked() {
+        if (!isViewAttached()) return;
 
+        getView().showNewUser();
     }
 
 }

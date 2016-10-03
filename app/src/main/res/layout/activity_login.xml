@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginBottom="@dimen/base_padding"
-            android:text="Need help? Call us"
+            android:text="@string/need_an_account"
             android:textAppearance="@style/TextTheme.ExtraLarge.Bold"
             android:textColor="@color/greyLight" />
     </RelativeLayout>
