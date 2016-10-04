@@ -19,7 +19,6 @@ public class Tradesman extends User {
     private double rating, experience;
     private Map<String, Boolean> workAreas;
     private Map<String, Object> settings;
-    private Location currentLocation;
 
     public Tradesman() {
         super();
@@ -55,14 +54,6 @@ public class Tradesman extends User {
 
     public void setExperience(double experience) {
         this.experience = experience;
-    }
-
-    public Location getCurrentLocation() {
-        return currentLocation;
-    }
-
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
     }
 
     public Map<String, Boolean> getWorkAreas() {

@@ -37,11 +37,11 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
 
         Calendar cal = Calendar.getInstance();
 
-        cal.setTimeInMillis(timeslot.getStart());
+        cal.setTimeInMillis(timeslot.getStartTime());
         setStartTime(cal);
 
         Calendar endCal = (Calendar) cal.clone();
-        endCal.setTimeInMillis(timeslot.getEnd());
+        endCal.setTimeInMillis(timeslot.getEndTime());
         setEndTime(endCal);
 
         // set the name

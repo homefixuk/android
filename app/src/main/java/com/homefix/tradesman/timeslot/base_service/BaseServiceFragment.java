@@ -1,6 +1,7 @@
 package com.homefix.tradesman.timeslot.base_service;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -19,15 +20,19 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
-import com.homefix.tradesman.model.Problem;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
-import com.homefix.tradesman.model.User;
+import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
@@ -95,54 +100,15 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
     protected String addressLine1, addressLine2, addressLine3, country, postcode;
     protected Double latitude = null, longitude = null;
 
+    private DatabaseReference serviceRef, serviceSetRef, customerPropertyRef, customerRef, propertyRef;
+
+
     public BaseServiceFragment() {
     }
 
     @Override
     public void setupView() {
         super.setupView();
-
-        if (mTimeslot != null) {
-            // setup values from Timeslot
-            Service service = mTimeslot.getService();
-
-            if (service != null) {
-                CustomerProperty customerProperty = service.getServiceSet().getCustomerProperty();
-
-                if (mCustomerPropertyType != null && customerProperty != null) {
-                    mCustomerPropertyType.setText(customerProperty.getType());
-
-                    Property property = customerProperty.getProperty();
-                    if (property != null) {
-                        addressLine1 = property.getAddressLine1();
-                        addressLine2 = property.getAddressLine2();
-                        addressLine3 = property.getAddressLine3();
-                        postcode = property.getPostcode();
-                        country = property.getCountry();
-                        latitude = property.getLatitude();
-                        longitude = property.getLongitude();
-                    }
-
-                    Customer customer = customerProperty.getCustomer();
-                    User user = customer != null ? customer.getUser() : null;
-                    if (user != null) {
-                        if (mPersonNameTxt != null) mPersonNameTxt.setText(user.getName());
-                        if (mPersonEmailTxt != null) mPersonEmailTxt.setText(user.getEmail());
-                        if (mPersonPhoneNumberTxt != null)
-                            mPersonPhoneNumberTxt.setText(user.getMobilePhone());
-                    }
-
-                    if (mJobTypeTxt != null) {
-                        Problem problem = service.getProblem();
-                        if (problem != null) mJobTypeTxt.setText(problem.getName());
-                        else mJobTypeTxt.setText(service.getServiceType());
-                    }
-                }
-
-                if (mDescriptionTxt != null) mDescriptionTxt.setText(service.getTradesmanNotes());
-                updateLocationText();
-            }
-        }
 
         ViewUtils.setEditTextEditable(mPersonNameTxt, isEdit);
         ViewUtils.setEditTextEditable(mPersonEmailTxt, isEdit);
@@ -193,7 +159,158 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         if (mLocationIcon != null)
             mLocationIcon.setImageResource(R.drawable.ic_map_marker_grey600_48dp);
+
+        // remove the old listener
+        if (serviceRef != null) serviceRef.removeEventListener(serviceValueEventListener);
+
+        // setup the new one
+        String serviceId = mTimeslot != null ? mTimeslot.getServiceId() : null;
+        serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
+        if (serviceRef != null) serviceRef.addValueEventListener(serviceValueEventListener);
     }
+
+    private ValueEventListener serviceValueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            Service service = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Service.class) : null;
+            if (service != null) {
+                if (mJobTypeTxt != null) mJobTypeTxt.setText(service.getServiceType());
+
+                setupServiceSet(service.getServiceSetId());
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+    };
+
+    private void setupServiceSet(String serviceSetId) {
+        if (Strings.isEmpty(serviceSetId)) return;
+
+        // remove the old listener
+        if (serviceSetRef != null) serviceSetRef.removeEventListener(serviceSetValueEventListener);
+
+        // setup the new one
+        serviceSetRef = FirebaseUtils.getSpecificServiceSetRef(serviceSetId);
+        if (serviceSetRef != null)
+            serviceSetRef.addValueEventListener(serviceSetValueEventListener);
+    }
+
+    private ValueEventListener serviceSetValueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            ServiceSet serviceSet = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(ServiceSet.class) : null;
+            if (serviceSet == null) return;
+
+            setupCustomerProperty(serviceSet.getCustomerPropertyId());
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private void setupCustomerProperty(String customerPropertyId) {
+        if (Strings.isEmpty(customerPropertyId)) return;
+
+        // remove the old listener
+        if (customerPropertyRef != null)
+            customerPropertyRef.removeEventListener(customerPropertyIdListener);
+
+        // setup the new one
+        customerPropertyRef = FirebaseUtils.getBaseRef().child("customerProperties").child(customerPropertyId);
+        customerPropertyRef.addValueEventListener(customerPropertyIdListener);
+    }
+
+    private ValueEventListener customerPropertyIdListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            CustomerProperty customerProperty = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(CustomerProperty.class) : null;
+            if (customerProperty == null) return;
+
+            String customerId = customerProperty.getCustomerId();
+            setupCustomer(customerId);
+
+            String propertyId = customerProperty.getPropertyId();
+            setupProperty(propertyId);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private void setupCustomer(String customerId) {
+        if (Strings.isEmpty(customerId)) return;
+
+        // remove the old listener
+        if (customerRef != null) customerRef.removeEventListener(customerListener);
+
+        // setup the new one
+        customerRef = FirebaseUtils.getBaseRef().child("customers").child(customerId);
+        customerRef.addValueEventListener(propertyListener);
+    }
+
+    private ValueEventListener customerListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            Customer customer = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Customer.class) : null;
+            if (customer == null) return;
+
+            if (mPersonNameTxt != null) mPersonNameTxt.setText(customer.getName());
+
+            if (mPersonEmailTxt != null) {
+                final String email = customer.getEmail();
+                mPersonEmailTxt.setText(email);
+            }
+
+            if (mPersonPhoneNumberTxt != null) {
+                String phone = customer.getHomePhone();
+                if (Strings.isEmpty(phone)) phone = customer.getMobilePhone();
+                mPersonPhoneNumberTxt.setText(phone);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private void setupProperty(String propertyId) {
+        if (Strings.isEmpty(propertyId)) return;
+
+        // remove the old listener
+        if (propertyRef != null) propertyRef.removeEventListener(propertyListener);
+
+        // setup the new one
+        propertyRef = FirebaseUtils.getBaseRef().child("properties").child(propertyId);
+        propertyRef.addValueEventListener(propertyListener);
+    }
+
+    private ValueEventListener propertyListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            Property property = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Property.class) : null;
+            if (property == null) return;
+
+            addressLine1 = property.getAddressLine1();
+            addressLine2 = property.getAddressLine2();
+            addressLine3 = property.getAddressLine3();
+            postcode = property.getPostcode();
+            country = property.getCountry();
+            updateLocationText();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
 
     /**
      * Show the google place picker activity
@@ -206,7 +323,11 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             return;
 
         } catch (GooglePlayServicesRepairableException e) {
-            GooglePlayServicesUtil.getErrorDialog(e.getConnectionStatusCode(), getActivity(), 0);
+            GooglePlayServicesUtil.showErrorDialogFragment(e.getConnectionStatusCode(), getActivity(), this, 0, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                }
+            });
         } catch (Exception e) {
         }
 

@@ -1,37 +1,24 @@
 package com.homefix.tradesman.login;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.homefix.tradesman.HomeFixApplication;
-import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
-import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.firebase.FirebaseUtils;
-import com.homefix.tradesman.model.Tradesman;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
-import com.samdroid.common.IntentHelper;
 import com.samdroid.common.MyLog;
-import com.samdroid.common.VariableUtils;
-import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.util.Date;
 import java.util.HashMap;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 6/22/2016.

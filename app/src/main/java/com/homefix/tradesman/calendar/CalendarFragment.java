@@ -358,7 +358,7 @@ public class CalendarFragment<A extends HomeFixBaseActivity>
     }
 
     public void removeTimeslot(Timeslot timeslot) {
-        if (timeslot == null || timeslot.getStart() == 0) return;
+        if (timeslot == null || timeslot.getStartTime() == 0) return;
 
         HomeFixCal.removeEvent(timeslot);
         if (mView != null) mView.notifyDatasetChanged();

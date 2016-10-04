@@ -14,7 +14,7 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Service {
 
-    private String serviceSetId, tradesmanId, status, serviceType;
+    private String id, serviceSetId, tradesmanId, status, serviceType;
     private long requestTime, arrivalTime, departTime, estimatedDuration;
     private int estimatedCost, actualDuration, actualCost;
     private String tradesmanNotes;
@@ -22,6 +22,18 @@ public class Service {
     private Map<String, Boolean> previousServices;
     private boolean isOwnJob;
     private String incompleteReason, actualDiagnosis, workCompletedDescription;
+
+    public Service(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getStatus() {
         return Strings.returnSafely(status);

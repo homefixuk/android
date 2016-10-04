@@ -11,6 +11,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.model.Service;
 import com.samdroid.common.IntentHelper;
+import com.samdroid.string.Strings;
 
 /**
  * Created by samuel on 7/27/2016.
@@ -30,7 +31,7 @@ public class PaymentsActivity extends BaseCloseActivity {
 
         Service service = Service.getSenderReceiver().remove(serviceKey);
 
-        if (service == null || service.getServiceSet() == null) {
+        if (service == null || Strings.isEmpty(service.getServiceSetId())) {
             Toast.makeText(getContext(), "Sorry, something went wrong.", Toast.LENGTH_SHORT).show();
             finishWithAnimation();
             return;

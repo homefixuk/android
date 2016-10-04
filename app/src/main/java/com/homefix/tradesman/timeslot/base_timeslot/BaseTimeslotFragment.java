@@ -14,23 +14,16 @@ import android.widget.TimePicker;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
-import com.homefix.tradesman.data.TradesmanController;
-import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 
 import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 7/13/2016.
@@ -123,8 +116,8 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         mEndCal = TimeUtils.setToTopOfHour(mEndCal);
 
         if (mTimeslot != null) {
-            mStartCal.setTimeInMillis(mTimeslot.getStart());
-            mEndCal.setTimeInMillis(mTimeslot.getEnd());
+            mStartCal.setTimeInMillis(mTimeslot.getStartTime());
+            mEndCal.setTimeInMillis(mTimeslot.getEndTime());
 
         } else if (mEndCal.getTimeInMillis() < mStartCal.getTimeInMillis() + TimeUtils.getHoursInMillis(1)) {
             mEndCal.setTimeInMillis(mStartCal.getTimeInMillis() + TimeUtils.getHoursInMillis(1));
@@ -153,42 +146,42 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         if (isRefreshingService) return;
         isRefreshingService = true;
 
-        final Service service = mTimeslot != null ? mTimeslot.getService() : null;
-        // if there is no timeslot just refresh the view
-        if (service == null) {
-            setupView();
-            return;
-        }
-
-        HomeFix
-                .getAPI()
-                .getService(TradesmanController.getToken(), service.getId())
-                .enqueue(new Callback<Service>() {
-                    @Override
-                    public void onResponse(Call<Service> call, Response<Service> response) {
-                        Service service1 = response != null ? response.body() : null;
-                        if (service1 == null || service1.isEmpty()) {
-                            onFailure(call, null);
-                            return;
-                        }
-
-                        if (mTimeslot != null) {
-                            // save the service into the Timeslot and refresh the view
-                            mTimeslot.setService(service1);
-                            setupView();
-                        }
-
-                        isRefreshingService = false;
-                    }
-
-                    @Override
-                    public void onFailure(Call<Service> call, Throwable t) {
-                        MyLog.e(TAG, "Error refreshing Service");
-                        if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
-
-                        isRefreshingService = false;
-                    }
-                });
+//        final Service service = mTimeslot != null ? mTimeslot.getService() : null;
+//        // if there is no timeslot just refresh the view
+//        if (service == null) {
+//            setupView();
+//            return;
+//        }
+//
+//        HomeFix
+//                .getAPI()
+//                .getService(TradesmanController.getToken(), service.getId())
+//                .enqueue(new Callback<Service>() {
+//                    @Override
+//                    public void onResponse(Call<Service> call, Response<Service> response) {
+//                        Service service1 = response != null ? response.body() : null;
+//                        if (service1 == null || service1.isEmpty()) {
+//                            onFailure(call, null);
+//                            return;
+//                        }
+//
+//                        if (mTimeslot != null) {
+//                            // save the service into the Timeslot and refresh the view
+//                            mTimeslot.setService(service1);
+//                            setupView();
+//                        }
+//
+//                        isRefreshingService = false;
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<Service> call, Throwable t) {
+//                        MyLog.e(TAG, "Error refreshing Service");
+//                        if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
+//
+//                        isRefreshingService = false;
+//                    }
+//                });
     }
 
     public void setType(Timeslot.TYPE type) {

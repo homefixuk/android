@@ -4,17 +4,15 @@ package com.homefix.tradesman.timeslot.own_job.invoice;
  * Created by samuel on 8/2/2016.
  */
 
+import com.homefix.tradesman.common.ListConverter;
 import com.homefix.tradesman.common.file.BasePdf;
-import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Charge;
 import com.homefix.tradesman.model.Customer;
-import com.homefix.tradesman.model.CustomerProperty;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanPrivate;
-import com.homefix.tradesman.model.User;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
@@ -23,17 +21,26 @@ import com.samdroid.string.Strings;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class OwnJobInvoice extends BasePdf {
 
+    private Tradesman tradesman;
     private Service service;
+    private ServiceSet serviceSet;
+    private Customer customer;
+    private Property property;
     private TradesmanPrivate tradesmanPrivate;
     private String customerFirstName, customerEmail;
 
-    public OwnJobInvoice(Service service, TradesmanPrivate tradesmanPrivate) {
+    public OwnJobInvoice(Tradesman tradesman, Service service, ServiceSet serviceSet, Customer customer, Property property, TradesmanPrivate tradesmanPrivate) {
         super("Service_Invoice_" + service.getId() + "_" + System.currentTimeMillis(), "Homefix Invoice: " + service.getId(), "Homefix Invoice: " + service.getId());
 
+        this.tradesman = tradesman;
         this.service = service;
+        this.serviceSet = serviceSet;
+        this.customer = customer;
+        this.property = property;
         this.tradesmanPrivate = tradesmanPrivate;
     }
 
@@ -58,16 +65,12 @@ public class OwnJobInvoice extends BasePdf {
 
         document.add(new Paragraph("Date: " + SimpleDateFormat.getDateInstance().format(new Date()), subFont));
 
-        ServiceSet serviceSet = service.getServiceSet();
-
         // Tradesman
-        Tradesman tradesman = service.getTradesman();
-        User user = tradesman != null ? tradesman.getUser() : null;
         String name = tradesmanPrivate != null ? tradesmanPrivate.getBusinessName() : null;
-        if (Strings.isEmpty(name)) name = user != null ? user.getName() : null;
+        if (Strings.isEmpty(name)) name = tradesman != null ? tradesman.getName() : null;
         if (Strings.isEmpty(name))
             name = tradesmanPrivate != null ? tradesmanPrivate.getNameOnAccount() : null;
-        String email = user != null ? user.getEmail() : null;
+        String email = tradesman != null ? tradesman.getEmail() : null;
         if (!Strings.isEmpty(name) || !Strings.isEmpty(email)) {
             Paragraph pFrom = new Paragraph("From", subFont);
             document.add(pFrom);
@@ -85,42 +88,38 @@ public class OwnJobInvoice extends BasePdf {
 
         // Customer details
         Paragraph pCustomer = new Paragraph("To:", subFont);
-        CustomerProperty customerProperty = serviceSet != null ? serviceSet.getCustomerProperty() : null;
-        if (customerProperty != null) {
-            Customer customer = customerProperty.getCustomer();
-            Property property = customerProperty.getProperty();
 
-            User customerUser = customer != null ? customer.getUser() : null;
-            if (customerUser != null) {
-                customerFirstName = customerUser.getFirstName();
-                if (Strings.isEmpty(customerFirstName)) customerFirstName = customerUser.getName();
+        if (customer != null) {
+            customerFirstName = customer.getFirstName();
+            if (Strings.isEmpty(customerFirstName))
+                customerFirstName = customer.getName();
 
-                if (!Strings.isEmpty(customerUser.getName()))
-                    pCustomer.add(new Paragraph(customerUser.getName(), subGrayFont));
-            }
+            if (!Strings.isEmpty(customer.getName()))
+                pCustomer.add(new Paragraph(customer.getName(), subGrayFont));
+        }
 
-            if (property != null) {
-                if (!Strings.isEmpty(property.getAddressLine1()))
-                    pCustomer.add(new Paragraph(property.getAddressLine1(), subGrayFont));
-                if (!Strings.isEmpty(property.getAddressLine2()))
-                    pCustomer.add(new Paragraph(property.getAddressLine2(), subGrayFont));
-                if (!Strings.isEmpty(property.getAddressLine3()))
-                    pCustomer.add(new Paragraph(property.getAddressLine3(), subGrayFont));
-                if (!Strings.isEmpty(property.getCountry()))
-                    pCustomer.add(new Paragraph(property.getCountry(), subGrayFont));
-                if (!Strings.isEmpty(property.getPostcode()))
-                    pCustomer.add(new Paragraph(property.getPostcode(), subGrayFont));
-            }
+        if (property != null) {
+            if (!Strings.isEmpty(property.getAddressLine1()))
+                pCustomer.add(new Paragraph(property.getAddressLine1(), subGrayFont));
+            if (!Strings.isEmpty(property.getAddressLine2()))
+                pCustomer.add(new Paragraph(property.getAddressLine2(), subGrayFont));
+            if (!Strings.isEmpty(property.getAddressLine3()))
+                pCustomer.add(new Paragraph(property.getAddressLine3(), subGrayFont));
+            if (!Strings.isEmpty(property.getCountry()))
+                pCustomer.add(new Paragraph(property.getCountry(), subGrayFont));
+            if (!Strings.isEmpty(property.getPostcode()))
+                pCustomer.add(new Paragraph(property.getPostcode(), subGrayFont));
+        }
 
-            if (customerUser != null) {
-                if (!Strings.isEmpty(customerUser.getMobilePhone()))
-                    pCustomer.add(new Paragraph(customerUser.getMobilePhone(), subGrayFont));
-                if (!Strings.isEmpty(customerUser.getEmail())) {
-                    customerEmail = customerUser.getEmail();
-                    pCustomer.add(new Paragraph(customerUser.getEmail(), subGrayFont));
-                }
+        if (customer != null) {
+            if (!Strings.isEmpty(customer.getMobilePhone()))
+                pCustomer.add(new Paragraph(customer.getMobilePhone(), subGrayFont));
+            if (!Strings.isEmpty(customer.getEmail())) {
+                customerEmail = customer.getEmail();
+                pCustomer.add(new Paragraph(customer.getEmail(), subGrayFont));
             }
         }
+
         document.add(pCustomer);
 
         // add a table with all the charges
@@ -135,43 +134,39 @@ public class OwnJobInvoice extends BasePdf {
         }
 
         // add Tradesman bank details
-        TradesmanPrivate tradesmanPrivate = TradesmanController.getCurrentTradesmanPrivate();
-        if (tradesmanPrivate != null) {
-            Paragraph pBank = new Paragraph("Bank Information", subFont);
+        Paragraph pBank = new Paragraph("Bank Information", subFont);
+        addEmptyLine(document);
+
+        if (!Strings.isEmpty(tradesmanPrivate.getAccountName())) {
+            pBank.add(new Paragraph("Account Name", smallBold));
+            pBank.add(new Paragraph(tradesmanPrivate.getAccountName(), subGrayFont));
+        }
+        if (!Strings.isEmpty(tradesmanPrivate.getAccountNumber())) {
+            pBank.add(new Paragraph("Account Number", smallBold));
+            pBank.add(new Paragraph(tradesmanPrivate.getAccountNumber(), subGrayFont));
+        }
+        if (!Strings.isEmpty(tradesmanPrivate.getSortCode())) {
+            pBank.add(new Paragraph("Sort Code", smallBold));
+            pBank.add(new Paragraph(tradesmanPrivate.getSortCode(), subGrayFont));
+        }
+        if (!Strings.isEmpty(tradesmanPrivate.getVatNumber())) {
+            pBank.add(new Paragraph("VAT Number", smallBold));
+            pBank.add(new Paragraph(tradesmanPrivate.getVatNumber(), subGrayFont));
+        }
+        if (!Strings.isEmpty(tradesmanPrivate.getNameOnAccount())) {
+            pBank.add(new Paragraph("Name on Account", smallBold));
+            pBank.add(new Paragraph(tradesmanPrivate.getNameOnAccount(), subGrayFont));
+        }
+
+        if (pBank.size() > 0) {
             addEmptyLine(document);
-
-            if (!Strings.isEmpty(tradesmanPrivate.getAccountName())) {
-                pBank.add(new Paragraph("Account Name", smallBold));
-                pBank.add(new Paragraph(tradesmanPrivate.getAccountName(), subGrayFont));
-            }
-            if (!Strings.isEmpty(tradesmanPrivate.getAccountNumber())) {
-                pBank.add(new Paragraph("Account Number", smallBold));
-                pBank.add(new Paragraph(tradesmanPrivate.getAccountNumber(), subGrayFont));
-            }
-            if (!Strings.isEmpty(tradesmanPrivate.getSortCode())) {
-                pBank.add(new Paragraph("Sort Code", smallBold));
-                pBank.add(new Paragraph(tradesmanPrivate.getSortCode(), subGrayFont));
-            }
-            if (!Strings.isEmpty(tradesmanPrivate.getVatNumber())) {
-                pBank.add(new Paragraph("VAT Number", smallBold));
-                pBank.add(new Paragraph(tradesmanPrivate.getVatNumber(), subGrayFont));
-            }
-            if (!Strings.isEmpty(tradesmanPrivate.getNameOnAccount())) {
-                pBank.add(new Paragraph("Name on Account", smallBold));
-                pBank.add(new Paragraph(tradesmanPrivate.getNameOnAccount(), subGrayFont));
-            }
-
-            if (pBank.size() > 0) {
-                addEmptyLine(document);
-                document.add(pBank);
-            }
+            document.add(pBank);
         }
     }
 
     private void createTable(Document document)
             throws DocumentException {
-        java.util.List<Charge> charges = service.getServiceSet().getCharges();
-
+        List<Charge> charges = new ListConverter<>(serviceSet.getCharges()).toList();
         if (charges == null || charges.size() == 0) return;
 
         addEmptyLines(document, 2);

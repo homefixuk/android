@@ -4,21 +4,21 @@ import android.support.annotation.NonNull;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.homefix.tradesman.api.HomeFix;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.calendar.HomeFixCal;
-import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.MyLog;
 import com.samdroid.network.NetworkManager;
+import com.samdroid.string.Strings;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 7/13/2016.
@@ -33,7 +33,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
         mType = type;
     }
 
-    public void save(final Timeslot timeslot, Calendar mStart, Calendar mEnd) {
+    public void save(Timeslot timeslot, Calendar mStart, Calendar mEnd) {
         if (!isViewAttached()) return;
 
         // if the user has made no changes to the timeslot
@@ -42,62 +42,80 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
             return;
         }
 
-        if (mStart == null || mEnd == null || !NetworkManager.hasConnection(getView().getContext())) {
+        String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
+        if (Strings.isEmpty(tradesmanId) || mStart == null || mEnd == null || !NetworkManager.hasConnection(getView().getContext())) {
             getView().showErrorDialog();
             return;
         }
 
         getView().showDialog((timeslot == null ? "Adding" : "Updating") + " timeslot...", true);
 
-        Callback<Timeslot> callback = new Callback<Timeslot>() {
-            @Override
-            public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-                Timeslot ts = response.body();
+        final String timeslotKey;
+        if (timeslot == null) {
+            // create a new Timeslot record
+            timeslotKey = FirebaseUtils.getTimeslotsRef().push().getKey();
 
-                if (ts == null || ts.getType().isEmpty() || ts.getStart() == 0 || ts.getEnd() == 0) {
-                    onFailure(call, null);
+            timeslot = new Timeslot(timeslotKey);
+            timeslot.setStartTime(mStart.getTimeInMillis());
+            timeslot.setEndTime(mEnd.getTimeInMillis());
+            timeslot.setType(mType.getName());
+
+        } else {
+            timeslotKey = timeslot.getId();
+        }
+
+        if (Strings.isEmpty(timeslotKey)) {
+            getView().showErrorDialog();
+            return;
+        }
+
+        Map<String, Object> timeslotValues = timeslot.toMap();
+
+        // save the timeslot to 2 locations
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/timeslots/" + timeslotKey, timeslotValues);
+        childUpdates.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslotKey, timeslotValues);
+
+        final Timeslot finalTimeslot = timeslot;
+
+        FirebaseUtils.getBaseRef().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    getView().showErrorDialog();
                     return;
                 }
 
-                MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + ts);
-
-                if (timeslot == null) {
-                    HomeFixCal.addEvent(ts);
-
-                } else {
-                    // update the Homefix calendar
-                    HomeFixCal.changeEvent(timeslot, ts);
+                DatabaseReference ref = FirebaseUtils.getSpecificTimeslotRef(timeslotKey);
+                if (ref == null) {
+                    getView().onSaveComplete(finalTimeslot);
+                    return;
                 }
 
-                getView().onSaveComplete(ts);
+                // fetch the saved Timeslot
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Timeslot timeslot1 = dataSnapshot != null ? dataSnapshot.getValue(Timeslot.class) : finalTimeslot;
+                        timeslot1.setId(dataSnapshot != null ? dataSnapshot.getKey() : finalTimeslot.getId());
+                        getView().onSaveComplete(timeslot1);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        getView().onSaveComplete(finalTimeslot);
+                    }
+                });
             }
-
-            @Override
-            public void onFailure(Call<Timeslot> call, Throwable t) {
-                if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
-
-                if (!isViewAttached()) return;
-
-                getView().showErrorDialog();
-            }
-        };
-
-        HomeFix.TimeslotMap map = new HomeFix.TimeslotMap(mStart.getTimeInMillis(), mEnd.getTimeInMillis(), true, mType);
-
-        // if the user was adding a timeslot
-        if (timeslot == null) {
-            HomeFix.getAPI().addTimeslot(TradesmanController.getToken(), map).enqueue(callback);
-
-        } else {
-            // else the user was editing a timeslot //
-            HomeFix.getAPI().updateTimeslot(TradesmanController.getToken(), timeslot.getId(), map).enqueue(callback);
-        }
+        });
     }
 
     public void delete(final Timeslot timeslot) {
         if (!isViewAttached()) return;
 
-        if (timeslot == null || !NetworkManager.hasConnection(getView().getContext())) {
+        final String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
+
+        if (Strings.isEmpty(tradesmanId) || timeslot == null || Strings.isEmpty(timeslot.getId()) || !NetworkManager.hasConnection(getView().getContext())) {
             getView().showErrorDialog();
             return;
         }
@@ -112,70 +130,30 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         getView().showDialog("Deleting timeslot...", true);
 
-                        Callback<Map<String, Object>> callback = new Callback<Map<String, Object>>() {
+                        // delete the timeslot from the 2 locations
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put("/timeslots/" + timeslot.getId(), null);
+                        childUpdates.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslot.getId(), null);
+
+                        // if the timeslot has a service, remove it too
+                        if (Timeslot.TYPE.OWN_JOB.getName().equals(timeslot.getType()) && !Strings.isEmpty(timeslot.getServiceId())) {
+                            childUpdates.put("/services/" + timeslot.getServiceId(), null);
+                        }
+
+                        FirebaseUtils.getBaseRef().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
                             @Override
-                            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                                Map<String, Object> map = response.body();
-
-                                if (map == null || !(boolean) map.get("success")) {
-                                    onFailure(call, null);
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    getView().showErrorDialog();
                                     return;
                                 }
-
-                                if (Timeslot.TYPE.OWN_JOB.name().equals(timeslot.getType()) && timeslot.getService() != null) {
-                                    // call deleteService
-                                    HomeFix.getAPI().deleteService(TradesmanController.getToken(), timeslot.getId())
-                                            .enqueue(new Callback<Map<String, Object>>() {
-                                                @Override
-                                                public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                                                    Map<String, Object> map = response.body();
-
-                                                    if (map == null || !(boolean) map.get("success")) {
-                                                        onFailure(call, null);
-                                                        return;
-                                                    }
-
-                                                    MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
-
-                                                    // remove the original timeslot
-                                                    HomeFixCal.removeEvent(timeslot);
-
-                                                    getView().onDeleteComplete(timeslot);
-                                                }
-
-                                                @Override
-                                                public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                                                    if (t != null && MyLog.isIsLogEnabled())
-                                                        t.printStackTrace();
-
-                                                    if (!isViewAttached()) return;
-
-                                                    getView().showErrorDialog();
-                                                }
-                                            });
-                                    return;
-                                }
-
-                                MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
 
                                 // remove the original timeslot
-                                HomeFixCal.changeEvent(timeslot, null);
+                                HomeFixCal.removeEvent(timeslot);
 
                                 getView().onDeleteComplete(timeslot);
                             }
-
-                            @Override
-                            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                                if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
-
-                                if (!isViewAttached()) return;
-
-                                getView().showErrorDialog();
-                            }
-
-                        };
-
-                        HomeFix.getAPI().deleteTimeslot(TradesmanController.getToken(), timeslot.getId()).enqueue(callback);
+                        });
 
                     }
 

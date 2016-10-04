@@ -2,7 +2,6 @@ package com.homefix.tradesman.timeslot.own_job;
 
 import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
 import com.homefix.tradesman.model.Problem;

@@ -104,7 +104,7 @@ public class HomeFixCal {
                 if (temp == null) continue;
 
                 // if this time slot is before the one in the loop, add it before it
-                if (timeslot.getStart() <= temp.getStart()) {
+                if (timeslot.getStartTime() <= temp.getStartTime()) {
                     evs.add(i, timeslot);
                     return true;
                 }
@@ -203,7 +203,7 @@ public class HomeFixCal {
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
                 // if it is not on the date we are looking for ignore it
-                if (!TimeUtils.isOnDate(timeslot.getStart(), cal)) continue;
+                if (!TimeUtils.isOnDate(timeslot.getStartTime(), cal)) continue;
 
                 e.add(timeslot);
             }
@@ -325,7 +325,7 @@ public class HomeFixCal {
 
     public static int getMonthKey(Timeslot timeslot) {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timeslot.getStart());
+        cal.setTimeInMillis(timeslot.getStartTime());
         return getMonthKey(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH));
     }
 
@@ -342,7 +342,7 @@ public class HomeFixCal {
 
         if (month == null) {
             Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(timeslot.getStart());
+            cal.setTimeInMillis(timeslot.getStartTime());
             month = addMonth(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), new ArrayList<Timeslot>());
             CalendarFragment.setNeedsNotifying();
         }
@@ -366,7 +366,7 @@ public class HomeFixCal {
             Month month = getMonth(original);
             if (month == null) {
                 Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(original.getStart());
+                cal.setTimeInMillis(original.getStartTime());
                 month = addMonth(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), new ArrayList<Timeslot>());
             }
 

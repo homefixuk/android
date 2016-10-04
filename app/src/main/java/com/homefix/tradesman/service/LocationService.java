@@ -14,12 +14,14 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
-import com.homefix.tradesman.api.HomeFix;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.homefix.tradesman.common.PermissionsHelper;
-import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.listener.OnNewLocationListener;
-import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.MyLog;
+import com.samdroid.common.VariableUtils;
+import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,9 +29,6 @@ import java.util.List;
 
 import io.nlopez.smartlocation.OnActivityUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LocationService extends Service {
 
@@ -256,29 +255,36 @@ public class LocationService extends Service {
      * Called after the new location received
      */
     private static void OnNewLocationReceived(Location location) {
-        if (location != null && TradesmanController.hasToken()) {
+        String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
+        if (location != null && !Strings.isEmpty(tradesmanId)) {
+            long time = System.currentTimeMillis();
 
             // send the update to the server
-            HashMap<String, Object> locationMap = new HashMap<>();
+            final HashMap<String, Object> locationMap = new HashMap<>();
+            locationMap.put("time", time);
             locationMap.put("latitude", location.getLatitude());
             locationMap.put("longitude", location.getLongitude());
 
             if (currentActivity != null)
                 locationMap.put("activity", getDetectedActivtyName(currentActivity));
 
-            Callback<Timeslot> callback = new Callback<Timeslot>() {
-                @Override
-                public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-                    MyLog.e(TAG, "[onResponse]: " + response.body());
-                }
+            FirebaseUtils
+                    .getBaseRef()
+                    .child("tradesmanLocations")
+                    .child(tradesmanId)
+                    .child("" + time)
+                    .updateChildren(locationMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError != null) {
+                                MyLog.printStackTrace(databaseError.toException());
+                                return;
+                            }
 
-                @Override
-                public void onFailure(Call<Timeslot> call, Throwable t) {
-                    if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
-                }
-            };
-
-            HomeFix.getAPI().updateLocation(TradesmanController.getToken(), locationMap).enqueue(callback);
+                            MyLog.e(TAG, "Tradesman Location updated");
+                            VariableUtils.printHashMap(locationMap);
+                        }
+                    });
         }
 
         notifyListeners(location);

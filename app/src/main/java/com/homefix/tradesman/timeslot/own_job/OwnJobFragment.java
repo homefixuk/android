@@ -8,14 +8,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.pdf.PdfViewActivity;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
-import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
@@ -275,15 +279,32 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     }
 
     private void generateInvoice(@NonNull final OnGotObjectListener<OwnJobInvoice> callback) {
-        TradesmanController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
+        final String serviceId = mTimeslot != null ? mTimeslot.getServiceId() : null;
+        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanPrivateRef();
+        if (Strings.isEmpty(serviceId) || ref == null) {
+            callback.onGotThing(null);
+            return;
+        }
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onGotThing(TradesmanPrivate o) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot == null || !dataSnapshot.exists()) {
+                    onCancelled(null);
+                    return;
+                }
+
                 OwnJobInvoice invoice = new OwnJobInvoice(
                         mTimeslot != null ? mTimeslot.getService() : null,
                         o);
 
                 invoice.generate();
                 callback.onGotThing(invoice);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onGotThing(null);
             }
         });
     }

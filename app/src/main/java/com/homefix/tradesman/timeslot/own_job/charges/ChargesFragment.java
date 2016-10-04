@@ -20,7 +20,6 @@ import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.base.presenter.DefaultFragementPresenter;
 import com.homefix.tradesman.base.view.BaseFragmentView;
-import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Charge;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;

@@ -1,18 +1,24 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.homefix.tradesman.common.SendReceiver;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
 
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by samuel on 6/15/2016.
  */
 
+@IgnoreExtraProperties
 public class Timeslot {
 
     public enum TYPE {
@@ -41,10 +47,17 @@ public class Timeslot {
     }
 
     private String id;
-    private long start, end, slotLength;
+    private long startTime, endTime, slotLength;
     private String type;
     private String tradesmanId, serviceId;
     private boolean canBeSplit;
+
+    public Timeslot() {
+    }
+
+    public Timeslot(String id) {
+        this.id = id;
+    }
 
     public String getId() {
         return id;
@@ -58,28 +71,28 @@ public class Timeslot {
         return tradesmanId;
     }
 
-    public long getStart() {
-        return start;
+    public long getStartTime() {
+        return startTime;
     }
 
-    public long getEnd() {
-        return end;
+    public long getEndTime() {
+        return endTime;
     }
 
     public long getSlotLength() {
-        return slotLength > 0 ? slotLength : end - start;
+        return slotLength > 0 ? slotLength : endTime - startTime;
     }
 
     public String getType() {
         return Strings.returnSafely(type);
     }
 
-    public void setStart(long start) {
-        this.start = start;
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
-    public void setEnd(long end) {
-        this.end = end;
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
 
     public void setSlotLength(long slotLength) {
@@ -110,15 +123,29 @@ public class Timeslot {
         this.serviceId = serviceId;
     }
 
-
     //////////////
     /// Helper ///
     //////////////
 
+    @Exclude
     public boolean isEmpty() {
-        return Strings.isEmpty(tradesmanId) || start == 0 || end == 0;
+        return Strings.isEmpty(tradesmanId) || startTime == 0 || endTime == 0;
     }
 
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", getId());
+        map.put("startTime", getStartTime());
+        map.put("endTime", getEndTime());
+        map.put("slotLength", getSlotLength());
+        map.put("type", getType());
+        map.put("tradesmanId", getTradesmanId());
+        map.put("serviceId", getServiceId());
+        map.put("canBeSplit", isCanBeSplit());
+        return map;
+    }
+
+    @Exclude
     public static void printList(List<Timeslot> list) {
         if (list == null) return;
 
@@ -132,10 +159,10 @@ public class Timeslot {
             }
 
             Date d = new Date();
-            d.setTime(t.getStart());
-            String start = TimeUtils.formatDataFormal(d) + " " + TimeUtils.formatDateToHoursMinutes(t.getStart());
-            d.setTime(t.getEnd());
-            String end = TimeUtils.formatDataFormal(d) + " " + TimeUtils.formatDateToHoursMinutes(t.getEnd());
+            d.setTime(t.getStartTime());
+            String start = TimeUtils.formatDataFormal(d) + " " + TimeUtils.formatDateToHoursMinutes(t.getStartTime());
+            d.setTime(t.getEndTime());
+            String end = TimeUtils.formatDataFormal(d) + " " + TimeUtils.formatDateToHoursMinutes(t.getEndTime());
 
             MyLog.e("Timeslot", t.getType() + " " + start + " -> " + end);
         }
@@ -148,25 +175,29 @@ public class Timeslot {
     ///////////////////////////////////////
     ///////////////////////////////////////
 
+    @Exclude
     private static final SendReceiver<Timeslot> senderReceiver = new SendReceiver<>(Timeslot.class);
 
+    @Exclude
     public static SendReceiver<Timeslot> getSenderReceiver() {
         return senderReceiver;
     }
 
+    @Exclude
     public static Calendar getStartCalender(Timeslot timeslot) {
         if (timeslot == null) return null;
 
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timeslot.getStart());
+        cal.setTimeInMillis(timeslot.getStartTime());
         return cal;
     }
 
+    @Exclude
     public static Calendar getEndCalender(Timeslot timeslot) {
         if (timeslot == null) return null;
 
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timeslot.getEnd());
+        cal.setTimeInMillis(timeslot.getEndTime());
         return cal;
     }
 

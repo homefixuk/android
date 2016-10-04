@@ -120,6 +120,11 @@ public class FirebaseUtils {
         return null;
     }
 
+    public static DatabaseReference getSpecificTimeslotRef(String id) {
+        if (!Strings.isEmpty(id)) return getBaseRef().child(REF_NAME_TIMESLOTS).child(id);
+        return null;
+    }
+
     public static DatabaseReference getServiceSetsRef() {
         return getBaseRef().child(REF_NAME_SERVICE_SETS);
     }

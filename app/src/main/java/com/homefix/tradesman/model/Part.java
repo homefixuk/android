@@ -6,7 +6,7 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class Part extends BaseModel {
+public class Part {
 
     private Service service;
     private String name, from, description, installationInfo, image, source;

@@ -12,13 +12,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseToolbarActivity;
 import com.homefix.tradesman.base.adapter.MyListAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
-import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
@@ -148,12 +149,24 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
         };
         mListView.setAdapter(mAdapter);
 
-        TradesmanController.loadTradesmanPrivate(getContext(), new OnGotObjectListener<TradesmanPrivate>() {
+        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanPrivateRef();
+        if (ref == null) return;
+
+        // continually listen to changes in the Tradesman private record and update adapter
+        // when there are changes
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onGotThing(TradesmanPrivate o) {
-                tradesmanPrivate = o;
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot == null) return;
+
+                tradesmanPrivate = dataSnapshot.getValue(TradesmanPrivate.class);
 
                 if (mAdapter != null) mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }

@@ -9,6 +9,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.ActivityHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Customer;
@@ -18,7 +19,6 @@ import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
-import com.homefix.tradesmanId.R;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
 
@@ -101,9 +101,9 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
         // set the start and end time
         if (startDateTimeView != null) {
-            String startDateTime = TimeUtils.getShortDateString(timeslot.getStart());
+            String startDateTime = TimeUtils.getShortDateString(timeslot.getStartTime());
             if (!Strings.isEmpty(startDateTime)) startDateTime += ", ";
-            startDateTime += TimeUtils.getShortTimeString(timeslot.getStart());
+            startDateTime += TimeUtils.getShortTimeString(timeslot.getStartTime());
             startDateTimeView.setText(startDateTime);
 
             if (showTimeUntil && timeslot.getSlotLength() > 0) {

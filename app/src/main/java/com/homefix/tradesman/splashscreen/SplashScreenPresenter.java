@@ -6,12 +6,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
-import com.homefix.tradesman.data.TradesmanController;
-import com.homefix.tradesman.model.Tradesman;
-import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.service.LocationService;
 import com.samdroid.common.MyLog;
-import com.samdroid.listener.interfaces.OnGotObjectListener;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,7 +26,7 @@ public class SplashScreenPresenter extends BaseActivityPresenter<SplashScreenVie
 
         // Initialize Firebase Auth
         // Firebase instance variables
-        FirebaseAuth mFirebaseAuth= FirebaseAuth.getInstance();
+        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         if (mFirebaseUser == null) {
