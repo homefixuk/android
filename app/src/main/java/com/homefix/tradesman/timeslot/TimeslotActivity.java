@@ -11,10 +11,14 @@ import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.common.Ids;
-import com.homefix.tradesman.model.Problem;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
@@ -24,7 +28,6 @@ import com.samdroid.common.IntentHelper;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
 
-import java.sql.Time;
 import java.util.Calendar;
 
 /**
@@ -92,21 +95,31 @@ public class TimeslotActivity extends BaseCloseActivity {
         if (type == Timeslot.TYPE.AVAILABILITY) title += "Availability";
         else if (type == Timeslot.TYPE.BREAK) title += "Break";
         else if (type == Timeslot.TYPE.OWN_JOB) {
-            String timeslotName = "";
-            if (timeslot != null) {
-                Service service = timeslot.getService();
-                if (service != null) {
-                    Problem problem = service.getProblem();
-                    if (problem == null) {
-                        timeslotName = service.getId();
+            final String preTitle = title;
+            final String serviceId = timeslot != null ? timeslot.getServiceId() : null;
+            DatabaseReference ref = FirebaseUtils.getSpecificServiceRef(serviceId);
+            if (ref != null) {
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Service service = dataSnapshot != null ? dataSnapshot.getValue(Service.class) : null;
+                        if (service == null) {
+                            setActionbarTitle(preTitle + "Own Job");
+                            return;
+                        }
 
-                    } else {
-                        timeslotName = problem.getName();
+                        setActionbarTitle(preTitle + Strings.returnSafely(service.getServiceType(), "Own Job"));
                     }
-                }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                return;
             }
 
-            title += Strings.isEmpty(timeslotName) ? "Own Job" : timeslotName;
+            title += "Own Job";
         }
 
         setActionbarTitle(title);

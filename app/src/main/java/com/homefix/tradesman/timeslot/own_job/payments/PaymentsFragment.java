@@ -21,6 +21,7 @@ import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.base.presenter.DefaultFragementPresenter;
 import com.homefix.tradesman.base.view.BaseFragmentView;
+import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.model.Payment;
 import com.homefix.tradesman.model.Service;
@@ -95,7 +96,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
                 double remaining = serviceSet.getAmountRemaining();
                 String s = String.format("£%s", Strings.priceToString(remaining));
                 s = Strings.setStringColour(s, remaining > 0 ? ColorUtils.red : ColorUtils.green);
-                mRemainingTxt.setText(Html.fromHtml(s));
+                mRemainingTxt.setText(HtmlHelper.fromHtml(s));
             }
         }
 
