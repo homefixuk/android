@@ -138,7 +138,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                                                     MyLog.e(BaseTimeslotFragmentPresenter.class.getSimpleName(), "[onResponse]: " + map);
 
                                                     // remove the original timeslot
-                                                    HomeFixCal.changeEvent(timeslot, null);
+                                                    HomeFixCal.removeEvent(timeslot);
 
                                                     getView().onDeleteComplete(timeslot);
                                                 }

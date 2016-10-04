@@ -1,21 +1,22 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class Customer extends BaseModel {
+@IgnoreExtraProperties
+public class Customer extends User {
 
-    private User user;
     private String priority;
     private List<Tradesman> preferredTradesman;
-
-    public Customer() {
-        super();
-    }
+    private Map<String, Boolean> customerProperties, invoices;
+    private double totalSpent;
 
     public String getPriority() {
         return priority;
@@ -27,7 +28,35 @@ public class Customer extends BaseModel {
         return preferredTradesman;
     }
 
-    public User getUser() {
-        return user;
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public void setPreferredTradesman(List<Tradesman> preferredTradesman) {
+        this.preferredTradesman = preferredTradesman;
+    }
+
+    public Map<String, Boolean> getCustomerProperties() {
+        return customerProperties;
+    }
+
+    public void setCustomerProperties(Map<String, Boolean> customerProperties) {
+        this.customerProperties = customerProperties;
+    }
+
+    public Map<String, Boolean> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(Map<String, Boolean> invoices) {
+        this.invoices = invoices;
+    }
+
+    public double getTotalSpent() {
+        return totalSpent;
+    }
+
+    public void setTotalSpent(double totalSpent) {
+        this.totalSpent = totalSpent;
     }
 }

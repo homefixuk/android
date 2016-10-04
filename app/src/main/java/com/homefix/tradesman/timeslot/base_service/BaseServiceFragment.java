@@ -54,7 +54,9 @@ import static android.app.Activity.RESULT_OK;
  * Created by samuel on 7/19/2016.
  */
 
-public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresenter<BaseServiceView>> extends BaseTimeslotFragment<TimeslotActivity, BaseServiceView, P> implements BaseServiceView {
+public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresenter<BaseServiceView>>
+        extends BaseTimeslotFragment<TimeslotActivity, BaseServiceView, P>
+        implements BaseServiceView {
 
     @BindView(R.id.location_bar)
     protected View mLocationBar;
@@ -127,7 +129,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
                         if (mPersonNameTxt != null) mPersonNameTxt.setText(user.getName());
                         if (mPersonEmailTxt != null) mPersonEmailTxt.setText(user.getEmail());
                         if (mPersonPhoneNumberTxt != null)
-                            mPersonPhoneNumberTxt.setText(user.getMobile());
+                            mPersonPhoneNumberTxt.setText(user.getMobilePhone());
                     }
 
                     if (mJobTypeTxt != null) {

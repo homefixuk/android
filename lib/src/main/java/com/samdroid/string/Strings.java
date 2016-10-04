@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1088,6 +1089,25 @@ public class Strings {
             if (!Strings.isEmpty(s)) s += delimiter;
 
             s += list.get(i);
+        }
+
+        if (s.endsWith(delimiter)) s = s.substring(0, s.length() - delimiter.length());
+        return s;
+    }
+
+    public static String flattenMap(Map<String, Boolean> map, String delimiter) {
+        if (map == null || map.size() == 0) return "";
+
+        delimiter = Strings.returnSafely(delimiter);
+        String s = "";
+
+        Set<String> keys = map.keySet();
+        for (String key : keys) {
+            if (Strings.isEmpty(key)) continue;
+
+            if (!Strings.isEmpty(s)) s += delimiter;
+
+            s += key;
         }
 
         if (s.endsWith(delimiter)) s = s.substring(0, s.length() - delimiter.length());

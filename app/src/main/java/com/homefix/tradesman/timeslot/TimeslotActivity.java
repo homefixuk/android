@@ -180,10 +180,18 @@ public class TimeslotActivity extends BaseCloseActivity {
         }
 
         if (baseFragment.canClose()) {
-            // set to results ok when they made a change
+            Intent data = new Intent();
+
+            // try sending the timeslot back
             if (baseFragment instanceof BaseTimeslotFragment) {
-                setResult(((BaseTimeslotFragment) baseFragment).didMakeChanges() ? RESULT_OK : RESULT_CANCELED);
+                Timeslot timeslot = ((BaseTimeslotFragment) baseFragment).getTimeslot();
+                if (timeslot != null) {
+                    Timeslot.getSenderReceiver().put(timeslot.getId(), timeslot);
+                    data.putExtra("timeslotId", timeslot.getId());
+                }
             }
+
+            setResult(RESULT_OK, data);
             finishWithAnimation();
             return;
         }

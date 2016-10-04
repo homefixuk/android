@@ -3,10 +3,10 @@ package com.homefix.tradesman.task;
 import android.content.Intent;
 import android.os.AsyncTask;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.base.view.BaseView;
-import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.splashscreen.SplashScreenActivity;
 
 import io.nlopez.smartlocation.SmartLocation;
@@ -52,13 +52,13 @@ public class LogoutTask extends AsyncTask<Void, Void, Boolean> {
             HomeFixApplication.startLocationTracking(baseView.getContext());
 
             if (baseView.getContext() != null)
-                SmartLocation.with(baseView.getContext()).activityRecognition().stop();
+                SmartLocation.with(baseView.getContext()).activity().stop();
         }
 
-        // clear the current user
-        TradesmanController.clearCurrentUser();
+        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth.signOut();
 
-        return TradesmanController.getCurrentTradesman() == null;
+        return mFirebaseAuth.getCurrentUser() == null;
     }
 
     @Override

@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "984588815387",
+    "firebase_url": "https://awesome-dogfish-137823.firebaseio.com",
+    "project_id": "awesome-dogfish-137823",
+    "storage_bucket": "awesome-dogfish-137823.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984588815387:android:7f4c3287e8c3e174",
+        "android_client_info": {
+          "package_name": "com.homefix.tradesman"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "984588815387-69qqugugr664r192q444o1j67uo0qha7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApS3k_PyE1i1AsZ0f9Ys7UEazyOvXPP5k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984588815387:android:b655cbcf5e2391ba",
+        "android_client_info": {
+          "package_name": "com.homefix.tradesman.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "984588815387-69qqugugr664r192q444o1j67uo0qha7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApS3k_PyE1i1AsZ0f9Ys7UEazyOvXPP5k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

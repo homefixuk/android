@@ -522,17 +522,11 @@ public class HomeActivity extends BaseToolbarNavMenuActivity<HomeView, HomePrese
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (calendarFragment != null && requestCode == Ids.TIMESLOT_CHANGE && resultCode == RESULT_OK && data != null) {
-            boolean deleted = data.getBooleanExtra("deleted", false);
-            if (deleted) {
-                String timeslotId = IntentHelper.getStringSafely(data, "timeslotId");
-                if (!Strings.isEmpty(timeslotId)) {
-                    Timeslot timeslot = Timeslot.getSenderReceiver().get(timeslotId);
-                    if (timeslot != null) {
-                        calendarFragment.removeTimeslot(timeslot);
-                    }
-                }
-            }
+        if (requestCode == Ids.TIMESLOT_CHANGE) {
+            // handle in the calendar fragment
+            if (calendarFragment != null)
+                calendarFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
+
 }

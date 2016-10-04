@@ -75,8 +75,7 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
 
         ServiceSet serviceSet = service != null ? service.getServiceSet() : null;
 
-        if (mTotalCost != null && serviceSet != null)
-            mTotalCost.setText(String.format("£%s", Strings.priceToString(serviceSet.getTotalCost())));
+        if (serviceSet != null) updateTotalCost(serviceSet.getTotalCost());
 
         if (mAdapter == null) {
             mAdapter = new ArrayAdapter<Charge>(getActivity(), R.layout.charges_item_layout) {
@@ -138,6 +137,20 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
 
                     return view;
                 }
+
+                @Override
+                public void notifyDataSetChanged() {
+                    super.notifyDataSetChanged();
+
+                    double totalCharges = 0;
+                    Charge charge;
+                    for (int i = 0, len = getCount(); i < len; i++) {
+                        charge = getItem(i);
+                        if (charge == null) continue;
+                        totalCharges += charge.getTotalCost();
+                    }
+                    updateTotalCost(totalCharges);
+                }
             };
 
             List<Charge> chargeList = serviceSet != null ? serviceSet.getCharges() : null;
@@ -148,6 +161,11 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         }
 
         mListView.setAdapter(mAdapter);
+    }
+
+    private void updateTotalCost(double totalCost) {
+        if (mTotalCost != null)
+            mTotalCost.setText(String.format("£%s", Strings.priceToString(totalCost)));
     }
 
     private void removeChargeClicked(final Charge charge) {
@@ -182,11 +200,6 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         };
 
         HomeFix.getAPI().deleteCharge(TradesmanController.getToken(), charge.getId()).enqueue(callback);
-    }
-
-    @Override
-    public boolean canClose() {
-        return super.canClose();
     }
 
     public void addClicked() {

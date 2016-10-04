@@ -113,8 +113,8 @@ public class OwnJobInvoice extends BasePdf {
             }
 
             if (customerUser != null) {
-                if (!Strings.isEmpty(customerUser.getMobile()))
-                    pCustomer.add(new Paragraph(customerUser.getMobile(), subGrayFont));
+                if (!Strings.isEmpty(customerUser.getMobilePhone()))
+                    pCustomer.add(new Paragraph(customerUser.getMobilePhone(), subGrayFont));
                 if (!Strings.isEmpty(customerUser.getEmail())) {
                     customerEmail = customerUser.getEmail();
                     pCustomer.add(new Paragraph(customerUser.getEmail(), subGrayFont));
@@ -198,7 +198,7 @@ public class OwnJobInvoice extends BasePdf {
             table.addCell(getCell(charge.getDescription(), subGrayFont));
             table.addCell(getCell(String.format("%s", Strings.priceToString(charge.getQuantity())), subGrayFont));
             table.addCell(getCell(String.format("£%s", Strings.priceToString(charge.getAmountWithVatAndMarkup())), subGrayFont));
-            table.addCell(getCell(String.format("£%s", Strings.priceToString(charge.totalCost())), subGrayFont));
+            table.addCell(getCell(String.format("£%s", Strings.priceToString(charge.getTotalCost())), subGrayFont));
         }
 
         document.add(table);

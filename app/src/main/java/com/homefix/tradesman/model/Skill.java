@@ -6,7 +6,7 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class Skill extends BaseModel {
+public class Skill {
 
     private String name, description;
 

@@ -1,42 +1,27 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.homefix.tradesman.common.SendReceiver;
 import com.samdroid.string.Strings;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class Service extends BaseModel {
+@IgnoreExtraProperties
+public class Service {
 
-    private ServiceSet serviceSet;
-    private Tradesman tradesman;
-    private Problem problem;
-    private String status;
-    private String serviceType;
+    private String serviceSetId, tradesmanId, status, serviceType;
     private long requestTime, arrivalTime, departTime, estimatedDuration;
     private int estimatedCost, actualDuration, actualCost;
     private String tradesmanNotes;
     private String keyLocation;
-    private List<Service> previousServices;
+    private Map<String, Boolean> previousServices;
     private boolean isOwnJob;
     private String incompleteReason, actualDiagnosis, workCompletedDescription;
-    private List<Part> partsUsed;
-
-    public ServiceSet getServiceSet() {
-        return serviceSet;
-    }
-
-    public Tradesman getTradesman() {
-        return tradesman;
-    }
-
-    public Problem getProblem() {
-        return problem;
-    }
 
     public String getStatus() {
         return Strings.returnSafely(status);
@@ -78,18 +63,10 @@ public class Service extends BaseModel {
         return Strings.returnSafely(keyLocation);
     }
 
-    public List<Service> getPreviousServices() {
-        if (previousServices == null) previousServices = new ArrayList<>();
+    public Map<String, Boolean> getPreviousServices() {
+        if (previousServices == null) previousServices = new HashMap<>();
 
         return previousServices;
-    }
-
-    public void setTradesman(Tradesman tradesman) {
-        this.tradesman = tradesman;
-    }
-
-    public void setProblem(Problem problem) {
-        this.problem = problem;
     }
 
     public void setStatus(String status) {
@@ -132,16 +109,12 @@ public class Service extends BaseModel {
         this.keyLocation = keyLocation;
     }
 
-    public void setPreviousServices(List<Service> previousServices) {
+    public void setPreviousServices(Map<String, Boolean> previousServices) {
         this.previousServices = previousServices;
     }
 
     public boolean isOwnJob() {
         return isOwnJob;
-    }
-
-    public void setServiceSet(ServiceSet serviceSet) {
-        this.serviceSet = serviceSet;
     }
 
     public void setOwnJob(boolean ownJob) {
@@ -160,10 +133,6 @@ public class Service extends BaseModel {
         this.workCompletedDescription = workCompletedDescription;
     }
 
-    public void setPartsUsed(List<Part> partsUsed) {
-        this.partsUsed = partsUsed;
-    }
-
     public String getIncompleteReason() {
         return Strings.returnSafely(incompleteReason);
     }
@@ -174,12 +143,6 @@ public class Service extends BaseModel {
 
     public String getWorkCompletedDescription() {
         return Strings.returnSafely(workCompletedDescription);
-    }
-
-    public List<Part> getPartsUsed() {
-        if (partsUsed == null) partsUsed = new ArrayList<>();
-
-        return partsUsed;
     }
 
     public String getServiceType() {
@@ -196,4 +159,19 @@ public class Service extends BaseModel {
         return senderReceiver;
     }
 
+    public String getServiceSetId() {
+        return Strings.returnSafely(serviceSetId);
+    }
+
+    public void setServiceSetId(String serviceSetId) {
+        this.serviceSetId = serviceSetId;
+    }
+
+    public String getTradesmanId() {
+        return tradesmanId;
+    }
+
+    public void setTradesmanId(String tradesmanId) {
+        this.tradesmanId = tradesmanId;
+    }
 }

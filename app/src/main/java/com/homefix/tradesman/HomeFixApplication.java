@@ -57,14 +57,7 @@ public class HomeFixApplication extends MultiDexApplication {
     }
 
     public static void setupAppAfterLogin(Context context) {
-        Problem.loadServiceTypes();
 
-        TradesmanController.loadTradesmanPrivate(context, new OnGotObjectListener<TradesmanPrivate>() {
-            @Override
-            public void onGotThing(TradesmanPrivate o) {
-
-            }
-        });
     }
 
     public static HomeFixApplication getInstance() {
@@ -72,7 +65,7 @@ public class HomeFixApplication extends MultiDexApplication {
     }
 
     public static boolean hasNetwork() {
-        return instance != null ? instance.checkIfHasNetwork() : false;
+        return instance != null && instance.checkIfHasNetwork();
     }
 
     public boolean checkIfHasNetwork() {

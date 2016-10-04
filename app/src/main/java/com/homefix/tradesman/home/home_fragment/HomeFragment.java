@@ -5,21 +5,19 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
-import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.common.Ids;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.samdroid.common.MyLog;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 
 import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 6/28/2016.
@@ -67,47 +65,30 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
     @Override
     public void refresh() {
+        MyLog.e(TAG, "[refresh]");
+
         setCurrentJob(currentTimeslot);
         setNextJob(nextTimeslot);
 
         isRefreshingCurrentJob = true;
         isRefreshingNextJob = true;
 
-        // if we need to refresh the jobs
-        HomeFix.getAPI().getCurrentService(TradesmanController.getToken()).enqueue(new Callback<Timeslot>() {
-            @Override
-            public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-                if (response == null) {
-                    onFailure(call, new Throwable());
-                    return;
-                }
-
-                setCurrentJob(response.body());
-            }
+        FirebaseUtils.getCurrentService(new OnGotObjectListener<Timeslot>() {
 
             @Override
-            public void onFailure(Call<Timeslot> call, Throwable t) {
-                // handle error
-                setCurrentJob(null);
+            public void onGotThing(Timeslot o) {
+                setCurrentJob(o);
             }
+
         });
 
-        HomeFix.getAPI().getNextService(TradesmanController.getToken()).enqueue(new Callback<Timeslot>() {
-            @Override
-            public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-                if (response == null) {
-                    onFailure(call, new Throwable());
-                    return;
-                }
-
-                setNextJob(response.body());
-            }
+        FirebaseUtils.getNextService(new OnGotObjectListener<Timeslot>() {
 
             @Override
-            public void onFailure(Call<Timeslot> call, Throwable t) {
-                // handle error
-                setNextJob(null);
+            public void onGotThing(Timeslot o) {
+                setNextJob(o);
             }
+
         });
     }
 
@@ -202,4 +183,13 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Ids.TIMESLOT_CHANGE) {
+            MyLog.e(TAG, "[onActivityResult]");
+            refresh();
+        }
+    }
 }

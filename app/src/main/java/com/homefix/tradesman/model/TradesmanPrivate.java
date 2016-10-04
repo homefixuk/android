@@ -1,26 +1,28 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.samdroid.string.Strings;
 
 /**
  * Created by samuel on 7/27/2016.
  */
 
-public class TradesmanPrivate extends BaseModel {
+@IgnoreExtraProperties
+public class TradesmanPrivate {
 
-    private Tradesman tradesman;
+    private String tradesmanId;
     private String accountName, accountNumber, sortCode, nameOnAccount, vatNumber, businessName;
     private double standardHourlyRate;
 
     public TradesmanPrivate() {
     }
 
-    public Tradesman getTradesman() {
-        return tradesman;
+    public String getTradesmanId() {
+        return Strings.returnSafely(tradesmanId);
     }
 
-    public void setTradesman(Tradesman tradesman) {
-        this.tradesman = tradesman;
+    public void setTradesmanId(String tradesmanId) {
+        this.tradesmanId = tradesmanId;
     }
 
     public String getAccountName() {

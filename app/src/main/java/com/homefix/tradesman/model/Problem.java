@@ -1,22 +1,15 @@
 package com.homefix.tradesman.model;
 
-import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.data.TradesmanController;
-import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class Problem extends BaseModel {
+public class Problem {
 
     private String name, description;
     private long time;
@@ -57,36 +50,6 @@ public class Problem extends BaseModel {
     }
 
     final private static List<Problem> M_PROBLEMs = new ArrayList<>();
-
-    public static void loadServiceTypes() {
-        if (!TradesmanController.hasToken()) {
-            MyLog.e("Problem", "[loadServiceTypes] no user token");
-            return;
-        }
-
-        // get the service types from the server
-        HomeFix.getAPI().getServiceTypes(TradesmanController.getToken()).enqueue(new Callback<List<Problem>>() {
-
-            @Override
-            public void onResponse(Call<List<Problem>> call, Response<List<Problem>> response) {
-                if (response == null || response.body() == null) {
-                    onFailure(call, null);
-                    return;
-                }
-
-                // store them in the static list
-                getProblemTypes().clear();
-                getProblemTypes().addAll(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<List<Problem>> call, Throwable t) {
-                MyLog.e("Problem", "[loadServiceTypes => onFailure]");
-                if (MyLog.isIsLogEnabled() && t != null) t.printStackTrace();
-            }
-
-        });
-    }
 
     public synchronized static List<Problem> getProblemTypes() {
         return M_PROBLEMs;

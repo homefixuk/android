@@ -2,6 +2,8 @@ package com.homefix.tradesman.splashscreen;
 
 import android.content.Intent;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.data.TradesmanController;
@@ -26,41 +28,39 @@ public class SplashScreenPresenter extends BaseActivityPresenter<SplashScreenVie
 
         if (!isViewAttached()) return;
 
-        // load the current user
-        TradesmanController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
-            @Override
-            public void onGotThing(Tradesman tradesman) {
-                User user = tradesman != null ? tradesman.getUser() : null;
-                if (user == null) {
-                    MyLog.e("HomeFixApplication", "No Current user found");
+        // Initialize Firebase Auth
+        // Firebase instance variables
+        FirebaseAuth mFirebaseAuth= FirebaseAuth.getInstance();
+        FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-                } else {
-                    // else there is a user logged in
-                    MyLog.e("HomeFixApplication", "Loaded User: " + user.getName());
+        if (mFirebaseUser == null) {
+            MyLog.e("HomeFixApplication", "No Current user found");
 
-                    HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
-                }
+        } else {
+            // else there is a user logged in
+            MyLog.e("HomeFixApplication", "Loaded User: " + mFirebaseUser.getDisplayName());
 
-                try {
-                    // if the location service is not running
-                    if (!LocationService.isRunning() && getView().getContext() != null) {
-                        getView().getContext().startService(new Intent(getView().getContext(), LocationService.class));
-                    }
-                } catch (Exception e) {
-                }
+            HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
+        }
 
-                // now wait before going into the app
-                new Timer().schedule(new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        if (!isViewAttached()) return;
-
-                        getView().goToApp();
-                    }
-
-                }, 1000);
+        try {
+            // if the location service is not running
+            if (!LocationService.isRunning() && getView().getContext() != null) {
+                getView().getContext().startService(new Intent(getView().getContext(), LocationService.class));
             }
-        });
+        } catch (Exception e) {
+        }
+
+        // now wait before going into the app
+        new Timer().schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                if (!isViewAttached()) return;
+
+                getView().goToApp();
+            }
+
+        }, 1000);
     }
 }

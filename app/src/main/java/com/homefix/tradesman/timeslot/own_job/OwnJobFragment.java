@@ -11,7 +11,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.pdf.PdfViewActivity;
 import com.homefix.tradesman.common.HtmlHelper;
-import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
@@ -118,7 +118,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
         if (mPaymentsBar != null) mPaymentsBar.setOnTouchListener(touchListener);
     }
 
-    private void goToActivitySendingService(Class activityClass) {
+    private void goToActivitySendingService(Class activityClass, int requestCode) {
         Service service = mTimeslot != null ? mTimeslot.getService() : null;
 
         if (service == null) return;
@@ -130,7 +130,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
         // start the ChargesActivity
         Intent i = new Intent(getContext(), activityClass);
         i.putExtra("serviceKey", serviceKey);
-        startActivity(i);
+        startActivityForResult(i, requestCode);
         getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
     }
 
@@ -199,7 +199,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
             return;
         }
 
-        goToActivitySendingService(ChargesActivity.class);
+        goToActivitySendingService(ChargesActivity.class, Ids.UPDATE_CHARGES);
     }
 
     @OnClick(R.id.invoice_bar)
@@ -295,7 +295,17 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
             return;
         }
 
-        goToActivitySendingService(PaymentsActivity.class);
+        goToActivitySendingService(PaymentsActivity.class, Ids.UPDATE_PAYMENTS);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // if we just came from the charges or payments page, refresh the service
+        if (requestCode == Ids.UPDATE_CHARGES || requestCode == Ids.UPDATE_PAYMENTS) {
+            refreshService();
+        }
     }
 
 }

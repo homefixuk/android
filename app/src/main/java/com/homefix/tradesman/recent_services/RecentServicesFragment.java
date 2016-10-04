@@ -1,32 +1,28 @@
 package com.homefix.tradesman.recent_services;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
 
-import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
+import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseFragment;
-import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.home.home_fragment.OwnJobViewHolder;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
-import com.samdroid.network.NetworkManager;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import com.homefix.tradesman.R;
+import com.samdroid.string.Strings;
 
 import butterknife.BindView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 9/16/2016.
@@ -36,14 +32,10 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
         extends BaseFragment<A, RecentServicesView, RecentServicesPresenter>
         implements RecentServicesView {
 
-    @BindView(R.id.list)
-    protected ListView listView;
+    @BindView(R.id.recycler_view)
+    protected RecyclerView recyclerView;
 
-    private ArrayAdapter<Timeslot> adapter;
-
-    private boolean isLoading = false;
-
-    private long lastStartTime = 0;
+    private RecentJobsAdapter adapter;
 
     public RecentServicesFragment() {
         super(RecentServicesFragment.class.getSimpleName());
@@ -59,142 +51,69 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
 
     @Override
     protected int getLayoutRes() {
-        return R.layout.fragment_list_view_loading;
+        return R.layout.fragment_recycler_view_loading;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        listView.setDividerHeight(getResources().getDimensionPixelSize(R.dimen.base_padding));
-
-        listView.setOnScrollListener(new InfiniteScrollListener(5) {
-
-            @Override
-            public void loadMore(int page, int totalItemsCount) {
-                getData();
+        if (adapter == null) {
+            String id = FirebaseUtils.getCurrentTradesmanId();
+            if (Strings.isEmpty(id)) {
+                // TODO: handle no tradesman
+                return;
             }
 
-        });
-
-        if (adapter != null) listView.setAdapter(adapter);
-
-        getData();
-    }
-
-    private void getData() {
-        if (isLoading) return;
-
-        isLoading = true;
-
-        if (NetworkManager.hasConnection(getActivity())) {
-
-            HashMap<String, Object> params = new HashMap<>();
-            params.put("startTime", getLastStartTime());
-            params.put("limit", 10);
-            params.put("type", Timeslot.TYPE.OWN_JOB.getName());
-
-            HomeFix.getAPI().getTradesmanEvents(TradesmanController.getToken(), params).enqueue(new Callback<List<Timeslot>>() {
-                @Override
-                public void onResponse(Call<List<Timeslot>> call, Response<List<Timeslot>> response) {
-                    List<Timeslot> list = response != null ? response.body() : null;
-                    if (list == null) list = new ArrayList<>();
-
-                    if (adapter == null) {
-                        adapter = new ArrayAdapter<Timeslot>(getActivity(), R.layout.own_job_summary_layout) {
-
-                            @NonNull
-                            @Override
-                            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                                View view = convertView;
-                                OwnJobViewHolder holder;
-
-                                if (view == null) {
-                                    view = getActivity().getLayoutInflater().inflate(R.layout.own_job_summary_layout, parent, false);
-                                    holder = new OwnJobViewHolder(view);
-                                    view.setTag(holder);
-
-                                } else {
-                                    holder = (OwnJobViewHolder) view.getTag();
-                                }
-
-                                holder.showTimeUntil = false; // do not show the time until time
-
-                                holder.bind(getBaseActivity(), getItem(position), new OwnJobViewHolder.TimeslotClickedListener() {
-                                    @Override
-                                    public void onTimeslotClicked(Timeslot timeslot, boolean longClick) {
-                                        HomefixServiceHelper.goToTimeslot(getBaseActivity(), timeslot, longClick);
-                                    }
-                                });
-                                view.requestLayout();
-
-                                return view;
-                            }
-
-                            @Override
-                            public void add(Timeslot object) {
-                                if (object == null || object.isEmpty() || !object.getType().equals("own_job"))
-                                    return;
-
-                                // make sure not to add duplicates
-                                String id = object.getId();
-                                for (int i = 0, len = getCount(); i < len; i++) {
-                                    if (id.equals(getItem(i).getId())) return;
-                                }
-
-//                                // update the last start time
-//                                if (object.getStart() > lastStartTime) {
-//                                    lastStartTime = object.getEnd();
-//                                }
-
-                                super.add(object);
-                            }
-
-                            @Override
-                            public void addAll(Timeslot... items) {
-                                for (int i = 0; i < items.length; i++) add(items[i]);
-                                notifyDataSetChanged();
-                            }
-
-                        };
-                        listView.setAdapter(adapter);
-                    }
-
-                    Timeslot[] timeslots = new Timeslot[list.size()];
-                    for (int i = 0; i < list.size(); i++) timeslots[i] = list.get(i);
-                    adapter.addAll(timeslots);
-
-                    isLoading = false;
-                }
-
-                @Override
-                public void onFailure(Call<List<Timeslot>> call, Throwable t) {
-                    isLoading = false;
-                }
-            });
-
-        } else {
-            Toast.makeText(getActivity(), "No network connection", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public long getLastStartTime() {
-        if (adapter == null || adapter.isEmpty()) return 0;
-
-        long time = 0;
-        Timeslot timeslot;
-        for (int i = 0, len = adapter.getCount(); i < len; i++) {
-            timeslot = adapter.getItem(i);
-            if (timeslot == null || timeslot.getStart() == 0) continue;
-
-            if (timeslot.getStart() > time) time = timeslot.getStart();
+            Query query = FirebaseUtils.getBaseRef().child("tradesmanTimeslots").child(id).orderByChild("startTime");
+            adapter = new RecentJobsAdapter(getBaseActivity(), Object.class, OwnJobViewHolder.class, R.layout.own_job_summary_layout, query);
         }
 
-        return time;
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(layoutManager);
+
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void refresh() {
         if (adapter != null) adapter.notifyDataSetChanged();
+    }
+
+    private class RecentJobsAdapter extends MyFirebaseRecyclerAdapter<Object, OwnJobViewHolder> {
+
+        public RecentJobsAdapter(Activity activity, Class<Object> modelClass, Class<OwnJobViewHolder> holderClass, int modelLayout, Query ref) {
+            super(activity, modelClass, holderClass, modelLayout, ref);
+        }
+
+        @Override
+        protected void populateViewHolder(final OwnJobViewHolder holder, Object model, final int position) {
+            DatabaseReference ref = getRef(position);
+            String key = ref != null ? ref.getKey() : "";
+
+            if (Strings.isEmpty(key)) return;
+
+            FirebaseUtils.getBaseRef().child("timeslots").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Timeslot timeslot = dataSnapshot != null ? dataSnapshot.getValue(Timeslot.class) : null;
+
+                    holder.showTimeUntil = false; // do not show the time until time
+                    holder.bind(getBaseActivity(), timeslot, new OwnJobViewHolder.TimeslotClickedListener() {
+                        @Override
+                        public void onTimeslotClicked(Timeslot timeslot, boolean longClick) {
+                            HomefixServiceHelper.goToTimeslot(getBaseActivity(), timeslot, longClick);
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }

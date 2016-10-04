@@ -17,17 +17,16 @@ import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
-import com.homefix.tradesman.data.TradesmanController;
 import com.homefix.tradesman.home.HomeActivity;
 import com.homefix.tradesman.login.LoginActivity;
 import com.homefix.tradesman.model.CCA;
-import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
@@ -37,9 +36,6 @@ import com.samdroid.string.Strings;
 
 import butterknife.ButterKnife;
 import icepick.Icepick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 1/7/2016.
@@ -304,7 +300,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
     public void goToApp() {
         MyLog.e(TAG, "[goToApp]");
         // check if user logged in
-        Tradesman tradesman = TradesmanController.getCurrentTradesman();
+        FirebaseUser tradesman = FirebaseAuth.getInstance().getCurrentUser();
 
         Intent i;
 
@@ -319,7 +315,7 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
             i.putExtra("previousActivity", TAG);
         }
 
-        if (i != null) startActivity(i);
+        startActivity(i);
         finishWithAnimation();
     }
 
@@ -330,12 +326,10 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
 
     @Override
     public void onScrollingStarted() {
-
     }
 
     @Override
     public void onScrollingStopped() {
-
     }
 
     /**

@@ -2,16 +2,23 @@ package com.samdroid.common;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.samdroid.string.Strings;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class IntentHelper {
@@ -124,24 +131,152 @@ public class IntentHelper {
         context.startActivity(intent);
     }
 
-    public static void openEmailWithAttachment(Activity activity, String toEmail, String subject, String content, String filePath) {
-        if (activity == null) return;
-        Intent email = new Intent(Intent.ACTION_SENDTO);
-        email.setData(Uri.parse("mailto:")); // only email apps should handle this
-        email.putExtra(Intent.EXTRA_EMAIL, toEmail);
+    public static boolean openEmailWithAttachment(Activity activity, String toEmail, String subject, String content, String filePath) {
+        if (activity == null) return false;
+
+        Intent email = new Intent(Intent.ACTION_SEND);
+        email.setData(Uri.parse("mailto:" + toEmail)); // only email apps should handle this
+        email.putExtra(Intent.EXTRA_EMAIL, new String[]{toEmail});
         email.putExtra(Intent.EXTRA_SUBJECT, subject);
         email.putExtra(Intent.EXTRA_TEXT, content);
 
-        if (!Strings.isEmpty(filePath)) {
+        try {
+            if (Strings.isEmpty(filePath)) throw new NullPointerException();
+
             File file = new File(filePath);
             Uri uri = Uri.fromFile(file);
             email.putExtra(Intent.EXTRA_STREAM, uri);
             email.setType("application/pdf");
-        } else {
+
+        } catch (Exception e) {
             email.setType("text/plain");
         }
 
-        activity.startActivity(email);
+        try {
+            activity.startActivity(Intent.createChooser(email, "Send to Homefix"));
+            return true;
+
+        } catch (android.content.ActivityNotFoundException ex) {
+            return false;
+        }
+    }
+
+    public static boolean sendEmail(
+            final Context context,
+            final String toEmail,
+            final String emailSubject,
+            final String emailBody,
+            final ArrayList<String> attachments) {
+        try {
+            PackageManager pm = context.getPackageManager();
+            ResolveInfo selectedEmailActivity = null;
+
+            Intent emailDummyIntent = new Intent(Intent.ACTION_SENDTO);
+            emailDummyIntent.setData(Uri.parse("mailto:" + toEmail));
+
+            List<ResolveInfo> emailActivities = pm.queryIntentActivities(emailDummyIntent, 0);
+            if (null == emailActivities || emailActivities.size() == 0) {
+                Intent emailDummyIntentRFC822 = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                emailDummyIntentRFC822.setType("message/rfc822");
+
+                emailActivities = pm.queryIntentActivities(emailDummyIntentRFC822, 0);
+            }
+
+            if (null != emailActivities) {
+                if (emailActivities.size() == 1) {
+                    selectedEmailActivity = emailActivities.get(0);
+
+                } else {
+                    for (ResolveInfo currAvailableEmailActivity : emailActivities) {
+                        if (currAvailableEmailActivity.isDefault) {
+                            selectedEmailActivity = currAvailableEmailActivity;
+                        }
+                    }
+                }
+
+                if (null != selectedEmailActivity) {
+                    // Send email using the only/default email activity
+                    sendEmailUsingSelectedEmailApp(context, toEmail, emailSubject, emailBody, attachments, selectedEmailActivity);
+
+                } else {
+                    final List<ResolveInfo> emailActivitiesForDialog = emailActivities;
+
+                    String[] availableEmailAppsName = new String[emailActivitiesForDialog.size()];
+                    for (int i = 0; i < emailActivitiesForDialog.size(); i++) {
+                        availableEmailAppsName[i] = emailActivitiesForDialog.get(i).activityInfo.applicationInfo.loadLabel(pm).toString();
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Choose an email app");
+                    builder.setItems(availableEmailAppsName, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            sendEmailUsingSelectedEmailApp(context, toEmail, emailSubject, emailBody, attachments, emailActivitiesForDialog.get(which));
+                        }
+                    });
+
+                    builder.create().show();
+                }
+
+            } else {
+                sendEmailUsingSelectedEmailApp(context, toEmail, emailSubject, emailBody, attachments, null);
+            }
+
+        } catch (Exception ex) {
+            MyLog.e(IntentHelper.class.getSimpleName(), "Can't send email");
+            MyLog.printStackTrace(ex);
+            return false;
+        }
+
+        return true;
+    }
+
+    protected static boolean sendEmailUsingSelectedEmailApp(
+            final Context context,
+            final String toEmail,
+            final String emailSubject,
+            final String emailBody,
+            final ArrayList<String> attachments,
+            final ResolveInfo selectedEmailApp) {
+        try {
+            Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+
+            String aEmailList[] = {toEmail};
+
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, aEmailList);
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, null != emailSubject ? emailSubject : "");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, null != emailBody ? emailBody : "");
+
+            if (null != attachments && attachments.size() > 0) {
+                ArrayList<Uri> attachmentsUris = new ArrayList<>();
+
+                // Convert from paths to Android friendly Parcelable Uri's
+                for (String currAttachemntPath : attachments) {
+                    File fileIn = new File(currAttachemntPath);
+                    Uri currAttachemntUri = Uri.fromFile(fileIn);
+                    attachmentsUris.add(currAttachemntUri);
+                }
+                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, attachmentsUris);
+            }
+
+            if (null != selectedEmailApp) {
+                MyLog.d(IntentHelper.class.getSimpleName(), "Sending email using " + selectedEmailApp);
+
+                emailIntent.setComponent(new ComponentName(selectedEmailApp.activityInfo.packageName, selectedEmailApp.activityInfo.name));
+                context.startActivity(emailIntent);
+
+            } else {
+                Intent emailAppChooser = Intent.createChooser(emailIntent, "Select Email app");
+                context.startActivity(emailAppChooser);
+            }
+
+        } catch (Exception ex) {
+            MyLog.e(IntentHelper.class.getSimpleName(), "Error sending email");
+            MyLog.printStackTrace(ex);
+            return false;
+        }
+
+        return true;
     }
 
 }

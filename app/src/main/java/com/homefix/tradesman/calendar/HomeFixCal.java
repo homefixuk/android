@@ -4,26 +4,25 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
-import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.data.TradesmanController;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.homefix.tradesman.firebase.FirebaseUtils;
+import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
-import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 7/12/2016.
@@ -79,7 +78,7 @@ public class HomeFixCal {
          * @return if the time slot was added
          */
         public boolean addEvent(Timeslot timeslot) {
-            if (timeslot == null || Strings.isEmpty(timeslot.getId())) return false;
+            if (timeslot == null) return false;
 
             List<Timeslot> evs = getEvents();
             if (evs == null) evs = new ArrayList<>();
@@ -154,6 +153,9 @@ public class HomeFixCal {
 
             Timeslot ev = getFromId(original.getId());
             return ev != null && evs.remove(ev);
+        }
+
+        public void updateTimeslotService(Timeslot timeslot, OnGotObjectListener<Service> onGotObjectListener) {
         }
 
         /**
@@ -392,7 +394,45 @@ public class HomeFixCal {
         return month;
     }
 
-    public static void loadMonth(Context context, int year, int month, OnGetListListener<Timeslot> listener) {
+    public static void updateTimeslotService(final Timeslot timeslot, final @NonNull OnGotObjectListener<Service> onGotObjectListener) {
+//        final Month month = getMonth(timeslot);
+//        final String serviceId = timeslot != null ? timeslot.getServiceId() : null;
+//        if (month == null || Strings.isEmpty(serviceId)) {
+//            onGotObjectListener.onGotThing(null);
+//            return;
+//        }
+//
+//
+//
+//        HomeFix
+//                .getAPI()
+//                .getService(TradesmanController.getToken(), service.getId())
+//                .enqueue(new Callback<Service>() {
+//                    @Override
+//                    public void onResponse(Call<Service> call, Response<Service> response) {
+//                        Service serviceNew = response != null ? response.body() : null;
+//
+//                        // if the returned service is not valid
+//                        if (serviceNew == null || serviceNew.isEmpty()) {
+//                            onGotObjectListener.onGotThing(null);
+//                            return;
+//                        }
+//
+//                        // else it's valid so update timeslot and the month it's from
+//                        timeslot.setService(serviceNew);
+//                        month.updateEvent(timeslot, timeslot);
+//                        onGotObjectListener.onGotThing(serviceNew);
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<Service> call, Throwable t) {
+//                        if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
+//                        onGotObjectListener.onGotThing(null);
+//                    }
+//                });
+    }
+
+    public static void loadMonth(Context context, final int year, final int month, final OnGetListListener<Timeslot> listener) {
         if (year < 0 || month < 0) {
             if (listener != null) listener.onGetListFinished(null);
             return;
@@ -416,45 +456,44 @@ public class HomeFixCal {
 
         // start from beginning of month
         cal.set(year, month, 0);
-        params.put("startTime", cal.getTimeInMillis());
+        long startTime = cal.getTimeInMillis();
 
         // until the end of the month
         cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH) + 1);
-        params.put("endTime", cal.getTimeInMillis());
+        long endTime = cal.getTimeInMillis();
 
-        HomeFix
-                .getAPI()
-                .getTradesmanEvents(TradesmanController.getToken(), params)
-                .enqueue(new MyCallback(year, month, listener));
-    }
+        Query query = FirebaseUtils.getBaseRef().child("tradesmanTimeslots").orderByChild("startTime").startAt(startTime).endAt(endTime);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot == null) return;
 
-    private static class MyCallback implements Callback<List<Timeslot>> {
+                FirebaseUtils.GetMultiFirebaseObjects<Timeslot> get = new FirebaseUtils.GetMultiFirebaseObjects<Timeslot>(Timeslot.class, new OnGetListListener<Timeslot>() {
 
-        int year, month;
-        OnGetListListener<Timeslot> listener;
+                    @Override
+                    public void onGetListFinished(List<Timeslot> list) {
+                        if (list == null) list = new ArrayList<>();
 
-        public MyCallback(int year, int month, OnGetListListener<Timeslot> listener) {
-            this.month = month;
-            this.year = year;
-            this.listener = listener;
-        }
+                        addMonth(year, month, list);
+                        if (listener != null) listener.onGetListFinished(list);
+                    }
 
-        @Override
-        public void onResponse(Call<List<Timeslot>> call, Response<List<Timeslot>> response) {
-            List<Timeslot> timeslots = response != null ? response.body() : new ArrayList<Timeslot>();
+                });
 
-            addMonth(year, month, timeslots);
-            if (listener != null) listener.onGetListFinished(timeslots);
-        }
+                // add all the keys to the multi get
+                Iterable<DataSnapshot> childrenSnapshots = dataSnapshot.getChildren();
+                for (DataSnapshot childrenSnapshot : childrenSnapshots) {
+                    get.add(childrenSnapshot.getKey());
+                }
 
-        @Override
-        public void onFailure(Call<List<Timeslot>> call, Throwable t) {
-            if (MyLog.isIsLogEnabled() && t != null) t.printStackTrace();
-            MyLog.e(TAG, call.toString());
+                get.run();
+            }
 
-            if (listener != null) listener.onGetListFinished(new ArrayList<Timeslot>());
-        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
     }
 
 }

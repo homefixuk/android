@@ -19,19 +19,22 @@ import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
-import com.homefix.tradesman.BuildConfig;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.common.Ids;
+import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.homefix.tradesman.BuildConfig;
+import com.samdroid.common.IntentHelper;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
-import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
-import com.samdroid.network.NetworkManager;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.string.Strings;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -537,6 +540,44 @@ public class CalendarFragment<A extends HomeFixBaseActivity>
 
         if (needsNotifying && mView != null) {
             mView.notifyDatasetChanged();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Ids.TIMESLOT_CHANGE) {
+            String timeslotId = IntentHelper.getStringSafely(data, "timeslotId");
+            if (Strings.isEmpty(timeslotId)) {
+                MyLog.e(TAG, "[onActivityResult] timeslotId is empty");
+                return;
+            }
+
+            Timeslot timeslot = Timeslot.getSenderReceiver().get(timeslotId);
+            if (timeslot == null) {
+                MyLog.e(TAG, "[onActivityResult] timeslot is NULL");
+                return;
+            }
+
+            String action = IntentHelper.getStringSafely(data, "action");
+            if ("deleted".equals(action)) {
+                removeTimeslot(timeslot);
+
+            } else {
+                // remove the original timeslot
+                HomeFixCal.changeEvent(timeslot, timeslot);
+                if (mView != null) mView.notifyDatasetChanged();
+
+                HomeFixCal.updateTimeslotService(timeslot, new OnGotObjectListener<Service>() {
+
+                    @Override
+                    public void onGotThing(Service o) {
+                        MyLog.e(TAG, "Service update: " + (o == null ? "Failed" : "Success"));
+                        if (mView != null) mView.notifyDatasetChanged();
+                    }
+                });
+            }
         }
     }
 

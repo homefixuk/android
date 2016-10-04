@@ -1,35 +1,28 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class Tradesman extends BaseModel {
+@IgnoreExtraProperties
+public class Tradesman extends User {
 
-    private User user;
     private String type, picture;
     private double rating, experience;
-    private List<String> workAreas;
-    private String settings;
-    private Object currentLocation;
+    private Map<String, Boolean> workAreas;
+    private Map<String, Object> settings;
+    private Location currentLocation;
 
     public Tradesman() {
         super();
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getType() {
@@ -48,16 +41,6 @@ public class Tradesman extends BaseModel {
         return experience;
     }
 
-    public List<String> getWorkAreas() {
-        if (workAreas == null) workAreas = new ArrayList<>();
-
-        return workAreas;
-    }
-
-    public String getSettings() {
-        return Strings.returnSafely(settings);
-    }
-
     public void setType(String type) {
         this.type = type;
     }
@@ -74,19 +57,36 @@ public class Tradesman extends BaseModel {
         this.experience = experience;
     }
 
-    public void setWorkAreas(List<String> workAreas) {
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public Map<String, Boolean> getWorkAreas() {
+        if (workAreas == null) workAreas = new HashMap<>();
+        return workAreas;
+    }
+
+    public void setWorkAreas(Map<String, Boolean> workAreas) {
         this.workAreas = workAreas;
     }
 
-    public void setSettings(String settings) {
+    public Map<String, Object> getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Map<String, Object> settings) {
         this.settings = settings;
     }
 
-//    public TradesmanLocation getCurrentLocation() {
-//        return currentLocation;
-//    }
-//
-//    public void setCurrentLocation(TradesmanLocation currentLocation) {
-//        this.currentLocation = currentLocation;
-//    }
+
+    @Exclude
+    public ArrayList<String> getWorkAreasList() {
+        if (workAreas == null) workAreas = new HashMap<>();
+        return new ArrayList<>(workAreas.keySet());
+    }
+
 }

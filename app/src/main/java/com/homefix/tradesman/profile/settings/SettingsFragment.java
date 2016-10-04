@@ -12,15 +12,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.activity.BaseToolbarActivity;
 import com.homefix.tradesman.base.adapter.MyListAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.MyLog;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
@@ -34,9 +35,6 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 9/1/2016.
@@ -160,32 +158,6 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
         });
     }
 
-    private final Callback<TradesmanPrivate> privateCallback = new Callback<TradesmanPrivate>() {
-        @Override
-        public void onResponse(Call<TradesmanPrivate> call, Response<TradesmanPrivate> response) {
-            TradesmanPrivate tp = response != null ? response.body() : null;
-            if (tp == null) {
-                showErrorDialog();
-                return;
-            }
-
-            tradesmanPrivate = tp;
-            if (mAdapter != null) mAdapter.notifyDataSetChanged();
-            hideDialog();
-        }
-
-        @Override
-        public void onFailure(Call<TradesmanPrivate> call, Throwable t) {
-            if (t != null) {
-                if (MyLog.isIsLogEnabled()) t.printStackTrace();
-
-                MyLog.e(TAG, t.getMessage());
-            }
-
-            showErrorDialog();
-        }
-    };
-
     private void onStandardHourlyRateClicked() {
         MaterialDialogWrapper.getEditTextDialog(
                 getActivity(),
@@ -225,16 +197,27 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                             return;
                         }
 
+                        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanPrivateRef();
+                        if (ref == null) {
+                            Toast.makeText(getContext(), "Please make sure you're logged in", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         showDialog("Saving hourly rate...", true);
 
-                        Map<String, Object> changes = new HashMap<>();
-                        changes.put("standardHourlyRate", d);
-                        HomeFix.getAPI()
-                                .updateTradesmanPrivateDetails(
-                                        TradesmanController.getToken(),
-                                        getString(HomeFix.API_KEY_resId),
-                                        changes)
-                                .enqueue(privateCallback);
+                        // save the change in the DB
+                        ref.child("standardHourlyRate").setValue(d, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    showErrorDialog();
+                                    return;
+                                }
+
+                                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+                                hideDialog();
+                            }
+                        });
                     }
 
                     @Override
@@ -277,16 +260,27 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                             return;
                         }
 
+                        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanPrivateRef();
+                        if (ref == null) {
+                            Toast.makeText(getContext(), "Please make sure you're logged in", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         showDialog("Saving VAT Number...", true);
 
-                        Map<String, Object> changes = new HashMap<>();
-                        changes.put("vatNumber", s);
-                        HomeFix.getAPI()
-                                .updateTradesmanPrivateDetails(
-                                        TradesmanController.getToken(),
-                                        getString(HomeFix.API_KEY_resId),
-                                        changes)
-                                .enqueue(privateCallback);
+                        // save the change in the DB
+                        ref.child("vatNumber").setValue(s, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    showErrorDialog();
+                                    return;
+                                }
+
+                                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+                                hideDialog();
+                            }
+                        });
                     }
 
                     @Override
@@ -337,7 +331,15 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                             return;
                         }
 
-                        // put all the changes into a object map
+                        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanPrivateRef();
+                        if (ref == null) {
+                            Toast.makeText(getContext(), "Please make sure you're logged in", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        showDialog("Saving bank account info...", true);
+
+                        // put all the changes into a map
                         Map<String, Object> changes = new HashMap<>();
                         Set<String> keys = newValues.keySet();
                         for (String key : keys) {
@@ -345,15 +347,19 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                             changes.put(key, newValues.get(key));
                         }
 
-                        showDialog("Saving bank account info...", true);
+                        // save the change in the DB
+                        ref.updateChildren(changes, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    showErrorDialog();
+                                    return;
+                                }
 
-                        // send the updates to the server
-                        HomeFix.getAPI()
-                                .updateTradesmanPrivateDetails(
-                                        TradesmanController.getToken(),
-                                        getString(HomeFix.API_KEY_resId),
-                                        changes)
-                                .enqueue(privateCallback);
+                                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+                                hideDialog();
+                            }
+                        });
                     }
                 }
 
@@ -393,16 +399,27 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                             return;
                         }
 
+                        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanPrivateRef();
+                        if (ref == null) {
+                            Toast.makeText(getContext(), "Please make sure you're logged in", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         showDialog("Saving business name...", true);
 
-                        Map<String, Object> changes = new HashMap<>();
-                        changes.put("businessName", s);
-                        HomeFix.getAPI()
-                                .updateTradesmanPrivateDetails(
-                                        TradesmanController.getToken(),
-                                        getString(HomeFix.API_KEY_resId),
-                                        changes)
-                                .enqueue(privateCallback);
+                        // save the change in the DB
+                        ref.child("businessName").setValue(s, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    showErrorDialog();
+                                    return;
+                                }
+
+                                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+                                hideDialog();
+                            }
+                        });
                     }
 
                     @Override

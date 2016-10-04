@@ -2,15 +2,21 @@ package com.homefix.tradesman.login;
 
 import android.os.Bundle;
 import android.text.InputType;
+import android.widget.Toast;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
+import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.rey.material.widget.EditText;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.input.AsteriskPasswordTransformationMethod;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.resource.ColourUtils;
 import com.samdroid.string.Strings;
+
+import java.util.Arrays;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -111,16 +117,52 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
 
     @Override
     public void showNewUser() {
-        IntentHelper.openEmailWithAttachment(
+//        IntentHelper.openEmailWithAttachment(
+//                this,
+//                "contact@homefix.co.uk",
+//                "New Tradesman for the app",
+//                "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
+//                        "Full Name: <insert_name>\n" +
+//                        "Phone Number: <insert_phone_number>\n\n" +
+//                        "Additional notes: <insert_any_additional_notes>\n\n" +
+//                        "Kind Regards",
+//                null);
+
+        MaterialDialogWrapper.getMultiInputDialogWithLabels(
                 this,
-                "contact@homefix.co.uk",
-                "New Tradesman for the app",
-                "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
-                        "Full Name: <insert_name>\n" +
-                        "Phone Number: <insert_phone_number>\n\n" +
-                        "Additional notes: <insert_any_additional_notes>\n\n" +
-                        "Kind Regards",
-                null);
+                "Enter your information",
+                "OK",
+                Arrays.asList("Name", "Contact Number", "Additional Notes"),
+                Arrays.asList("Name", "Contact Number", "Additional Notes"),
+                Arrays.asList("", "", ""),
+                new OnGotObjectListener<HashMap<String, String>>() {
+                    @Override
+                    public void onGotThing(HashMap<String, String> o) {
+                        if (o == null || o.isEmpty()) {
+                            Toast.makeText(getContext(), "Signup request not sent", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        String name = o.get("Name");
+                        String body = "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
+                                "Name: " + name + " \n" +
+                                "Phone Number: " + o.get("Contact Number") + "\n\n";
+
+                        String notes = o.get("Additional Notes");
+                        if (!Strings.isEmpty(notes)) body += "Additional notes: " + notes + "\n\n";
+
+                        body += "Kind Regards";
+
+                        IntentHelper.sendEmail(
+                                getBaseActivity(),
+                                "contact@homefix.co.uk",
+                                name + ": new Tradesman for the Android app",
+                                body,
+                                null);
+                    }
+                }
+        ).show();
+
     }
 
 }

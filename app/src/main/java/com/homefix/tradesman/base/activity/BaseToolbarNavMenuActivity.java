@@ -17,16 +17,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.presenter.BaseToolbarNavMenuActivityPresenter;
 import com.homefix.tradesman.base.view.BaseToolbarNavMenuActivityView;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
-import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.Tradesman;
-import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.profile.ProfileFragment;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
@@ -40,7 +43,8 @@ import butterknife.ButterKnife;
  * Created by samuel on 6/22/2016.
  */
 
-public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuActivityView, P extends BaseToolbarNavMenuActivityPresenter<V>> extends BaseToolbarActivity<V, P>
+public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuActivityView, P extends BaseToolbarNavMenuActivityPresenter<V>>
+        extends BaseToolbarActivity<V, P>
         implements BaseToolbarNavMenuActivityView, NavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.navigation_view)
@@ -195,12 +199,23 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     }
 
     public void setupUser() {
-        Tradesman tradesman = TradesmanController.getCurrentTradesman();
-        User user = tradesman != null ? tradesman.getUser() : null;
-        if (user == null) return;
+        DatabaseReference ref = FirebaseUtils.getTradesmanPrivatesRef();
+        if (ref == null) return;
 
-        if (mUserNameTxt != null) mUserNameTxt.setText(user.getName());
-        if (mUserInfoTxt != null) mUserInfoTxt.setText(user.getEmail());
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Tradesman tradesman = dataSnapshot != null ? dataSnapshot.getValue(Tradesman.class) : null;
+                if (tradesman == null) return;
+
+                if (mUserNameTxt != null) mUserNameTxt.setText(tradesman.getName());
+                if (mUserInfoTxt != null) mUserInfoTxt.setText(tradesman.getEmail());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
     public void setCCANumber(String phone) {
@@ -260,7 +275,7 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
     public void onGotThing(CCA cca) {
         super.onGotThing(cca);
 
-        if (cca != null) setCCANumber(cca.getMobile());
+        if (cca != null) setCCANumber(cca.getMobilePhone());
     }
 
     /**

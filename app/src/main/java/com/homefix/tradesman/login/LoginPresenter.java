@@ -1,11 +1,22 @@
 package com.homefix.tradesman.login;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.api.HomeFix;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.data.TradesmanController;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Tradesman;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.IntentHelper;
@@ -15,6 +26,7 @@ import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import retrofit2.Call;
@@ -31,29 +43,36 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Callback<HashMap<String, Object>> callback = new Callback<HashMap<String, Object>>() {
+        final FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth.createUserWithEmailAndPassword("test@homefix.co.uk", "password").addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onResponse(Call<HashMap<String, Object>> call, Response<HashMap<String, Object>> response) {
-                MyLog.e("LoginPresenter", "[onResponse]");
-                VariableUtils.printMap(response.body());
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                MyLog.e(LoginPresenter.class.getSimpleName(), "Setup account: " + task.isSuccessful());
 
-                MyLog.e("LoginPresenter CALL", call.request().toString());
+                mFirebaseAuth.signInWithEmailAndPassword("test@homefix.co.uk", "password")
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                MyLog.d(LoginPresenter.class.getSimpleName(), "signInWithCredential:onComplete:" + task.isSuccessful());
+
+                                if (task.isSuccessful()) {
+                                    DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
+                                    HashMap<String, Object> children = new HashMap<>();
+                                    children.put("name", "Test Plumber");
+                                    children.put("createdAt", new Date());
+                                    ref.setValue(children, new DatabaseReference.CompletionListener() {
+                                        @Override
+                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                            MyLog.e(LoginPresenter.class.getSimpleName(), "Saved to DB: " + (databaseError != null));
+                                        }
+                                    });
+                                }
+
+                                mFirebaseAuth.signOut();
+                            }
+                        });
             }
-
-            @Override
-            public void onFailure(Call<HashMap<String, Object>> call, Throwable t) {
-                MyLog.e("LoginPresenter", "[onFailure]");
-                if (t != null) t.printStackTrace();
-            }
-        };
-
-//        HomeFix.getAPI().signup(
-//                getView().getContext().getString(HomeFix.API_KEY_resId),
-//                "Test",
-//                "Plumber",
-//                "testplumber@homefix.co.uk",
-//                "password",
-//                "TRADE").enqueue(callback);
+        });
     }
 
     public void doEmailPasswordLogin(String email, String password) {
@@ -79,67 +98,32 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
         // cache the email
         CacheUtils.writeObjectFile("email", email);
 
-        Callback<HashMap<String, Object>> callback = new Callback<HashMap<String, Object>>() {
-            @Override
-            public void onResponse(Call<HashMap<String, Object>> call, Response<HashMap<String, Object>> response) {
-                if (!isViewAttached()) return;
-
-                HashMap<String, Object> results = response != null ? response.body() : null;
-
-                VariableUtils.printMap(results);
-
-                if (results == null
-                        || !results.containsKey("token")
-                        || results.get("token") == null
-                        || Strings.isEmpty((String) results.get("token"))) {
-                    getView().hideAttemptingLogin();
-                    getView().showDialog("Sorry, something went wrong with the login. Please try again", false);
-                    return;
-                }
-
-                // cache the token
-                CacheUtils.writeFile("token", (String) results.get("token"));
-
-                // load the current user
-                TradesmanController.loadCurrentUser(true, new OnGotObjectListener<Tradesman>() {
+        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onGotThing(Tradesman tradesman) {
-                        if (tradesman == null) {
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        MyLog.d(LoginPresenter.class.getSimpleName(), "signInWithCredential:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user
+                        if (!task.isSuccessful()) {
                             getView().hideAttemptingLogin();
-                            getView().showDialog("Sorry, something went wrong with the login. Please try again", false);
-                            return;
+
+                            if (!NetworkManager.hasConnection(getView().getContext())) {
+                                getView().showDialog("Please make sure you are connected to the internet before logging in.", false);
+                            } else {
+                                getView().showEmailError("Please make sure your email is correct");
+                                getView().showPasswordError("Please make sure your password is correct");
+                            }
+
+                        } else {
+                            HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
+
+                            // we can take the user to the app
+                            getView().goToApp();
                         }
-
-                        HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
-
-                        // we can take the user to the app
-                        getView().goToApp();
                     }
                 });
-            }
-
-            @Override
-            public void onFailure(Call<HashMap<String, Object>> call, Throwable t) {
-                if (MyLog.isIsLogEnabled()) t.printStackTrace();
-
-                if (!isViewAttached()) return;
-
-                getView().hideAttemptingLogin();
-
-                if (!NetworkManager.hasConnection(getView().getContext())) {
-                    getView().showDialog("Please make sure you are connected to the internet before logging in.", false);
-                } else {
-                    getView().showEmailError("Please make sure your email is correct");
-                    getView().showPasswordError("Please make sure your password is correct");
-                }
-            }
-
-        };
-
-        HomeFix.getAPI().login(
-                getView().getContext().getString(HomeFix.API_KEY_resId),
-                email,
-                password).enqueue(callback);
     }
 
     public void onContactUsClicked() {

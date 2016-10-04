@@ -13,7 +13,7 @@ import java.util.List;
  * Created by samuel on 6/15/2016.
  */
 
-public class Timeslot extends BaseModel {
+public class Timeslot {
 
     public enum TYPE {
 
@@ -40,11 +40,23 @@ public class Timeslot extends BaseModel {
 
     }
 
+    private String id;
     private long start, end, slotLength;
     private String type;
-    private Tradesman tradesman;
-    private Service service;
+    private String tradesmanId, serviceId;
     private boolean canBeSplit;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTradesmanId() {
+        return tradesmanId;
+    }
 
     public long getStart() {
         return start;
@@ -60,14 +72,6 @@ public class Timeslot extends BaseModel {
 
     public String getType() {
         return Strings.returnSafely(type);
-    }
-
-    public Tradesman getTradesman() {
-        return tradesman;
-    }
-
-    public Service getService() {
-        return service;
     }
 
     public void setStart(long start) {
@@ -86,14 +90,6 @@ public class Timeslot extends BaseModel {
         this.type = type;
     }
 
-    public void setTradesman(Tradesman tradesman) {
-        this.tradesman = tradesman;
-    }
-
-    public void setService(Service service) {
-        this.service = service;
-    }
-
     public boolean isCanBeSplit() {
         return canBeSplit;
     }
@@ -102,9 +98,25 @@ public class Timeslot extends BaseModel {
         this.canBeSplit = canBeSplit;
     }
 
-    @Override
+    public void setTradesmanId(String tradesmanId) {
+        this.tradesmanId = tradesmanId;
+    }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+
+    //////////////
+    /// Helper ///
+    //////////////
+
     public boolean isEmpty() {
-        return tradesman == null || start == 0 || end == 0 || Strings.isEmpty(getId());
+        return Strings.isEmpty(tradesmanId) || start == 0 || end == 0;
     }
 
     public static void printList(List<Timeslot> list) {

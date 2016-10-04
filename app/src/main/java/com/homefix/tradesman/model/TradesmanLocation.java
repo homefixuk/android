@@ -8,14 +8,18 @@ import com.samdroid.string.Strings;
 
 public class TradesmanLocation {
 
-    private Tradesman tradesman;
+    private String tradesmanId;
     private boolean isGoingToJob;
     private long timestmap;
     private String activity;
     private Location location;
 
-    public Tradesman getTradesman() {
-        return tradesman;
+    public String getTradesmanId() {
+        return tradesmanId;
+    }
+
+    public void setTradesmanId(String tradesmanId) {
+        this.tradesmanId = tradesmanId;
     }
 
     public boolean isGoingToJob() {
@@ -24,10 +28,6 @@ public class TradesmanLocation {
 
     public long getTimestmap() {
         return timestmap;
-    }
-
-    public void setTradesman(Tradesman tradesman) {
-        this.tradesman = tradesman;
     }
 
     public void setGoingToJob(boolean goingToJob) {

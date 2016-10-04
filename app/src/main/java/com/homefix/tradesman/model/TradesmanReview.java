@@ -6,19 +6,34 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanReview extends BaseModel {
+public class TradesmanReview {
 
-    private Tradesman tradesman;
-    private User user;
+    private String tradesmanId, customerId;
     private double rating;
     private String review;
 
-    public Tradesman getTradesman() {
-        return tradesman;
+    public String getTradesmanId() {
+        return tradesmanId;
     }
 
-    public User getUser() {
-        return user;
+    public void setTradesmanId(String tradesmanId) {
+        this.tradesmanId = tradesmanId;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public void setReview(String review) {
+        this.review = review;
     }
 
     public double getRating() {

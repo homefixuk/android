@@ -1,17 +1,25 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.samdroid.string.Strings;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class User extends BaseModel {
+@IgnoreExtraProperties
+public class User {
 
-    private String firstName, lastName, email, mobile, role, homePhone;
+    private String firstName, lastName, email, mobilePhone, role, homePhone;
     private String homeAddressLine1, homeAddressLine2, homeAddressLine3, homePostcode, homeCountry;
     private String billingAddressLine1, billingAddressLine2, billingAddressLine3, billingPostcode, billingCountry;
+    private Map<String, Boolean> groups;
 
+    @Exclude
     public String getName() {
         return Strings.combineNames(firstName, lastName);
     }
@@ -32,8 +40,8 @@ public class User extends BaseModel {
         return Strings.returnSafely(homePhone);
     }
 
-    public String getMobile() {
-        return Strings.returnSafely(mobile);
+    public String getMobilePhone() {
+        return Strings.returnSafely(mobilePhone);
     }
 
     public String getHomeAddressLine1() {
@@ -92,8 +100,8 @@ public class User extends BaseModel {
         this.email = email;
     }
 
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
+    public void setMobilePhone(String mobilePhone) {
+        this.mobilePhone = mobilePhone;
     }
 
     public void setRole(String role) {
@@ -142,5 +150,14 @@ public class User extends BaseModel {
 
     public void setBillingCountry(String billingCountry) {
         this.billingCountry = billingCountry;
+    }
+
+    public Map<String, Boolean> getGroups() {
+        if (groups == null) groups = new HashMap<>();
+        return groups;
+    }
+
+    public void setGroups(Map<String, Boolean> groups) {
+        this.groups = groups;
     }
 }

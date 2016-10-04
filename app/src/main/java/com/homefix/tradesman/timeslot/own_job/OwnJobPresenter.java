@@ -181,7 +181,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
                         changes.put("customerName", customerName);
                     if (!user.getEmail().equals(customerEmail))
                         changes.put("customerEmail", customerEmail);
-                    if (!user.getMobile().equals(customerPhone))
+                    if (!user.getMobilePhone().equals(customerPhone))
                         changes.put("customerPhone", customerPhone);
                 }
 

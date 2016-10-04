@@ -6,7 +6,7 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class Activity extends BaseModel {
+public class Activity {
 
     Service service;
     String type;

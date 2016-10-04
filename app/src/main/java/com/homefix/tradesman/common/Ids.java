@@ -12,7 +12,8 @@ public class Ids {
             CODE_LOCATION_RECEIVER = 2,
             TIMESLOT_CHANGE = 3,
             PLACE_PICKER_REQUEST = 4,
-            WORK_AREAS_CODE = 5;
-
+            WORK_AREAS_CODE = 5,
+            UPDATE_CHARGES = 6,
+            UPDATE_PAYMENTS = 7;
 
 }

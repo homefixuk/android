@@ -11,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
@@ -21,7 +20,6 @@ import com.samdroid.string.Strings;
 import com.samdroid.view.ScreenUtils;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
 /**
  * Created by samuel on 6/16/2016.

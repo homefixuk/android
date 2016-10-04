@@ -1,5 +1,7 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.samdroid.string.Strings;
 
 import java.util.Map;
@@ -8,21 +10,17 @@ import java.util.Map;
  * Created by samuel on 7/27/2016.
  */
 
-public class Charge extends BaseModel {
+@IgnoreExtraProperties
+public class Charge {
 
-    private Object service;
     private double amount = 0;
     private String description; // labour/part/other
-    private double quantity = 1;
+    private double quantity = 1.0;
     private boolean withVat = true;
     private double markup = 0;
     private boolean markupBeforeVat = false;
 
     public Charge() {
-    }
-
-    public Object getService() {
-        return service;
     }
 
     public double getAmount() {
@@ -57,10 +55,6 @@ public class Charge extends BaseModel {
         return markupBeforeVat;
     }
 
-    public void setService(Object service) {
-        this.service = service;
-    }
-
     public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
@@ -78,53 +72,23 @@ public class Charge extends BaseModel {
     }
 
     public double getAmountWithVatAndMarkup() {
-        return totalCost() / quantity;
+        return getTotalCost() / quantity;
     }
 
-    public double totalCost() {
+    /**
+     * @return the total cost combining the VAT and markup multiplied by the quantity
+     */
+    @Exclude
+    public double getTotalCost() {
         // if there is no markup
         if (markup == 0) return quantity * amount * (withVat ? 1.2 : 1.0);
 
         double VAT = quantity * amount * (withVat ? 0.2 : 0.0);
 
-        if (markupBeforeVat) return (quantity * amount * (1.0 + markup)) + VAT;
+        if (markupBeforeVat) return (quantity * amount * (1.0 + markup * 0.01)) + VAT;
 
         // else markup is after VAT
-        return ((quantity * amount) + VAT) * (1.0 + markup);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o) || (o != null && o instanceof Charge && getId().equals(((Charge) o).getId()));
-    }
-
-    @Override
-    public Map<String, Object> toMap() {
-        Map<String, Object> map = super.toMap();
-
-        if (service != null) {
-            if (service instanceof String) {
-                String serviceId = (String) service;
-                if (!Strings.isEmpty(serviceId)) map.put("service", serviceId);
-
-            } else if (service instanceof Service) {
-                Service service1 = (Service) service;
-                if (!Strings.isEmpty(service1.getId())) map.put("service", service1.getId());
-
-            } else if (service instanceof Map) {
-                Map<String, Object> serviceMap = (Map<String, Object>) service;
-                if (serviceMap.containsKey("_id") && !Strings.isEmpty((String) serviceMap.get("_id")))
-                    map.put("service", serviceMap.get("_id"));
-            }
-        }
-
-        map.put("amount", getAmount());
-        if (!Strings.isEmpty(description)) map.put("description", description);
-        map.put("quantity", getQuantity());
-        map.put("withVat", isWithVat());
-        map.put("markup", getMarkup());
-        map.put("markupBeforeVat", isMarkupBeforeVat());
-        return map;
+        return ((quantity * amount) + VAT) * (1.0 + markup * 0.01);
     }
 
 }

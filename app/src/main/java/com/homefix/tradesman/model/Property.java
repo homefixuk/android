@@ -1,23 +1,28 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.samdroid.string.Strings;
+
+import java.util.Map;
 
 /**
  * Created by samuel on 6/15/2016.
  */
 
-public class Property extends BaseModel {
+@IgnoreExtraProperties
+public class Property {
 
-    private Group group;
+    private String groupId;
     private String addressLine1, addressLine2, addressLine3, country, postcode, phone;
-    private int number_tennants, number_bedrooms;
+    private int numberTennants, numberBedrooms;
     private double latitude, longitude;
+    private Map<String, Boolean> customerProperties;
 
     public Property() {
     }
 
-    public Group getGroup() {
-        return group;
+    public String getGroup() {
+        return groupId;
     }
 
     public String getAddressLine1() {
@@ -44,12 +49,12 @@ public class Property extends BaseModel {
         return Strings.returnSafely(phone);
     }
 
-    public int getNumber_tennants() {
-        return number_tennants;
+    public int getNumberTennants() {
+        return numberTennants;
     }
 
-    public int getNumber_bedrooms() {
-        return number_bedrooms;
+    public int getNumberBedrooms() {
+        return numberBedrooms;
     }
 
     public double getLatitude() {
@@ -77,8 +82,8 @@ public class Property extends BaseModel {
         return s;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setGroup(String groupId) {
+        this.groupId = groupId;
     }
 
     public void setAddressLine1(String addressLine1) {
@@ -105,12 +110,12 @@ public class Property extends BaseModel {
         this.phone = phone;
     }
 
-    public void setNumber_tennants(int number_tennants) {
-        this.number_tennants = number_tennants;
+    public void setNumberTennants(int numberTennants) {
+        this.numberTennants = numberTennants;
     }
 
-    public void setNumber_bedrooms(int number_bedrooms) {
-        this.number_bedrooms = number_bedrooms;
+    public void setNumberBedrooms(int numberBedrooms) {
+        this.numberBedrooms = numberBedrooms;
     }
 
     public void setLatitude(double latitude) {
@@ -119,5 +124,13 @@ public class Property extends BaseModel {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public Map<String, Boolean> getCustomerProperties() {
+        return customerProperties;
+    }
+
+    public void setCustomerProperties(Map<String, Boolean> customerProperties) {
+        this.customerProperties = customerProperties;
     }
 }

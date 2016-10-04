@@ -4,7 +4,7 @@ package com.homefix.tradesman.model;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanSkill extends BaseModel {
+public class TradesmanSkill {
 
     private Tradesman tradesman;
     private Skill skill;

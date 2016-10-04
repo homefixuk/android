@@ -6,21 +6,21 @@ import com.samdroid.string.Strings;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanNotification extends BaseModel {
+public class TradesmanNotification {
 
-    private Tradesman tradesman;
+    private String tradesmanId;
     private String type, title, content;
 
     public TradesmanNotification() {
 
     }
 
-    public Tradesman getTradesman() {
-        return tradesman;
+    public String getTradesmanId() {
+        return tradesmanId;
     }
 
-    public void setTradesman(Tradesman tradesman) {
-        this.tradesman = tradesman;
+    public void setTradesmanId(String tradesmanId) {
+        this.tradesmanId = tradesmanId;
     }
 
     public String getType() {

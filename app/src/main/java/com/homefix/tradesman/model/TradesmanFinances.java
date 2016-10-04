@@ -4,14 +4,14 @@ package com.homefix.tradesman.model;
  * Created by samuel on 6/15/2016.
  */
 
-public class TradesmanFinances extends BaseModel {
+public class TradesmanFinances {
 
-    private Tradesman tradesman;
+    private String tradesmanId;
     private int numberJobs;
     private double hoursWorked, amountEarned;
 
-    public Tradesman getTradesman() {
-        return tradesman;
+    public String getTradesman() {
+        return tradesmanId;
     }
 
     public int getNumberJobs() {
