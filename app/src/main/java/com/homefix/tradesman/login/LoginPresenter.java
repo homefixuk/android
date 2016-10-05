@@ -92,7 +92,7 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         MyLog.d(LoginPresenter.class.getSimpleName(), "signInWithCredential:onComplete:" + task.isSuccessful());
 
-                        // If sign in fails, display a message to the user
+                        // if sign in fails, display a message to the user
                         if (!task.isSuccessful()) {
                             getView().hideAttemptingLogin();
 

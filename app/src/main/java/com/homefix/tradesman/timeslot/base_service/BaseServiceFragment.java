@@ -101,7 +101,11 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
     protected Double latitude = null, longitude = null;
 
     private DatabaseReference serviceRef, serviceSetRef, customerPropertyRef, customerRef, propertyRef;
-
+    protected Service mService;
+    protected ServiceSet mServiceSet;
+    protected CustomerProperty mCustomerProperty;
+    protected Customer mCustomer;
+    protected Property mProperty;
 
     public BaseServiceFragment() {
     }
@@ -173,17 +177,24 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Service service = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Service.class) : null;
-            if (service != null) {
-                if (mJobTypeTxt != null) mJobTypeTxt.setText(service.getServiceType());
+            if (service == null) return;
 
-                setupServiceSet(service.getServiceSetId());
-            }
+            setupServiceView(service);
+            setupServiceSet(service.getServiceSetId());
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
         }
     };
+
+    protected void setupServiceView(Service service) {
+        mService = service;
+
+        if (mService == null) return;
+
+        if (mJobTypeTxt != null) mJobTypeTxt.setText(mService.getServiceType());
+    }
 
     private void setupServiceSet(String serviceSetId) {
         if (Strings.isEmpty(serviceSetId)) return;
@@ -203,6 +214,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
             ServiceSet serviceSet = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(ServiceSet.class) : null;
             if (serviceSet == null) return;
 
+            setupServiceSetView(serviceSet);
             setupCustomerProperty(serviceSet.getCustomerPropertyId());
         }
 
@@ -211,6 +223,10 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         }
     };
+
+    protected void setupServiceSetView(ServiceSet serviceSet) {
+        mServiceSet = serviceSet;
+    }
 
     private void setupCustomerProperty(String customerPropertyId) {
         if (Strings.isEmpty(customerPropertyId)) return;
@@ -228,13 +244,15 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             CustomerProperty customerProperty = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(CustomerProperty.class) : null;
-            if (customerProperty == null) return;
+            setupCustomerPropertyView(customerProperty);
 
-            String customerId = customerProperty.getCustomerId();
-            setupCustomer(customerId);
+            if (customerProperty != null) {
+                String customerId = customerProperty.getCustomerId();
+                setupCustomer(customerId);
 
-            String propertyId = customerProperty.getPropertyId();
-            setupProperty(propertyId);
+                String propertyId = customerProperty.getPropertyId();
+                setupProperty(propertyId);
+            }
         }
 
         @Override
@@ -242,6 +260,10 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         }
     };
+
+    protected void setupCustomerPropertyView(CustomerProperty customerProperty) {
+        mCustomerProperty = customerProperty;
+    }
 
     private void setupCustomer(String customerId) {
         if (Strings.isEmpty(customerId)) return;
@@ -258,20 +280,7 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Customer customer = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Customer.class) : null;
-            if (customer == null) return;
-
-            if (mPersonNameTxt != null) mPersonNameTxt.setText(customer.getName());
-
-            if (mPersonEmailTxt != null) {
-                final String email = customer.getEmail();
-                mPersonEmailTxt.setText(email);
-            }
-
-            if (mPersonPhoneNumberTxt != null) {
-                String phone = customer.getHomePhone();
-                if (Strings.isEmpty(phone)) phone = customer.getMobilePhone();
-                mPersonPhoneNumberTxt.setText(phone);
-            }
+            setupCustomerView(customer);
         }
 
         @Override
@@ -279,6 +288,24 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
 
         }
     };
+
+    protected void setupCustomerView(Customer customer) {
+        mCustomer = customer;
+        if (mCustomer == null) return;
+
+        if (mPersonNameTxt != null) mPersonNameTxt.setText(mCustomer.getName());
+
+        if (mPersonEmailTxt != null) {
+            final String email = mCustomer.getEmail();
+            mPersonEmailTxt.setText(email);
+        }
+
+        if (mPersonPhoneNumberTxt != null) {
+            String phone = mCustomer.getHomePhone();
+            if (Strings.isEmpty(phone)) phone = mCustomer.getMobilePhone();
+            mPersonPhoneNumberTxt.setText(phone);
+        }
+    }
 
     private void setupProperty(String propertyId) {
         if (Strings.isEmpty(propertyId)) return;
@@ -295,22 +322,25 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Property property = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Property.class) : null;
-            if (property == null) return;
-
-            addressLine1 = property.getAddressLine1();
-            addressLine2 = property.getAddressLine2();
-            addressLine3 = property.getAddressLine3();
-            postcode = property.getPostcode();
-            country = property.getCountry();
-            updateLocationText();
+            setupPropertyView(property);
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
         }
     };
 
+    protected void setupPropertyView(Property property) {
+        mProperty = property;
+        if (mProperty == null) return;
+
+        addressLine1 = mProperty.getAddressLine1();
+        addressLine2 = mProperty.getAddressLine2();
+        addressLine3 = mProperty.getAddressLine3();
+        postcode = mProperty.getPostcode();
+        country = mProperty.getCountry();
+        updateLocationText();
+    }
 
     /**
      * Show the google place picker activity

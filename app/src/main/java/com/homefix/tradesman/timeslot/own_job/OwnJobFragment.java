@@ -20,7 +20,7 @@ import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
-import com.homefix.tradesman.model.User;
+import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.own_job.charges.ChargesActivity;
@@ -61,6 +61,8 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     @BindView(R.id.payments_txt)
     protected TextView mPaymentsTxt;
 
+    private DatabaseReference serviceRef, serviceSetRef, customerPropertyRef, customerRef, propertyRef;
+
     public OwnJobFragment() {
     }
 
@@ -80,34 +82,6 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     public void setupView() {
         super.setupView();
 
-        Service service = mTimeslot != null ? mTimeslot.getService() : null;
-        if (service != null) {
-            ServiceSet serviceSet = service.getServiceSet();
-            if (serviceSet != null) {
-                if (mChargesTxt != null) {
-                    mChargesTxt.setText(HtmlHelper.fromHtml("£" + Strings.priceToString(serviceSet.getTotalCost()) + " total"));
-                }
-
-                if (mPaymentsTxt != null) {
-                    double amountRemaining = serviceSet.getAmountRemaining();
-                    double amountPaid = serviceSet.getAmountPaid();
-                    String s = "";
-
-                    if (amountRemaining > 0) {
-                        s += Strings.setStringColour("£" + Strings.priceToString(amountRemaining) + " due", ColorUtils.red);
-                    }
-
-                    if (amountPaid > 0) {
-                        if (amountRemaining > 0) s += " ";
-                        s += Strings.setStringColour("(£" + Strings.priceToString(amountPaid) + " paid)", ColorUtils.green);
-                    }
-
-                    mPaymentsTxt.setText(HtmlHelper.fromHtml(s));
-                }
-
-            }
-        }
-
         BackgroundColourOnTouchListener touchListener = new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.colorAccentDark) {
 
             @Override
@@ -122,14 +96,40 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
         if (mPaymentsBar != null) mPaymentsBar.setOnTouchListener(touchListener);
     }
 
-    private void goToActivitySendingService(Class activityClass, int requestCode) {
-        Service service = mTimeslot != null ? mTimeslot.getService() : null;
+    @Override
+    protected void setupServiceSetView(ServiceSet serviceSet) {
+        super.setupServiceSetView(serviceSet);
 
-        if (service == null) return;
+        if (serviceSet == null) return;
+
+        if (mChargesTxt != null) {
+            mChargesTxt.setText(HtmlHelper.fromHtml("£" + Strings.priceToString(serviceSet.getTotalCost()) + " total"));
+        }
+
+        if (mPaymentsTxt != null) {
+            double amountRemaining = serviceSet.getAmountRemaining();
+            double amountPaid = serviceSet.getAmountPaid();
+            String s = "";
+
+            if (amountRemaining > 0) {
+                s += Strings.setStringColour("£" + Strings.priceToString(amountRemaining) + " due", ColorUtils.red);
+            }
+
+            if (amountPaid > 0) {
+                if (amountRemaining > 0) s += " ";
+                s += Strings.setStringColour("(£" + Strings.priceToString(amountPaid) + " paid)", ColorUtils.green);
+            }
+
+            mPaymentsTxt.setText(HtmlHelper.fromHtml(s));
+        }
+    }
+
+    private void goToActivitySendingService(Class activityClass, int requestCode) {
+        if (mService == null) return;
 
         // add the service to the cache
-        String serviceKey = "" + mTimeslot.getService().hashCode();
-        Service.getSenderReceiver().put(serviceKey, mTimeslot.getService());
+        String serviceKey = "" + mService.hashCode();
+        Service.getSenderReceiver().put(serviceKey, mService);
 
         // start the ChargesActivity
         Intent i = new Intent(getContext(), activityClass);
@@ -230,14 +230,13 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                                 }
 
                                 if (which == 0) {
-                                    Service service = mTimeslot != null ? mTimeslot.getService() : null;
                                     String content = "";
 
                                     content += "Hi " + invoice.getCustomerFirstName() + ",\n\n";
                                     content += "Please see your attached invoice";
-                                    if (service != null && service.getDepartTime() > 0) {
+                                    if (mService != null && mService.getDepartTime() > 0) {
                                         Date d = new Date();
-                                        d.setTime(service.getDepartTime());
+                                        d.setTime(mTimeslot.getStartTime());
                                         content += " for the work done on the " + SimpleDateFormat.getInstance().format(d) + ".";
                                     } else {
                                         content += ".";
@@ -245,9 +244,8 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                                     content += "\n\n";
                                     content += "Kind Regards,\n";
 
-                                    Tradesman tradesman = TradesmanController.getCurrentTradesman();
-                                    User user = tradesman != null ? tradesman.getUser() : null;
-                                    content += user != null ? user.getName() : "Your Homefix Tradesman";
+                                    Tradesman tradesman = Tradesman.getCurrentTradesman();
+                                    content += tradesman != null ? tradesman.getName() : "Your Homefix Tradesman";
 
                                     IntentHelper.openEmailWithAttachment(
                                             getBaseActivity(),
@@ -279,9 +277,10 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
     }
 
     private void generateInvoice(@NonNull final OnGotObjectListener<OwnJobInvoice> callback) {
+        final Tradesman currentTradesman = Tradesman.getCurrentTradesman();
         final String serviceId = mTimeslot != null ? mTimeslot.getServiceId() : null;
         DatabaseReference ref = FirebaseUtils.getCurrentTradesmanPrivateRef();
-        if (Strings.isEmpty(serviceId) || ref == null) {
+        if (currentTradesman == null || Strings.isEmpty(serviceId) || ref == null) {
             callback.onGotThing(null);
             return;
         }
@@ -294,9 +293,15 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
                     return;
                 }
 
+                TradesmanPrivate tradesmanPrivate = dataSnapshot.getValue(TradesmanPrivate.class);
+
                 OwnJobInvoice invoice = new OwnJobInvoice(
-                        mTimeslot != null ? mTimeslot.getService() : null,
-                        o);
+                        currentTradesman,
+                        mService,
+                        mServiceSet,
+                        mCustomer,
+                        mProperty,
+                        tradesmanPrivate);
 
                 invoice.generate();
                 callback.onGotThing(invoice);

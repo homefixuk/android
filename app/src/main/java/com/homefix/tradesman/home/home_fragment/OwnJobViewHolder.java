@@ -311,5 +311,4 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
         }
     };
 
-
 }

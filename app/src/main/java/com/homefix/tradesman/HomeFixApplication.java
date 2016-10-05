@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.service.LocationService;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
@@ -53,7 +54,7 @@ public class HomeFixApplication extends MultiDexApplication {
     }
 
     public static void setupAppAfterLogin(Context context) {
-
+        Tradesman.getCurrentTradesman();
     }
 
     public static HomeFixApplication getInstance() {
