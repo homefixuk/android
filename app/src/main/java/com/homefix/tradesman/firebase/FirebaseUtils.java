@@ -538,8 +538,10 @@ public class FirebaseUtils {
         property.setAddressLine3(addressLine3);
         property.setCountry(country);
         property.setPostcode(postcode);
-        property.setLatitude(latitude);
-        property.setLongitude(longitude);
+        if (latitude != null && longitude != null) {
+            property.setLatitude(latitude);
+            property.setLongitude(longitude);
+        }
 
         CustomerProperty customerProperty = new CustomerProperty();
         customerProperty.setId(customerPropertyInfoKey);

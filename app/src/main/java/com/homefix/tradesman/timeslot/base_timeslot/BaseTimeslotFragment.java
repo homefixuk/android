@@ -27,7 +27,6 @@ import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 
 import java.util.Calendar;
-import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -114,6 +113,8 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     public void setupView() {
+        MyLog.e(TAG, "[setupView] BaseTimeslotFragment");
+
         if (mIcon != null) {
             if (mType == Timeslot.TYPE.BREAK)
                 mIcon.setImageResource(R.drawable.ic_food_grey600_48dp);
@@ -139,22 +140,15 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         }
 
         hasMadeChanges = false;
-
-        if (timeslotRef != null) timeslotRef.removeEventListener(timeslotValueEventListener);
-
-        // setup the new timeslot listener
-        String timeslotId = mTimeslot != null ? mTimeslot.getId() : null;
-        timeslotRef = FirebaseUtils.getSpecificTimeslotRef(timeslotId);
-        if (timeslotRef != null) timeslotRef.addValueEventListener(timeslotValueEventListener);
     }
 
-    private ValueEventListener timeslotValueEventListener = new ValueEventListener() {
+    private final ValueEventListener timeslotValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             MyLog.e(TAG, "[timeslotValueEventListener]");
-            mTimeslot = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Timeslot.class) : mTimeslot;
+            Timeslot timeslot = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Timeslot.class) : mTimeslot;
 //            Timeslot.printList(Collections.singletonList(mTimeslot));
-            setupView();
+            setupTimeslot(timeslot);
         }
 
         @Override
@@ -168,11 +162,51 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         }
     };
 
+    protected void setupTimeslot(Timeslot timeslot) {
+        if (timeslot == null) return;
+
+        setTimeslot(timeslot);
+        setupView();
+    }
+
     @Override
     public void setTimeslot(Timeslot timeslot) {
         this.mTimeslot = timeslot;
 
-        if (mTimeslot != null) mType = Timeslot.TYPE.getTypeEnum(mTimeslot.getType());
+        if (mTimeslot != null) {
+            mType = Timeslot.TYPE.getTypeEnum(mTimeslot.getType());
+
+            if (mTimeslot.getStartTime() > 0) {
+                mStartCal = Calendar.getInstance();
+                mStartCal.setTimeInMillis(mTimeslot.getStartTime());
+            }
+
+            if (mTimeslot.getEndTime() > 0) {
+                mEndCal = Calendar.getInstance();
+                mEndCal.setTimeInMillis(mTimeslot.getEndTime());
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // setup the new timeslot listener
+        String timeslotId = mTimeslot != null ? mTimeslot.getId() : null;
+        timeslotRef = FirebaseUtils.getSpecificTimeslotRef(timeslotId);
+        if (timeslotRef != null) {
+            MyLog.e(TAG, "[setupView] add listener to timeslotRef");
+            timeslotRef.addValueEventListener(timeslotValueEventListener);
+        } else {
+            MyLog.e(TAG, "[setupView] timeslotRef is NULL");
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (timeslotRef != null) timeslotRef.removeEventListener(timeslotValueEventListener);
+        super.onPause();
     }
 
     public void setType(Timeslot.TYPE type) {

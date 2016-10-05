@@ -21,7 +21,6 @@ import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.listener.OnNewLocationListener;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
-import com.samdroid.common.VariableUtils;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
@@ -36,8 +35,7 @@ public class LocationService extends Service {
     private static final String TAG = LocationService.class.getSimpleName();
 
     public static final int MIN_TIME_REQUEST = 60 * 1000; // milliseconds
-    public static final float MIN_DISTANCE = 0f; // metres
-    private static final long MIN_LOCATION_UPDATE_TIME = TimeUtils.getMinutesInMillis(2);
+    public static final float MIN_DISTANCE = 5f; // metres
 
     private static Location currentLocation, prevLocation;
     private static DetectedActivity currentActivity;
@@ -272,7 +270,7 @@ public class LocationService extends Service {
             long time = System.currentTimeMillis();
 
             // if it has not been enough time between updates, do not send the updated location
-            if (time < lastLocationTime + MIN_LOCATION_UPDATE_TIME) return;
+            if (time < lastLocationTime + getLocationUpdateInterval(currentActivity)) return;
             lastLocationTime = time;
 
             // send the update to the server
@@ -303,6 +301,16 @@ public class LocationService extends Service {
         }
 
         notifyListeners(location);
+    }
+
+    private static long getLocationUpdateInterval(DetectedActivity currentActivity) {
+        if (currentActivity != null && currentActivity.getType() != DetectedActivity.IN_VEHICLE)
+            return 15 * 1000;
+
+        if (currentActivity != null && currentActivity.getType() != DetectedActivity.ON_FOOT)
+            return 45 * 1000;
+
+        return TimeUtils.getMinutesInMillis(2);
     }
 
     private static void notifyListeners(Location location) {

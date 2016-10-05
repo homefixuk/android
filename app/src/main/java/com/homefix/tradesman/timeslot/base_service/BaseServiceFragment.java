@@ -33,6 +33,7 @@ import com.homefix.tradesman.model.CustomerProperty;
 import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
+import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
@@ -115,6 +116,9 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
     public void setupView() {
         super.setupView();
 
+        Context applicationContext = getContext() != null ? getContext().getApplicationContext() : null;
+        if (applicationContext == null) return;
+
         ViewUtils.setEditTextEditable(mPersonNameTxt, isEdit);
         ViewUtils.setEditTextEditable(mPersonEmailTxt, isEdit);
         ViewUtils.setEditTextEditable(mPersonPhoneNumberTxt, isEdit);
@@ -133,15 +137,15 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
             BackgroundViewColourOnTouchListener listener = new BackgroundViewColourOnTouchListener(
                     mPersonEmailTxt,
-                    ContextCompat.getColor(getContext(), R.color.transparent),
-                    ContextCompat.getColor(getContext(), R.color.colorAccentDark));
+                    ContextCompat.getColor(applicationContext, R.color.transparent),
+                    ContextCompat.getColor(applicationContext, R.color.colorAccentDark));
             if (mPersonEmailTxt != null) mPersonEmailTxt.setOnTouchListener(listener);
             if (mEmailIcon != null) mEmailIcon.setOnTouchListener(listener);
 
             BackgroundViewColourOnTouchListener phoneListener = new BackgroundViewColourOnTouchListener(
                     mPersonPhoneNumberTxt,
-                    ContextCompat.getColor(getContext(), R.color.transparent),
-                    ContextCompat.getColor(getContext(), R.color.colorAccentDark));
+                    ContextCompat.getColor(applicationContext, R.color.transparent),
+                    ContextCompat.getColor(applicationContext, R.color.colorAccentDark));
             if (mPersonPhoneNumberTxt != null)
                 mPersonPhoneNumberTxt.setOnTouchListener(phoneListener);
             if (mPhoneIcon != null) mPhoneIcon.setOnTouchListener(phoneListener);
@@ -164,14 +168,39 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         if (mLocationIcon != null)
             mLocationIcon.setImageResource(R.drawable.ic_map_marker_grey600_48dp);
+    }
 
+    @Override
+    protected void setupTimeslot(Timeslot timeslot) {
+        super.setupTimeslot(timeslot);
+
+        setupServiceRefListener();
+    }
+
+    private void setupServiceRefListener() {
+        String serviceId = mTimeslot != null ? mTimeslot.getServiceId() : null;
+        serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
+        if (serviceRef != null) {
+            MyLog.e(TAG, "[setupServiceRefListener] add listener to serviceRef");
+            serviceRef.addValueEventListener(serviceValueEventListener);
+        } else {
+            MyLog.e(TAG, "[setupServiceRefListener] serviceRef is NULL");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        setupServiceRefListener();
+    }
+
+    @Override
+    public void onPause() {
         // remove the old listener
         if (serviceRef != null) serviceRef.removeEventListener(serviceValueEventListener);
 
-        // setup the new one
-        String serviceId = mTimeslot != null ? mTimeslot.getServiceId() : null;
-        serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
-        if (serviceRef != null) serviceRef.addValueEventListener(serviceValueEventListener);
+        super.onPause();
     }
 
     private ValueEventListener serviceValueEventListener = new ValueEventListener() {
@@ -182,7 +211,7 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
             Service service = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Service.class) : null;
             if (service == null) return;
 
-            MyLog.e(TAG, "[serviceValueEventListener] got snapshot: SUCCESS");
+            MyLog.e(TAG, "[serviceValueEventListener] got snapshot: SUCCESS -> " + service.getServiceSetId());
             setupServiceView(service);
             setupServiceSet(service.getServiceSetId());
         }
@@ -200,14 +229,16 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
     protected void setupServiceView(Service service) {
         mService = service;
-
         if (mService == null) return;
 
         if (mJobTypeTxt != null) mJobTypeTxt.setText(mService.getServiceType());
     }
 
     private void setupServiceSet(String serviceSetId) {
-        if (Strings.isEmpty(serviceSetId)) return;
+        if (Strings.isEmpty(serviceSetId)) {
+            MyLog.e(TAG, "[setupServiceSet] serviceSetId is empty");
+            return;
+        }
 
         // remove the old listener
         if (serviceSetRef != null) serviceSetRef.removeEventListener(serviceSetValueEventListener);
@@ -216,21 +247,30 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         serviceSetRef = FirebaseUtils.getSpecificServiceSetRef(serviceSetId);
         if (serviceSetRef != null)
             serviceSetRef.addValueEventListener(serviceSetValueEventListener);
+        else MyLog.e(TAG, "[setupServiceSet] serviceSetRef is NULL");
     }
 
     private ValueEventListener serviceSetValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            ServiceSet serviceSet = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(ServiceSet.class) : null;
-            if (serviceSet == null) return;
+            ServiceSet serviceSet = dataSnapshot != null ? dataSnapshot.getValue(ServiceSet.class) : null;
+            if (serviceSet == null) {
+                MyLog.e(TAG, "[serviceSetValueEventListener] serviceSet is NULL");
+                return;
+            }
 
+            MyLog.e(TAG, "[serviceSetValueEventListener] serviceSet SUCCESS");
             setupServiceSetView(serviceSet);
             setupCustomerProperty(serviceSet.getCustomerPropertyId());
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
+            MyLog.e(TAG, "[serviceSetValueEventListener] onCancelled");
+            if (databaseError != null) {
+                MyLog.e(TAG, "[serviceSetValueEventListener] " + databaseError.getMessage());
+                MyLog.printStackTrace(databaseError.toException());
+            }
         }
     };
 
@@ -246,8 +286,10 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
             customerPropertyRef.removeEventListener(customerPropertyIdListener);
 
         // setup the new one
-        customerPropertyRef = FirebaseUtils.getBaseRef().child("customerProperties").child(customerPropertyId);
-        customerPropertyRef.addValueEventListener(customerPropertyIdListener);
+        customerPropertyRef = FirebaseUtils.getBaseRef().child("customerPropertyInfos").child(customerPropertyId);
+        if (customerPropertyRef != null)
+            customerPropertyRef.addValueEventListener(customerPropertyIdListener);
+        else MyLog.e(TAG, "[setupCustomerProperty] NULL");
     }
 
     private ValueEventListener customerPropertyIdListener = new ValueEventListener() {
@@ -262,17 +304,28 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
                 String propertyId = customerProperty.getPropertyId();
                 setupProperty(propertyId);
+
+            } else {
+                MyLog.e(TAG, "[customerPropertyIdListener] is NULL");
             }
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
+            MyLog.e(TAG, "[customerPropertyIdListener] onCancelled");
+            if (databaseError != null) {
+                MyLog.e(TAG, "[customerPropertyIdListener] " + databaseError.getMessage());
+                MyLog.printStackTrace(databaseError.toException());
+            }
         }
     };
 
     protected void setupCustomerPropertyView(CustomerProperty customerProperty) {
         mCustomerProperty = customerProperty;
+        if (mCustomerProperty == null) return;
+
+        if (mCustomerPropertyType != null)
+            mCustomerPropertyType.setText(mCustomerProperty.getType());
     }
 
     private void setupCustomer(String customerId) {
@@ -283,7 +336,8 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         // setup the new one
         customerRef = FirebaseUtils.getBaseRef().child("customers").child(customerId);
-        customerRef.addValueEventListener(propertyListener);
+        if (customerRef != null) customerRef.addValueEventListener(customerListener);
+        else MyLog.e(TAG, "[setupCustomer] ref is NULL");
     }
 
     private ValueEventListener customerListener = new ValueEventListener() {
@@ -295,7 +349,11 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
+            MyLog.e(TAG, "[customerListener] onCancelled");
+            if (databaseError != null) {
+                MyLog.e(TAG, "[customerListener] " + databaseError.getMessage());
+                MyLog.printStackTrace(databaseError.toException());
+            }
         }
     };
 
@@ -325,7 +383,8 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         // setup the new one
         propertyRef = FirebaseUtils.getBaseRef().child("properties").child(propertyId);
-        propertyRef.addValueEventListener(propertyListener);
+        if (propertyRef != null) propertyRef.addValueEventListener(propertyListener);
+        else MyLog.e(TAG, "[setupProperty] NULL");
     }
 
     private ValueEventListener propertyListener = new ValueEventListener() {
@@ -337,6 +396,11 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
+            MyLog.e(TAG, "[propertyListener] onCancelled");
+            if (databaseError != null) {
+                MyLog.e(TAG, "[propertyListener] " + databaseError.getMessage());
+                MyLog.printStackTrace(databaseError.toException());
+            }
         }
     };
 
