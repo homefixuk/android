@@ -54,7 +54,7 @@ public class HomeFixApplication extends MultiDexApplication {
     }
 
     public static void setupAppAfterLogin(Context context) {
-        Tradesman.getCurrentTradesman();
+        Tradesman.setupCurrentTradesman();
     }
 
     public static HomeFixApplication getInstance() {

@@ -13,14 +13,21 @@ import android.widget.TimePicker;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 
 import java.util.Calendar;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -55,6 +62,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     @BindView(R.id.save)
     protected TextView mSaveTxt;
 
+    private DatabaseReference timeslotRef;
     protected Calendar mStartCal, mEndCal;
 
     public BaseTimeslotFragment() {
@@ -131,57 +139,40 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         }
 
         hasMadeChanges = false;
+
+        if (timeslotRef != null) timeslotRef.removeEventListener(timeslotValueEventListener);
+
+        // setup the new timeslot listener
+        String timeslotId = mTimeslot != null ? mTimeslot.getId() : null;
+        timeslotRef = FirebaseUtils.getSpecificTimeslotRef(timeslotId);
+        if (timeslotRef != null) timeslotRef.addValueEventListener(timeslotValueEventListener);
     }
+
+    private ValueEventListener timeslotValueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            MyLog.e(TAG, "[timeslotValueEventListener]");
+            mTimeslot = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Timeslot.class) : mTimeslot;
+//            Timeslot.printList(Collections.singletonList(mTimeslot));
+            setupView();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            MyLog.e(TAG, "[timeslotValueEventListener] error");
+            if (databaseError != null) {
+                MyLog.e(TAG, databaseError.getDetails());
+                MyLog.e(TAG, databaseError.getMessage());
+                MyLog.printStackTrace(databaseError.toException());
+            }
+        }
+    };
 
     @Override
     public void setTimeslot(Timeslot timeslot) {
         this.mTimeslot = timeslot;
 
         if (mTimeslot != null) mType = Timeslot.TYPE.getTypeEnum(mTimeslot.getType());
-    }
-
-    private boolean isRefreshingService = false;
-
-    public void refreshService() {
-        if (isRefreshingService) return;
-        isRefreshingService = true;
-
-//        final Service service = mTimeslot != null ? mTimeslot.getService() : null;
-//        // if there is no timeslot just refresh the view
-//        if (service == null) {
-//            setupView();
-//            return;
-//        }
-//
-//        HomeFix
-//                .getAPI()
-//                .getService(TradesmanController.getToken(), service.getId())
-//                .enqueue(new Callback<Service>() {
-//                    @Override
-//                    public void onResponse(Call<Service> call, Response<Service> response) {
-//                        Service service1 = response != null ? response.body() : null;
-//                        if (service1 == null || service1.isEmpty()) {
-//                            onFailure(call, null);
-//                            return;
-//                        }
-//
-//                        if (mTimeslot != null) {
-//                            // save the service into the Timeslot and refresh the view
-//                            mTimeslot.setService(service1);
-//                            setupView();
-//                        }
-//
-//                        isRefreshingService = false;
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<Service> call, Throwable t) {
-//                        MyLog.e(TAG, "Error refreshing Service");
-//                        if (t != null && MyLog.isIsLogEnabled()) t.printStackTrace();
-//
-//                        isRefreshingService = false;
-//                    }
-//                });
     }
 
     public void setType(Timeslot.TYPE type) {

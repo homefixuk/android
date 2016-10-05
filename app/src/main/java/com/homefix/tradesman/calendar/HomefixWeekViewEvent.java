@@ -3,7 +3,11 @@ package com.homefix.tradesman.calendar;
 import android.graphics.Color;
 
 import com.alamkanak.weekview.WeekViewEvent;
-import com.homefix.tradesman.model.Problem;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.TimeUtils;
@@ -17,9 +21,10 @@ import java.util.List;
  * Created by samuel on 7/5/2016.
  */
 
-public class HomefixWeekViewEvent extends WeekViewEvent {
+public class HomefixWeekViewEvent extends WeekViewEvent implements ValueEventListener {
 
-    Timeslot timeslot;
+    private Timeslot timeslot;
+    private DatabaseReference serviceRef;
 
     public HomefixWeekViewEvent() {
     }
@@ -31,9 +36,29 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
     }
 
     private void setup() {
-        if (timeslot == null) return;
+        DatabaseReference ref = FirebaseUtils.getSpecificTimeslotRef(timeslot != null ? timeslot.getId() : null);
+        if (ref == null) return;
 
-        setId(timeslot.hashCode());
+        // if we don't have a type
+        if (Strings.isEmpty(timeslot.getType())) {
+            setName("Loading...");
+            // load the timeslot and call the setup again
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    timeslot = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Timeslot.class) : timeslot;
+                    setup();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+            return;
+        }
+
+        setId(timeslot.getId().hashCode());
 
         Calendar cal = Calendar.getInstance();
 
@@ -55,26 +80,18 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
                 setName("Break");
                 break;
             case SERVICE:
-                if (timeslot.getService() != null) setName(timeslot.getService().getId());
-                else setName("Homefix");
+                setName(Strings.returnSafely(timeslot.getServiceId(), "Homefix"));
                 break;
             case OWN_JOB:
-                Service service = timeslot.getService();
-                if (service != null) {
-                    Problem problem = service.getProblem();
-                    if (problem != null && !Strings.isEmpty(problem.getName()))
-                        setName(problem.getName());
-                    else if (!Strings.isEmpty(service.getServiceType()))
-                        setName(service.getServiceType());
-                    else setName(timeslot.getService().getId());
+                String serviceId = timeslot.getServiceId();
+                setName(Strings.returnSafely(serviceId, "Own Job"));
 
-                } else {
-                    setName("Own Job");
-                }
+                serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
+                if (serviceRef != null) serviceRef.addValueEventListener(this);
                 break;
 
             default:
-                setName("unknown event");
+                setName("unknown");
                 break;
         }
 
@@ -140,6 +157,20 @@ public class HomefixWeekViewEvent extends WeekViewEvent {
         }
 
         return events;
+    }
+
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+        Service service = dataSnapshot.getValue(Service.class);
+        if (service == null) return;
+        setName(Strings.returnSafely(service.getServiceType(), "Own Job"));
+    }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
     }
 
 }

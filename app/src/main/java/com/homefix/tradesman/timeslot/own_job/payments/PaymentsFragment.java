@@ -3,24 +3,26 @@ package com.homefix.tradesman.timeslot.own_job.payments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.homefix.tradesman.BuildConfig;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
+import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.base.presenter.DefaultFragementPresenter;
 import com.homefix.tradesman.base.view.BaseFragmentView;
 import com.homefix.tradesman.common.HtmlHelper;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Payment;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
@@ -30,14 +32,8 @@ import com.samdroid.common.ColorUtils;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.string.Strings;
 
-import java.util.List;
-import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 7/27/2016.
@@ -56,10 +52,11 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
     @BindView(R.id.remaining)
     protected TextView mRemainingTxt;
 
-    @BindView(R.id.list)
-    protected ListView mListView;
+    @BindView(R.id.recycler_view)
+    protected RecyclerView mRecyclerView;
 
-    private ArrayAdapter<Payment> mAdapter;
+    private MyFirebaseRecyclerAdapter<Payment, PaymentViewHolder> adapter;
+    private DatabaseReference paymentsRef;
 
     public PaymentsFragment() {
         super(PaymentsFragment.class.getSimpleName());
@@ -78,133 +75,147 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ServiceSet serviceSet = service != null ? service.getServiceSet() : null;
-
-        if (serviceSet != null) {
-            if (mTotalPaid != null)
-                mTotalPaid.setText(String.format("£%s", Strings.priceToString(serviceSet.getAmountPaid())));
-
-            if (mTotalCost != null)
-                mTotalCost.setText(String.format("£%s", Strings.priceToString(serviceSet.getTotalCost())));
-
-            if (mRemainingTxt != null) {
-                double remaining = serviceSet.getAmountRemaining();
-                String s = String.format("£%s", Strings.priceToString(remaining));
-                s = Strings.setStringColour(s, remaining > 0 ? ColorUtils.red : ColorUtils.green);
-                mRemainingTxt.setText(HtmlHelper.fromHtml(s));
-            }
+        paymentsRef = getPaymentsRef();
+        if (paymentsRef == null) {
+            Toast.makeText(getContext(), "Unable to update the payments", Toast.LENGTH_SHORT).show();
+            getBaseActivity().finishWithIntentAndAnimation(null);
+            return;
         }
 
-        if (mAdapter == null) {
-            mAdapter = new ArrayAdapter<Payment>(getActivity(), R.layout.payments_item_layout) {
+        paymentsRef.getParent().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ServiceSet serviceSet = dataSnapshot != null ? dataSnapshot.getValue(ServiceSet.class) : null;
+                updateServiceSetView(serviceSet);
+            }
 
-                @NonNull
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        adapter = new MyFirebaseRecyclerAdapter<Payment, PaymentViewHolder>(
+                getBaseActivity(),
+                Payment.class,
+                PaymentViewHolder.class,
+                R.layout.payments_item_layout,
+                paymentsRef) {
+            @Override
+            protected void populateViewHolder(PaymentViewHolder viewHolder, Payment model, int position) {
+                viewHolder.bind(model);
+            }
+        };
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseActivity());
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+        mRecyclerView.setAdapter(adapter);
+    }
+
+    private void updateServiceSetView(ServiceSet serviceSet) {
+        if (serviceSet == null) return;
+
+        if (mTotalPaid != null)
+            mTotalPaid.setText(String.format("£%s", Strings.priceToString(serviceSet.getAmountPaid())));
+
+        if (mTotalCost != null)
+            mTotalCost.setText(String.format("£%s", Strings.priceToString(serviceSet.getTotalCost())));
+
+        if (mRemainingTxt != null) {
+            double remaining = serviceSet.getAmountRemaining();
+            String s = String.format("£%s", Strings.priceToString(remaining));
+            s = Strings.setStringColour(s, remaining > 0 ? ColorUtils.red : ColorUtils.green);
+            mRemainingTxt.setText(HtmlHelper.fromHtml(s));
+        }
+    }
+
+    private DatabaseReference getPaymentsRef() {
+        if (paymentsRef != null) return paymentsRef;
+
+        String serviceSetId = service != null ? service.getServiceSetId() : null;
+        DatabaseReference ref = FirebaseUtils.getSpecificServiceSetRef(serviceSetId);
+        return ref == null ? paymentsRef : ref.child("payments");
+    }
+
+    public class PaymentViewHolder extends RecyclerView.ViewHolder {
+
+        public PaymentViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        public void bind(final Payment payment) {
+            TextView mLbl = ButterKnife.findById(itemView, R.id.label);
+            TextView mAmount = ButterKnife.findById(itemView, R.id.amount);
+
+            if (payment == null) {
+                itemView.setVisibility(View.GONE);
+                return;
+            }
+
+            itemView.setVisibility(View.VISIBLE);
+
+            mLbl.setText(payment.getType());
+            mAmount.setText(String.format("£%s", Strings.priceToString(payment.getAmount())));
+
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                    View view = convertView;
-
-                    if (view == null) {
-                        LayoutInflater inflater = getActivity().getLayoutInflater();
-                        view = inflater.inflate(R.layout.payments_item_layout, parent, false);
-                    }
-
-                    TextView mLbl = ButterKnife.findById(view, R.id.label);
-                    TextView mAmount = ButterKnife.findById(view, R.id.amount);
-
-                    final Payment payment = getItem(position);
-                    if (payment == null) {
-                        view.setVisibility(View.GONE);
-                        return view;
-                    }
-
-                    view.setVisibility(View.VISIBLE);
-
-                    mLbl.setText(payment.getType());
-                    mAmount.setText(String.format("£%s", Strings.priceToString(payment.getAmount())));
-
-                    view.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showEditPayment(payment);
-                        }
-                    });
-                    view.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.light_grey));
-
-                    // show long touch listener to ask if the user wants to delete the charge
-                    view.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            MaterialDialogWrapper.getNegativeConfirmationDialog(
-                                    getActivity(),
-                                    "Would you like to delete this payment?",
-                                    "DELETE",
-                                    "CANCEL",
-                                    new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            // call API to delete charge
-                                            removePaymentClicked(payment);
-                                            dialog.dismiss();
-                                        }
-                                    }, new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            dialog.dismiss();
-                                        }
-                                    }).show();
-
-                            return true;
-                        }
-                    });
-
-                    return view;
+                public void onClick(View v) {
+                    showEditPayment(payment);
                 }
-            };
-            List<Payment> paymentList = serviceSet != null ? serviceSet.getPayments() : null;
-            if (paymentList != null) {
-                mAdapter.addAll(paymentList);
-                mAdapter.notifyDataSetChanged();
-            }
-        }
+            });
+            itemView.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.light_grey));
 
-        mListView.setAdapter(mAdapter);
+            // show long touch listener to ask if the user wants to delete the charge
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    MaterialDialogWrapper.getNegativeConfirmationDialog(
+                            getActivity(),
+                            "Would you like to delete this payment?",
+                            "DELETE",
+                            "CANCEL",
+                            new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    // call API to delete charge
+                                    removePaymentClicked(payment);
+                                    dialog.dismiss();
+                                }
+                            }, new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
+
+                    return true;
+                }
+            });
+        }
     }
 
     private void removePaymentClicked(final Payment payment) {
-        if (payment == null || Strings.isEmpty(payment.getId())) return;
+        paymentsRef = getPaymentsRef();
+        if (paymentsRef == null || payment == null || Strings.isEmpty(payment.getId())) return;
 
         // show loading dialog
         showDialog("Removing Payment...", true);
 
-        Callback<Map<String, Object>> callback = new Callback<Map<String, Object>>() {
+        paymentsRef.child(payment.getId()).removeValue(new DatabaseReference.CompletionListener() {
             @Override
-            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                Map<String, Object> results = response.body();
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                hideDialog();
 
-                // if not successful
-                if (results == null || !results.containsKey("success") || !(Boolean) results.get("success")) {
-                    onFailure(call, null);
-                    return;
+                if (databaseError != null) {
+                    Toast.makeText(getContext(), "Sorry, unable to remove the payment right now. Please try again", Toast.LENGTH_SHORT).show();
                 }
-
-                // else successful //
-                hideDialog();
-                if (mAdapter != null) mAdapter.remove(payment);
             }
-
-            @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                if (BuildConfig.DEBUG && t != null) t.printStackTrace();
-
-                hideDialog();
-                Toast.makeText(getContext(), "Sorry, unable to remove the payment right now. Please try again", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        HomeFix.getAPI().deletePayment(TradesmanController.getToken(), payment.getId()).enqueue(callback);
+        });
     }
 
     @Override
@@ -225,7 +236,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
 
         if (isEmpty) {
             payment = new Payment();
-            payment.setServiceSet(service.getServiceSet().getId());
+            payment.setId("" + System.currentTimeMillis());
         }
 
         final Payment finalPayment = payment;
@@ -259,59 +270,27 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
     }
 
     private boolean addOrEditCharge(AddPaymentView view, final Payment originalPayment, final Payment newPayment) {
-        if (view == null || newPayment == null) return false;
+        paymentsRef = getPaymentsRef();
+        if (paymentsRef == null || view == null || newPayment == null) {
+            Toast.makeText(getContext(), "Sorry, unable to add/edit charge", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
         // show loading dialog
         showDialog((originalPayment == null ? "Adding" : "Updating") + " Payment...", true);
 
-        Callback<Payment> callback = new Callback<Payment>() {
+        paymentsRef.child(newPayment.getId()).setValue(newPayment, new DatabaseReference.CompletionListener() {
             @Override
-            public void onResponse(Call<Payment> call, Response<Payment> response) {
-                Payment payment = response.body();
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                hideDialog();
 
-                if (payment == null) {
-                    onFailure(call, null);
-                    return;
+                if (databaseError != null) {
+                    Toast.makeText(getContext(), "Sorry, unable to add/edit payment", Toast.LENGTH_SHORT).show();
                 }
-
-                hideDialog();
-                updatePaymentInAdapter(originalPayment, payment); // take the Charge returned from the server
             }
-
-            @Override
-            public void onFailure(Call<Payment> call, Throwable t) {
-                if (BuildConfig.DEBUG && t != null) t.printStackTrace();
-
-                hideDialog();
-                showEditPayment(originalPayment);
-                Toast.makeText(getContext(), "Sorry, unable to do this right now. Please try again", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        // send the request to the server
-        if (originalPayment == null) {
-            HomeFix.getAPI().addPayment(TradesmanController.getToken(), newPayment.toMap()).enqueue(callback);
-        } else {
-            HomeFix.getAPI().updatePayment(TradesmanController.getToken(), originalPayment.getId(), newPayment.toMap()).enqueue(callback);
-        }
+        });
 
         return true;
-    }
-
-    private void updatePaymentInAdapter(Payment originalPayment, Payment newPayment) {
-        if (mAdapter == null) return;
-
-        // update the Charge in the adapter
-        for (int i = 0, len = mAdapter.getCount(); i < len; i++) {
-            if (mAdapter.getItem(i).equals(originalPayment)) {
-                mAdapter.remove(originalPayment);
-                mAdapter.insert(newPayment, i);
-                return;
-            }
-        }
-
-        // else if it was not originally in the adapter, add it to the end
-        mAdapter.add(newPayment);
     }
 
     public void setService(Service service) {

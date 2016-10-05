@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
 import com.homefix.tradesman.model.Service;
-import com.homefix.tradesman.model.ServiceSet;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.string.Strings;
 

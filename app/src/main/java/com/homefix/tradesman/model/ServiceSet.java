@@ -1,6 +1,5 @@
 package com.homefix.tradesman.model;
 
-import com.google.android.gms.common.api.BooleanResult;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.homefix.tradesman.common.SendReceiver;
@@ -15,7 +14,7 @@ import java.util.Set;
  */
 
 @IgnoreExtraProperties
-public class ServiceSet {
+public class ServiceSet extends BaseModel {
 
     private String customerPropertyId;
     private long createdAt, resolvedAt;
@@ -24,13 +23,45 @@ public class ServiceSet {
     private double totalCost, amountPaid;
     private Map<String, Payment> payments;
     private Map<String, Charge> charges;
-    private Map<String, Boolean> services;
+    private Map<String, Object> services;
 
     public ServiceSet() {
     }
 
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setResolvedAt(long resolvedAt) {
+        this.resolvedAt = resolvedAt;
+    }
+
+    public void setCustomerDescription(String customerDescription) {
+        this.customerDescription = customerDescription;
+    }
+
+    public void setNumberServices(int numberServices) {
+        this.numberServices = numberServices;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public void setAmountPaid(double amountPaid) {
+        this.amountPaid = amountPaid;
+    }
+
+    public void setPayments(Map<String, Payment> payments) {
+        this.payments = payments;
+    }
+
+    public void setCharges(Map<String, Charge> charges) {
+        this.charges = charges;
+    }
+
     public String getCustomerPropertyId() {
-        return customerPropertyId;
+        return Strings.returnSafely(customerPropertyId);
     }
 
     public long getCreatedAt() {
@@ -113,15 +144,33 @@ public class ServiceSet {
         return senderReceiver;
     }
 
-    public Map<String, Boolean> getServices() {
+    public Map<String, Object> getServices() {
+        if (services == null) services = new HashMap<>();
         return services;
     }
 
-    public void setServices(Map<String, Boolean> services) {
+    public void setServices(Map<String, Object> services) {
         this.services = services;
     }
 
     public void setCustomerPropertyId(String customerPropertyId) {
         this.customerPropertyId = customerPropertyId;
     }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        map.put("customerPropertyId", getCustomerPropertyId());
+        map.put("createdAt", getCreatedAt());
+        map.put("resolvedAt", getResolvedAt());
+        map.put("customerDescription", getCustomerDescription());
+        map.put("numberServices", getNumberServices());
+        map.put("totalCost", getTotalCost());
+        map.put("amountPaid", getAmountPaid());
+        map.put("payments", getPayments());
+        map.put("charges", getCharges());
+        map.put("services", getServices());
+        return map;
+    }
+
 }

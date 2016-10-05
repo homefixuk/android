@@ -1,9 +1,18 @@
 package com.homefix.tradesman.model;
 
+import android.support.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.common.SendReceiver;
+import com.homefix.tradesman.firebase.FirebaseUtils;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +21,9 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Service {
+public class Service extends BaseModel {
 
-    private String id, serviceSetId, tradesmanId, status, serviceType;
+    private String serviceSetId, tradesmanId, status, serviceType;
     private long requestTime, arrivalTime, departTime, estimatedDuration;
     private int estimatedCost, actualDuration, actualCost;
     private String tradesmanNotes;
@@ -23,16 +32,11 @@ public class Service {
     private boolean isOwnJob;
     private String incompleteReason, actualDiagnosis, workCompletedDescription;
 
+    public Service() {
+    }
+
     public Service(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        super(id);
     }
 
     public String getStatus() {
@@ -180,10 +184,35 @@ public class Service {
     }
 
     public String getTradesmanId() {
-        return tradesmanId;
+        return Strings.returnSafely(tradesmanId);
     }
 
     public void setTradesmanId(String tradesmanId) {
         this.tradesmanId = tradesmanId;
     }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        map.put("serviceSetId", getServiceSetId());
+        map.put("tradesmanId", getTradesmanId());
+        map.put("status", getStatus());
+        map.put("serviceType", getServiceType());
+        map.put("requestTime", getRequestTime());
+        map.put("arrivalTime", getArrivalTime());
+        map.put("departTime", getDepartTime());
+        map.put("estimatedDuration", getEstimatedDuration());
+        map.put("estimatedCost", getEstimatedCost());
+        map.put("actualDuration", getActualDuration());
+        map.put("actualCost", getActualCost());
+        map.put("tradesmanNotes", getTradesmanNotes());
+        map.put("keyLocation", getKeyLocation());
+        map.put("previousServices", getPreviousServices());
+        map.put("isOwnJob", isOwnJob());
+        map.put("incompleteReason", getIncompleteReason());
+        map.put("actualDiagnosis", getActualDiagnosis());
+        map.put("workCompletedDescription", getWorkCompletedDescription());
+        return map;
+    }
+
 }

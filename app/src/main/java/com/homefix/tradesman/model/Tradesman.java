@@ -1,5 +1,7 @@
 package com.homefix.tradesman.model;
 
+import android.support.annotation.NonNull;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -12,6 +14,7 @@ import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -111,6 +114,7 @@ public class Tradesman extends User {
                 if (dataSnapshot == null || !dataSnapshot.exists()) return;
 
                 setCurrentTradesman(dataSnapshot.getValue(Tradesman.class));
+                notifyCurrentTradesmanListeners();
             }
 
             @Override
@@ -119,5 +123,27 @@ public class Tradesman extends User {
         });
     }
 
+    private static final List<OnGotObjectListener<Tradesman>> mCurrentTradesmanListeners = new ArrayList<>();
+
+    public static List<OnGotObjectListener<Tradesman>> getCurrentTradesmanListeners() {
+        return mCurrentTradesmanListeners;
+    }
+
+    public static void addCurrentTradesmanListener(@NonNull OnGotObjectListener<Tradesman> listener) {
+        getCurrentTradesmanListeners().add(listener);
+        listener.onGotThing(getCurrentTradesman());
+    }
+
+    public static void removeCurrentTradesmanListener(@NonNull OnGotObjectListener<Tradesman> listener) {
+        getCurrentTradesmanListeners().remove(listener);
+    }
+
+    private static void notifyCurrentTradesmanListeners() {
+        List<OnGotObjectListener<Tradesman>> listeners = getCurrentTradesmanListeners();
+        for (OnGotObjectListener<Tradesman> listener : listeners) {
+            if (listener == null) continue;
+            listener.onGotThing(getCurrentTradesman());
+        }
+    }
 
 }

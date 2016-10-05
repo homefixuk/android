@@ -3,6 +3,7 @@ package com.homefix.tradesman.timeslot.own_job.charges;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;

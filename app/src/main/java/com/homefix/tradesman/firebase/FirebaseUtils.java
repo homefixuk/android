@@ -15,6 +15,11 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.homefix.tradesman.model.Customer;
+import com.homefix.tradesman.model.CustomerProperty;
+import com.homefix.tradesman.model.Property;
+import com.homefix.tradesman.model.Service;
+import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
@@ -25,6 +30,7 @@ import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +46,7 @@ public class FirebaseUtils {
             REF_NAME_USERS = "users",
             REF_NAME_TRADESMAN = "tradesman",
             REF_NAME_CUSTOMERS = "customers",
+            REF_NAME_PROPERTIES = "properties",
             REF_NAME_SERVICE_SETS = "serviceSets",
             REF_NAME_SERVICES = "services",
             REF_NAME_TIMESLOTS = "timeslots",
@@ -104,6 +111,10 @@ public class FirebaseUtils {
 
     public static DatabaseReference getCustomersRef() {
         return getBaseRef().child(REF_NAME_CUSTOMERS);
+    }
+
+    public static DatabaseReference getPropertiesRef() {
+        return getBaseRef().child(REF_NAME_PROPERTIES);
     }
 
     public static DatabaseReference getServicesRef() {
@@ -456,6 +467,160 @@ public class FirebaseUtils {
         });
     }
 
+    public static void createService(final boolean isOwnJob, @NonNull final Calendar start, @NonNull final Calendar end, String jobType, String addressLine1, String addressLine2,
+                                     String addressLine3, String postcode, String country, Double latitude, Double longitude,
+                                     String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
+                                     @NonNull final OnGotObjectListener<Timeslot> listener) {
+        String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
+        if (Strings.isEmpty(tradesmanId)) {
+            MyLog.e(TAG, "[createService] TradesmanId is empty");
+            listener.onGotThing(null);
+            return;
+        }
+
+        String customerKey = getCustomersRef().push().getKey();
+        String propertyKey = getPropertiesRef().push().getKey();
+        String customerPropertyInfoKey = getBaseRef().child("customerPropertyInfos").push().getKey();
+        String serviceKey = getServicesRef().push().getKey();
+        String serviceSetKey = getServiceSetsRef().push().getKey();
+        final String timeslotKey = getTimeslotsRef().push().getKey();
+
+        updateJob(timeslotKey, serviceKey, serviceSetKey, customerKey, propertyKey, customerPropertyInfoKey,
+                isOwnJob, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country,
+                latitude, longitude, customerName, customerEmail, customerPhone, customerPropertyRelationship,
+                description, listener);
+    }
+
+    public static void updateJob(
+            final String timeslotKey,
+            final String serviceKey,
+            final String serviceSetKey,
+            final String customerKey,
+            final String propertyKey,
+            final String customerPropertyInfoKey,
+            final boolean isOwnJob, final Calendar start, final Calendar end, String jobType, String addressLine1, String addressLine2,
+            String addressLine3, String postcode, String country, Double latitude, Double longitude,
+            String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
+            @NonNull final OnGotObjectListener<Timeslot> listener) {
+
+        String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
+        if (Strings.isEmpty(tradesmanId) || Strings.isEmpty(timeslotKey) || Strings.isEmpty(serviceKey)
+                || Strings.isEmpty(serviceSetKey) || Strings.isEmpty(customerKey)
+                || Strings.isEmpty(propertyKey) || Strings.isEmpty(customerPropertyInfoKey)) {
+            MyLog.e(TAG, "[updateJob] a key is empty");
+            listener.onGotThing(null);
+            return;
+        }
+
+        long startTime = start.getTimeInMillis();
+        long endTime = end.getTimeInMillis();
+
+        Customer customer = new Customer();
+        customer.setId(customerKey);
+        customer.setHomeAddressLine1(addressLine1);
+        customer.setHomeAddressLine2(addressLine2);
+        customer.setHomeAddressLine3(addressLine3);
+        customer.setHomeCountry(country);
+        customer.setHomePostcode(postcode);
+        customer.setBillingAddressLine1(addressLine1);
+        customer.setBillingAddressLine2(addressLine2);
+        customer.setBillingAddressLine3(addressLine3);
+        customer.setBillingCountry(country);
+        customer.setBillingPostcode(postcode);
+        customer.setName(customerName);
+        customer.setEmail(customerEmail);
+        customer.setHomePhone(customerPhone);
+
+        Property property = new Property();
+        property.setId(propertyKey);
+        property.setAddressLine1(addressLine1);
+        property.setAddressLine2(addressLine2);
+        property.setAddressLine3(addressLine3);
+        property.setCountry(country);
+        property.setPostcode(postcode);
+        property.setLatitude(latitude);
+        property.setLongitude(longitude);
+
+        CustomerProperty customerProperty = new CustomerProperty();
+        customerProperty.setId(customerPropertyInfoKey);
+        customerProperty.setType(customerPropertyRelationship);
+        customerProperty.setCustomerId(customerKey);
+        customerProperty.setPropertyId(propertyKey);
+
+        ServiceSet serviceSet = new ServiceSet();
+        serviceSet.setId(serviceSetKey);
+        serviceSet.setCustomerPropertyId(customerPropertyInfoKey);
+        Map<String, Object> serviceSetServices = new HashMap<>();
+        serviceSetServices.put(serviceKey, true);
+        serviceSet.setServices(serviceSetServices);
+        serviceSet.setCreatedAt(System.currentTimeMillis());
+        serviceSet.setNumberServices(1);
+        serviceSet.setAmountPaid(0);
+        serviceSet.setTotalCost(0);
+
+        Service service = new Service(serviceKey);
+        service.setOwnJob(isOwnJob);
+        service.setEstimatedDuration(endTime - startTime);
+        service.setTradesmanId(tradesmanId);
+        service.setServiceType(jobType);
+        service.setTradesmanNotes(description);
+        service.setServiceSetId(serviceSetKey);
+
+        final Timeslot timeslot = new Timeslot(timeslotKey);
+        timeslot.setType((isOwnJob ? Timeslot.TYPE.OWN_JOB : Timeslot.TYPE.SERVICE).getName());
+        timeslot.setStartTime(startTime);
+        timeslot.setEndTime(endTime);
+        timeslot.setTradesmanId(tradesmanId);
+        timeslot.setServiceId(serviceKey);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("/customers/" + customerKey, customer.toMap());
+        map.put("/properties/" + propertyKey, property.toMap());
+        map.put("/customerPropertyInfos/" + customerPropertyInfoKey, customerProperty.toMap());
+        map.put("/customerProperties/" + customerKey + "/" + propertyKey, customerPropertyInfoKey);
+        map.put("/propertyCustomers/" + propertyKey + "/" + customerKey, customerPropertyInfoKey);
+        map.put("/serviceSets/" + serviceSetKey, serviceSet.toMap());
+        map.put("/services/" + serviceKey, service.toMap());
+        map.put("/timeslots/" + timeslotKey, timeslot.toMap());
+        map.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslotKey, timeslot.toMap());
+
+        // update all the references at the same that, that way either all or none get set
+        FirebaseUtils.getBaseRef().updateChildren(map, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    MyLog.e(TAG, "Something went wrong updating timeslot and service");
+                    MyLog.e(TAG, databaseError.getDetails());
+                    MyLog.e(TAG, databaseError.getMessage());
+                    MyLog.printStackTrace(databaseError.toException());
+                    listener.onGotThing(null);
+                    return;
+                }
+
+                listener.onGotThing(timeslot);
+
+//                FirebaseUtils.getSpecificTimeslotRef(timeslotKey).addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        Timeslot timeslot1 = dataSnapshot != null ? dataSnapshot.getValue(Timeslot.class) : timeslot;
+//                        listener.onGotThing(timeslot1);
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//                        MyLog.e(TAG, "Something went wrong fetching Timeslot");
+//                        if (databaseError != null) {
+//                            MyLog.e(TAG, databaseError.getDetails());
+//                            MyLog.printStackTrace(databaseError.toException());
+//                        }
+//                        listener.onGotThing(timeslot);
+//                    }
+//                });
+            }
+        });
+    }
+
 
     //////////////////////////////////////////////////
     /////////// Multi Function Results ///////////////
@@ -635,38 +800,6 @@ public class FirebaseUtils {
                 FirebaseUtils.getBaseRef().child(paths.get(i)).addListenerForSingleValueEvent(eventListeners.get(i));
             }
         }
-    }
-
-
-    /////////////////////////////////
-    /////////// Login ///////////////
-    /////////////////////////////////
-
-
-    public enum LOGIN_PROVIDER {
-
-        NO_USER, PASSWORD, FACEBOOK, GOOGLE, UNKNOWN
-
-    }
-
-    public static LOGIN_PROVIDER getLoginProvider() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user == null) return LOGIN_PROVIDER.NO_USER;
-
-        List<String> providers = user.getProviders();
-        boolean email = false, facebook = false, google = false;
-        for (String provider : providers) {
-            if (provider.contains("firebase") || provider.contains("password")) email = true;
-            else if (provider.contains("facebook")) facebook = true;
-            else if (provider.contains("google")) google = true;
-        }
-
-        if (facebook) return LOGIN_PROVIDER.FACEBOOK;
-        if (google) return LOGIN_PROVIDER.GOOGLE;
-        if (email) return LOGIN_PROVIDER.PASSWORD;
-
-        return LOGIN_PROVIDER.UNKNOWN;
     }
 
 

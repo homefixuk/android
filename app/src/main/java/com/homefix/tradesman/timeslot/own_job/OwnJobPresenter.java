@@ -1,33 +1,34 @@
 package com.homefix.tradesman.timeslot.own_job;
 
-import com.homefix.tradesman.BuildConfig;
-import com.homefix.tradesman.api.HomeFix;
-import com.homefix.tradesman.model.Customer;
-import com.homefix.tradesman.model.CustomerProperty;
-import com.homefix.tradesman.model.Problem;
-import com.homefix.tradesman.model.Property;
-import com.homefix.tradesman.model.Service;
+import android.support.annotation.NonNull;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.homefix.tradesman.calendar.HomeFixCal;
+import com.homefix.tradesman.firebase.FirebaseUtils;
+import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
-import com.homefix.tradesman.model.User;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
+import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotView;
+import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 /**
  * Created by samuel on 7/19/2016.
  */
 
-public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceView> {
+public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
 
-    public OwnJobPresenter(BaseServiceView view) {
+    public OwnJobPresenter(OwnJobView view) {
         super(view, Timeslot.TYPE.OWN_JOB);
     }
 
@@ -40,180 +41,126 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<BaseServiceVi
 
         getView().showDialog("Creating new job...", true);
 
-        Callback<Service> serviceCallback = new Callback<Service>() {
-            @Override
-            public void onResponse(Call<Service> call, Response<Service> response) {
-                Service service = response.body();
+        FirebaseUtils.createService(true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
+                customerName, customerEmail, customerPhone, customerPropertyRelationship, description, new OnGotObjectListener<Timeslot>() {
 
-                // if no service was created, handle it as an error
-                if (service == null) {
-                    onFailure(call, null);
-                    return;
-                }
+                    @Override
+                    public void onGotThing(Timeslot o) {
+                        if (!isViewAttached()) return;
 
-                // now create the Timeslot for the service
-                HomeFix.getAPI().addTimeslot(TradesmanController.getToken(),
-                        new HomeFix.TimeslotMap(
-                                getView().getStartTime().getTimeInMillis(),
-                                getView().getEndTime().getTimeInMillis(),
-                                service))
-                        .enqueue(new TimeslotCallback(service));
-            }
+                        if (o == null) {
+                            getView().showDialog("Sorry, something went wrong", false);
+                            return;
+                        }
 
-            @Override
-            public void onFailure(Call<Service> call, Throwable t) {
-                getView().showDialog("Sorry, something went wrong", false);
-            }
-        };
+                        // update the view
+                        getView().setTimeslot(o);
+                        getView().setEditing(false);
+                        getView().setupView();
 
-        //noinspection UnnecessaryUnboxing
-        HomeFix.getAPI().createService(
-                TradesmanController.getToken(),
-                customerName,
-                customerEmail,
-                customerPhone,
-                customerPropertyRelationship,
-                addressLine1,
-                Strings.returnSafely(addressLine2),
-                Strings.returnSafely(addressLine3),
-                postcode,
-                country,
-                latitude != null ? latitude.doubleValue() : 0,
-                longitude != null ? longitude.doubleValue() : 0,
-                jobType,
-                start.getTimeInMillis(),
-                end.getTimeInMillis(),
-                Strings.returnSafely(description))
-                .enqueue(serviceCallback);
+                        getView().hideDialog();
+                    }
+                });
     }
-
-    public class TimeslotCallback implements Callback<Timeslot> {
-        private Service service;
-
-        public TimeslotCallback(Service service) {
-            this.service = service;
-        }
-
-        @Override
-        public void onResponse(Call<Timeslot> call, Response<Timeslot> response) {
-            Timeslot timeslot = response.body();
-
-            if (timeslot == null) {
-                onFailure(call, null);
-                return;
-            }
-
-            // update the view
-            getView().setTimeslot(timeslot);
-            getView().setEditing(false);
-            getView().setupView();
-
-            getView().hideDialog();
-        }
-
-        @Override
-        public void onFailure(Call<Timeslot> call, Throwable t) {
-            getView().showDialog("Sorry, something went wrong", false);
-        }
-    }
-
 
     public void updateJob(
-            final Timeslot originalTimeslot, final Calendar start, final Calendar end, String jobType, String addressLine1, String addressLine2,
+            final String timeslotId,
+            final String serviceId,
+            final String serviceSetId,
+            final String customerId,
+            final String propertyId,
+            final String customerPropertyInfoId,
+            final Calendar start, final Calendar end, String jobType, String addressLine1, String addressLine2,
             String addressLine3, String postcode, String country, Double latitude, Double longitude,
             String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description) {
 
         if (!isViewAttached()) return;
 
-        if (originalTimeslot == null) {
-            getView().showDialog("Unable to update your job...", false);
+        FirebaseUtils.updateJob(
+                timeslotId, serviceId, serviceSetId, customerId, propertyId, customerPropertyInfoId,
+                true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
+                customerName, customerEmail, customerPhone, customerPropertyRelationship, description, new OnGotObjectListener<Timeslot>() {
+
+                    @Override
+                    public void onGotThing(Timeslot o) {
+                        if (!isViewAttached()) return;
+
+                        if (o == null) {
+                            getView().showDialog("Sorry, unable to update your job", false);
+                            return;
+                        }
+
+                        // update the view
+                        getView().setTimeslot(o);
+                        getView().setEditing(false);
+                        getView().setupView();
+
+                        getView().hideDialog();
+                    }
+                });
+    }
+
+    @Override
+    public void delete(final Timeslot timeslot) {
+        if (!isViewAttached()) return;
+
+        final String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
+
+        if (Strings.isEmpty(tradesmanId) || timeslot == null || Strings.isEmpty(timeslot.getId()) || !NetworkManager.hasConnection(getView().getContext())) {
+            getView().showErrorDialog();
             return;
         }
 
-        getView().showDialog("Updating job...", true);
+        MaterialDialogWrapper.getNegativeConfirmationDialog(
+                getView().getBaseActivity(),
+                "Are you sure you want to delete this event?",
+                "DELETE",
+                "CANCEL",
+                new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        getView().showDialog("Deleting timeslot...", true);
 
-        Callback<Service> callback = new Callback<Service>() {
-            @Override
-            public void onResponse(Call<Service> call, Response<Service> response) {
-                Service service = response.body();
+                        // delete the timeslot from the 2 locations
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put("/timeslots/" + timeslot.getId(), null);
+                        childUpdates.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslot.getId(), null);
 
-                if (service == null) {
-                    onFailure(call, null);
-                    return;
-                }
+                        // if the timeslot has a service, remove it too
+                        if (Timeslot.TYPE.OWN_JOB.getName().equals(timeslot.getType()) && !Strings.isEmpty(timeslot.getServiceId())) {
+                            childUpdates.put("/services/" + timeslot.getServiceId(), null);
 
-                // now update the Timeslot for the service
-                HomeFix.getAPI().updateTimeslot(TradesmanController.getToken(),
-                        originalTimeslot.getId(),
-                        new HomeFix.TimeslotMap(
-                                start.getTimeInMillis(),
-                                end.getTimeInMillis(),
-                                service))
-                        .enqueue(new TimeslotCallback(service));
-            }
+                            // remove service from service set
+                            ServiceSet serviceSet = getView().getServiceSet();
+                            String serviceSetId = serviceSet != null ? serviceSet.getId() : null;
+                            if (!Strings.isEmpty(serviceSetId)) {
+                                childUpdates.put("/serviceSets/" + serviceSetId + "/services/" + timeslot.getServiceId(), null);
+                            }
+                        }
 
-            @Override
-            public void onFailure(Call<Service> call, Throwable t) {
-                if (BuildConfig.DEBUG && t != null) t.printStackTrace();
+                        FirebaseUtils.getBaseRef().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    getView().showErrorDialog();
+                                    return;
+                                }
 
-                getView().showDialog("Sorry, something went wrong updating your job.", false);
+                                // remove the original timeslot
+                                HomeFixCal.removeEvent(timeslot);
 
-                getView().setEditing(false);
-                getView().setupView();
-            }
-        };
+                                getView().onDeleteComplete(timeslot);
+                            }
+                        });
 
-        // add all the changes made
-        Map<String, Object> changes = new HashMap<>();
+                    }
 
-        Service service = originalTimeslot.getService();
-        if (service != null) {
-            CustomerProperty customerProperty = service.getServiceSet().getCustomerProperty();
-            if (customerProperty != null) {
-                if (!customerProperty.getType().equals(customerPropertyRelationship))
-                    changes.put("customerPropertyRelationship", customerPropertyRelationship);
-
-                Customer customer = customerProperty.getCustomer();
-                User user = customer != null ? customer.getUser() : null;
-                if (customer != null) {
-                    if (!user.getName().equals(customerName))
-                        changes.put("customerName", customerName);
-                    if (!user.getEmail().equals(customerEmail))
-                        changes.put("customerEmail", customerEmail);
-                    if (!user.getMobilePhone().equals(customerPhone))
-                        changes.put("customerPhone", customerPhone);
-                }
-
-                Property property = customerProperty.getProperty();
-                if (property != null) {
-                    if (!property.getAddressLine1().equals(addressLine1))
-                        changes.put("addressLine1", addressLine1);
-                    if (!property.getAddressLine2().equals(addressLine2))
-                        changes.put("addressLine2", addressLine2);
-                    if (!property.getAddressLine3().equals(addressLine3))
-                        changes.put("addressLine3", Strings.returnSafely(addressLine3));
-                    if (!property.getPostcode().equals(postcode)) changes.put("postcode", postcode);
-                    if (!property.getCountry().equals(country)) changes.put("country", country);
-                    if (latitude != null && !latitude.equals(property.getLatitude()))
-                        changes.put("latitude", latitude);
-                    if (longitude != null && !longitude.equals(property.getLongitude()))
-                        changes.put("longitude", longitude);
-                }
-            }
-
-            Problem problem = service.getProblem();
-            if (problem != null && !problem.getName().equals(jobType))
-                changes.put("problemName", jobType);
-
-            if (!service.getTradesmanNotes().equals(description))
-                changes.put("tradesmanNotes", description);
-        }
-
-        Call<Service> call = HomeFix.getAPI().updateService(
-                originalTimeslot.getService().getId(),
-                TradesmanController.getToken(),
-                changes);
-        call.enqueue(callback);
+                }, new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                }).show();
     }
 
 }

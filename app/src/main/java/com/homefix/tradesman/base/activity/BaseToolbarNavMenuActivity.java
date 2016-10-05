@@ -17,21 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.presenter.BaseToolbarNavMenuActivityPresenter;
 import com.homefix.tradesman.base.view.BaseToolbarNavMenuActivityView;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.common.PermissionsHelper;
-import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.CCA;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.profile.ProfileFragment;
 import com.samdroid.common.IntentHelper;
+import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
@@ -151,8 +147,6 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
                 getPresenter().onFabClicked();
             }
         });
-
-        setupUser();
     }
 
     protected void resetActionBarTitle() {
@@ -198,25 +192,27 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
         drawerLayout.closeDrawer(GravityCompat.START);
     }
 
-    public void setupUser() {
-        DatabaseReference ref = FirebaseUtils.getTradesmanPrivatesRef();
-        if (ref == null) return;
-
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Tradesman tradesman = dataSnapshot != null ? dataSnapshot.getValue(Tradesman.class) : null;
-                if (tradesman == null) return;
-
-                if (mUserNameTxt != null) mUserNameTxt.setText(tradesman.getName());
-                if (mUserInfoTxt != null) mUserInfoTxt.setText(tradesman.getEmail());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+    @Override
+    public void onResume() {
+        super.onResume();
+        Tradesman.addCurrentTradesmanListener(tradesmanListener);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Tradesman.removeCurrentTradesmanListener(tradesmanListener);
+    }
+
+    private final OnGotObjectListener<Tradesman> tradesmanListener = new OnGotObjectListener<Tradesman>() {
+        @Override
+        public void onGotThing(Tradesman tradesman) {
+            if (tradesman == null) return;
+
+            if (mUserNameTxt != null) mUserNameTxt.setText(tradesman.getName());
+            if (mUserInfoTxt != null) mUserInfoTxt.setText(tradesman.getEmail());
+        }
+    };
 
     public void setCCANumber(String phone) {
         if (mCallCcaTxt == null) return;

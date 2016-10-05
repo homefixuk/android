@@ -304,10 +304,7 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
     }
 
     private void onBankAccountClicked() {
-        if (tradesmanPrivate == null) {
-            Toast.makeText(getContext(), "Sorry, unable to update your bank account right now", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (tradesmanPrivate == null) tradesmanPrivate = new TradesmanPrivate();
 
         List<String> keys = new ArrayList<>();
         List<String> labels = new ArrayList<>();

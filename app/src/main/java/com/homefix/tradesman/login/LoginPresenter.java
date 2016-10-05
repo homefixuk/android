@@ -30,36 +30,36 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseAuth.createUserWithEmailAndPassword("test@homefix.co.uk", "password").addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                MyLog.e(LoginPresenter.class.getSimpleName(), "Setup account: " + task.isSuccessful());
-
-                mFirebaseAuth.signInWithEmailAndPassword("test@homefix.co.uk", "password")
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                MyLog.d(LoginPresenter.class.getSimpleName(), "signInWithCredential:onComplete:" + task.isSuccessful());
-
-                                if (task.isSuccessful()) {
-                                    DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
-                                    HashMap<String, Object> children = new HashMap<>();
-                                    children.put("name", "Test Plumber");
-                                    children.put("createdAt", new Date());
-                                    ref.setValue(children, new DatabaseReference.CompletionListener() {
-                                        @Override
-                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                            MyLog.e(LoginPresenter.class.getSimpleName(), "Saved to DB: " + (databaseError != null));
-                                        }
-                                    });
-                                }
-
-                                mFirebaseAuth.signOut();
-                            }
-                        });
-            }
-        });
+//        final FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+//        mFirebaseAuth.createUserWithEmailAndPassword("test@homefix.co.uk", "password").addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<AuthResult> task) {
+//                MyLog.e(LoginPresenter.class.getSimpleName(), "Setup account: " + task.isSuccessful());
+//
+//                mFirebaseAuth.signInWithEmailAndPassword("test@homefix.co.uk", "password")
+//                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<AuthResult> task) {
+//                                MyLog.d(LoginPresenter.class.getSimpleName(), "signInWithCredential:onComplete:" + task.isSuccessful());
+//
+//                                if (task.isSuccessful()) {
+//                                    DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
+//                                    HashMap<String, Object> children = new HashMap<>();
+//                                    children.put("name", "Test Plumber");
+//                                    children.put("createdAt", new Date());
+//                                    ref.setValue(children, new DatabaseReference.CompletionListener() {
+//                                        @Override
+//                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+//                                            MyLog.e(LoginPresenter.class.getSimpleName(), "Saved to DB: " + (databaseError != null));
+//                                        }
+//                                    });
+//                                }
+//
+//                                mFirebaseAuth.signOut();
+//                            }
+//                        });
+//            }
+//        });
     }
 
     public void doEmailPasswordLogin(String email, String password) {

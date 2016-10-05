@@ -20,6 +20,7 @@ import com.homefix.tradesman.common.PermissionsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.listener.OnNewLocationListener;
 import com.samdroid.common.MyLog;
+import com.samdroid.common.TimeUtils;
 import com.samdroid.common.VariableUtils;
 import com.samdroid.string.Strings;
 
@@ -36,6 +37,7 @@ public class LocationService extends Service {
 
     public static final int MIN_TIME_REQUEST = 60 * 1000; // milliseconds
     public static final float MIN_DISTANCE = 0f; // metres
+    private static final long MIN_LOCATION_UPDATE_TIME = TimeUtils.getMinutesInMillis(2);
 
     private static Location currentLocation, prevLocation;
     private static DetectedActivity currentActivity;
@@ -46,6 +48,7 @@ public class LocationService extends Service {
     private static LocationListener locationListener;
     private static ArrayList<OnNewLocationListener> arrOnNewLocationListener = new ArrayList<>();
     private static boolean isListenerAttached = false;
+    private static long lastLocationTime;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -53,7 +56,7 @@ public class LocationService extends Service {
 
         if (!hasLocationPermissionsGranted(getApplicationContext())) return START_NOT_STICKY;
 
-        stopLocationListener();
+        stopLocationListener(getApplicationContext());
 
         if (locationManager == null)
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -85,13 +88,17 @@ public class LocationService extends Service {
             startActivity(settingsIntent);
         }
 
-        SmartLocation.with(this).activityRecognition()
-                .start(new OnActivityUpdatedListener() {
-                    @Override
-                    public void onActivityUpdated(DetectedActivity detectedActivity) {
-                        setCurrentActivity(detectedActivity);
-                    }
-                });
+        try {
+            SmartLocation.with(getApplicationContext()).activity()
+                    .start(new OnActivityUpdatedListener() {
+                        @Override
+                        public void onActivityUpdated(DetectedActivity detectedActivity) {
+                            setCurrentActivity(detectedActivity);
+                        }
+                    });
+        } catch (Exception e) {
+            MyLog.printStackTrace(e);
+        }
 
         return START_STICKY;
     }
@@ -202,13 +209,18 @@ public class LocationService extends Service {
         return true;
     }
 
-    public static void stopLocationListener() {
+    public static void stopLocationListener(Context context) {
         if (locationManager == null) return;
 
         try {
             locationManager.removeUpdates(getLocationListener());
         } catch (SecurityException e) {
             MyLog.printStackTrace(e);
+        }
+
+        try {
+            SmartLocation.with(context).activity().stop();
+        } catch (Exception e) {
         }
 
         isListenerAttached = false;
@@ -233,8 +245,8 @@ public class LocationService extends Service {
         arrOnNewLocationListener.clear();
     }
 
-    private static String getDetectedActivtyName(DetectedActivity detectedActivity) {
-        String s = DetectedActivity.zzhR(detectedActivity.getType());
+    private static String getDetectedActivityName(DetectedActivity detectedActivity) {
+        String s = DetectedActivity.zztz(detectedActivity.getType());
 
         switch (s) {
             case "IN_VEHICLE":
@@ -259,6 +271,10 @@ public class LocationService extends Service {
         if (location != null && !Strings.isEmpty(tradesmanId)) {
             long time = System.currentTimeMillis();
 
+            // if it has not been enough time between updates, do not send the updated location
+            if (time < lastLocationTime + MIN_LOCATION_UPDATE_TIME) return;
+            lastLocationTime = time;
+
             // send the update to the server
             final HashMap<String, Object> locationMap = new HashMap<>();
             locationMap.put("time", time);
@@ -266,7 +282,7 @@ public class LocationService extends Service {
             locationMap.put("longitude", location.getLongitude());
 
             if (currentActivity != null)
-                locationMap.put("activity", getDetectedActivtyName(currentActivity));
+                locationMap.put("activity", getDetectedActivityName(currentActivity));
 
             FirebaseUtils
                     .getBaseRef()
@@ -282,7 +298,6 @@ public class LocationService extends Service {
                             }
 
                             MyLog.e(TAG, "Tradesman Location updated");
-                            VariableUtils.printHashMap(locationMap);
                         }
                     });
         }
@@ -327,7 +342,7 @@ public class LocationService extends Service {
 
     @Override
     public void onDestroy() {
-        stopLocationListener();
+        stopLocationListener(getApplicationContext());
     }
 
 }

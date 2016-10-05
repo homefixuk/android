@@ -11,7 +11,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Charge {
+public class Charge extends BaseModel {
 
     private double amount = 0;
     private String description; // labour/part/other
@@ -91,4 +91,15 @@ public class Charge {
         return ((quantity * amount) + VAT) * (1.0 + markup * 0.01);
     }
 
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        map.put("amount", getAmount());
+        map.put("description", getDescription());
+        map.put("quantity", getQuantity());
+        map.put("withVat", isWithVat());
+        map.put("markup", getMarkup());
+        map.put("markupBeforeVat", isMarkupBeforeVat());
+        return map;
+    }
 }

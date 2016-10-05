@@ -72,8 +72,8 @@
         android:layout_height="1dp"
         android:background="@color/light_grey" />
 
-    <ListView
-        android:id="@+id/list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@color/transparent"

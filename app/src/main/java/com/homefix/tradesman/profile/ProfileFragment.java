@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.InputType;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.firebase.database.DataSnapshot;
@@ -17,7 +18,6 @@ import com.homefix.tradesman.base.fragment.BaseFragment;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Tradesman;
-import com.homefix.tradesman.splashscreen.SplashScreenActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
@@ -67,8 +67,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
     @BindView(R.id.work_areas)
     protected TextView workAreasView;
 
-    private DatabaseReference ref;
-    private Tradesman mCurrentTradesman;
+    protected Tradesman mCurrentTradesman;
 
     public ProfileFragment() {
         super(ProfileFragment.class.getSimpleName());
@@ -89,24 +88,21 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
     @Override
     public void onResume() {
         super.onResume();
-        refreshView();
+        Tradesman.addCurrentTradesmanListener(tradesmanListener);
     }
 
-    private void refreshView() {
-        // remove the old listener
-        if (ref != null) ref.removeEventListener(currentTradesmanRef);
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
 
-        // setup the new one
-        ref = FirebaseUtils.getCurrentTradesmanRef();
-        if (ref == null) {
-            // if there is no tradesman logged in, restart app
-            startActivity(new Intent(getContext(), SplashScreenActivity.class));
-            getActivity().finish();
-            return;
+    private final OnGotObjectListener<Tradesman> tradesmanListener = new OnGotObjectListener<Tradesman>() {
+        @Override
+        public void onGotThing(Tradesman tradesman) {
+            mCurrentTradesman = tradesman;
+            setupView();
         }
-
-        ref.addValueEventListener(currentTradesmanRef);
-    }
+    };
 
     private final ValueEventListener currentTradesmanRef = new ValueEventListener() {
         @Override
@@ -174,11 +170,17 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                         if ((original != null && original.equals(changed))
                                 || (original == null && changed == null)) return;
 
+                        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
+                        if (ref == null) {
+                            Toast.makeText(getContext(), "Sorry, unable to make changes rightb now", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         String homePhoneNew = Strings.returnSafely(String.valueOf(changed));
 
                         showDialog("Updating Home Phone...", true);
 
-                        if (ref == null) ref = FirebaseUtils.getCurrentTradesmanRef();
+
                         ref.child("homePhone").setValue(homePhoneNew, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -219,11 +221,16 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                         if ((original != null && original.equals(changed))
                                 || (original == null && changed == null)) return;
 
+                        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
+                        if (ref == null) {
+                            Toast.makeText(getContext(), "Sorry, unable to make changes rightb now", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         String mobilePhoneNew = Strings.returnSafely(String.valueOf(changed));
 
                         showDialog("Updating Mobile Phone...", true);
 
-                        if (ref == null) ref = FirebaseUtils.getCurrentTradesmanRef();
                         ref.child("mobilePhone").setValue(mobilePhoneNew, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -279,6 +286,12 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
             public void onGotThing(HashMap<String, String> newAddress) {
                 if (newAddress == null) return;
 
+                DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
+                if (ref == null) {
+                    Toast.makeText(getContext(), "Sorry, unable to make changes rightb now", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 showDialog("Updating Address...", true);
 
                 // send the changes to the server
@@ -289,7 +302,6 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                 changes.put("homeCountry", Strings.returnSafely(newAddress.get(_COUNTRY)));
                 changes.put("homePostcode", Strings.returnSafely(newAddress.get(_POSTCODE)));
 
-                if (ref == null) ref = FirebaseUtils.getCurrentTradesmanRef();
                 ref.updateChildren(changes, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -331,6 +343,12 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
     public void onNewWorkAreasReturned(ArrayList<String> workAreas) {
         if (workAreas == null) workAreas = new ArrayList<>();
 
+        DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
+        if (ref == null) {
+            Toast.makeText(getContext(), "Sorry, unable to make changes rightb now", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         showDialog("Updating Work Areas...", true);
 
         Map<String, Object> workAreasMap = new HashMap<>();
@@ -340,8 +358,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
             workAreasMap.put(workArea, true);
         }
 
-        if (ref == null) ref = FirebaseUtils.getCurrentTradesmanRef();
-        ref.child("workAreas").updateChildren(workAreasMap, new DatabaseReference.CompletionListener() {
+        ref.child("workAreas").setValue(workAreasMap, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null) {

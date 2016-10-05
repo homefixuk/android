@@ -12,12 +12,15 @@ import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
+import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -78,7 +81,7 @@ public class HomeFixCal {
          * @return if the time slot was added
          */
         public boolean addEvent(Timeslot timeslot) {
-            if (timeslot == null) return false;
+            if (timeslot == null || Strings.isEmpty(timeslot.getId())) return false;
 
             List<Timeslot> evs = getEvents();
             if (evs == null) evs = new ArrayList<>();
@@ -136,7 +139,7 @@ public class HomeFixCal {
             evs.remove(ev); // remove the original event
 
             // add the changed one in the appropriate place
-            return changed != null && addEvent(changed);
+            return addEvent(changed);
         }
 
         /**
@@ -433,7 +436,8 @@ public class HomeFixCal {
     }
 
     public static void loadMonth(Context context, final int year, final int month, final OnGetListListener<Timeslot> listener) {
-        if (year < 0 || month < 0) {
+        String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
+        if (Strings.isEmpty(tradesmanId) || year < 0 || month < 0) {
             if (listener != null) listener.onGetListFinished(null);
             return;
         }
@@ -452,8 +456,6 @@ public class HomeFixCal {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
 
-        HashMap<String, Object> params = new HashMap<>();
-
         // start from beginning of month
         cal.set(year, month, 0);
         long startTime = cal.getTimeInMillis();
@@ -462,36 +464,61 @@ public class HomeFixCal {
         cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH) + 1);
         long endTime = cal.getTimeInMillis();
 
-        Query query = FirebaseUtils.getBaseRef().child("tradesmanTimeslots").orderByChild("startTime").startAt(startTime).endAt(endTime);
+        Query query = FirebaseUtils
+                .getBaseRef()
+                .child("tradesmanTimeslots")
+                .child(tradesmanId)
+                .orderByChild("startTime")
+                .startAt(startTime)
+                .endAt(endTime);
+        MyLog.e(TAG, "Getting tradesmanTimeslots between " + startTime + " and " + endTime);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot == null) return;
+                MyLog.e(TAG, "got tradesmanTimeslots: " + (dataSnapshot != null && dataSnapshot.exists()));
 
-                FirebaseUtils.GetMultiFirebaseObjects<Timeslot> get = new FirebaseUtils.GetMultiFirebaseObjects<Timeslot>(Timeslot.class, new OnGetListListener<Timeslot>() {
-
-                    @Override
-                    public void onGetListFinished(List<Timeslot> list) {
-                        if (list == null) list = new ArrayList<>();
-
-                        addMonth(year, month, list);
-                        if (listener != null) listener.onGetListFinished(list);
-                    }
-
-                });
-
-                // add all the keys to the multi get
-                Iterable<DataSnapshot> childrenSnapshots = dataSnapshot.getChildren();
-                for (DataSnapshot childrenSnapshot : childrenSnapshots) {
-                    get.add(childrenSnapshot.getKey());
+                if (dataSnapshot == null) {
+                    if (listener != null) listener.onGetListFinished(null);
+                    return;
                 }
 
-                get.run();
+                // add all the timeslots to a list
+                List<Timeslot> timeslots = new ArrayList<>();
+                Iterable<DataSnapshot> childrenSnapshots = dataSnapshot.getChildren();
+                for (DataSnapshot childrenSnapshot : childrenSnapshots) {
+                    timeslots.add(childrenSnapshot.getValue(Timeslot.class));
+                }
+
+                Timeslot.printList(timeslots);
+
+                addMonth(year, month, timeslots);
+                if (listener != null) listener.onGetListFinished(timeslots);
+
+//                FirebaseUtils.GetMultiFirebaseObjects<Timeslot> get = new FirebaseUtils.GetMultiFirebaseObjects<>(Timeslot.class, new OnGetListListener<Timeslot>() {
+//
+//                    @Override
+//                    public void onGetListFinished(List<Timeslot> list) {
+//                        if (list == null) list = new ArrayList<>();
+//
+//                        addMonth(year, month, list);
+//                        if (listener != null) listener.onGetListFinished(list);
+//                    }
+//
+//                });
+//
+//                // add all the keys to the multi get
+//                Iterable<DataSnapshot> childrenSnapshots = dataSnapshot.getChildren();
+//                for (DataSnapshot childrenSnapshot : childrenSnapshots) {
+//                    get.add(childrenSnapshot.getKey());
+//                }
+//
+//                get.run();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                if (databaseError != null) MyLog.printStackTrace(databaseError.toException());
+                if (listener != null) listener.onGetListFinished(null);
             }
         });
     }

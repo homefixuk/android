@@ -1,5 +1,6 @@
 package com.homefix.tradesman.timeslot.base_service;
 
+import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotView;
 
 /**
@@ -7,4 +8,6 @@ import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotView;
  */
 
 public interface BaseServiceView extends BaseTimeslotView {
+
+    ServiceSet getServiceSet();
 }

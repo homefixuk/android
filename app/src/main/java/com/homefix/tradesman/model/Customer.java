@@ -59,4 +59,15 @@ public class Customer extends User {
     public void setTotalSpent(double totalSpent) {
         this.totalSpent = totalSpent;
     }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        map.put("priority", getPriority());
+        map.put("preferredTradesman", getPreferredTradesman());
+        map.put("customerProperties", getCustomerProperties());
+        map.put("invoices", getInvoices());
+        map.put("totalSpent", getTotalSpent());
+        return map;
+    }
 }

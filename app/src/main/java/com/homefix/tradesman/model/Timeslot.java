@@ -7,7 +7,6 @@ import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
 
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +18,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Timeslot {
+public class Timeslot extends BaseModel {
 
     public enum TYPE {
 
@@ -46,8 +45,7 @@ public class Timeslot {
 
     }
 
-    private String id;
-    private long startTime, endTime, slotLength;
+    private long startTime, endTime, slotLength, reverseStartTime, reverseEndTime;
     private String type;
     private String tradesmanId, serviceId;
     private boolean canBeSplit;
@@ -56,15 +54,7 @@ public class Timeslot {
     }
 
     public Timeslot(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        super(id);
     }
 
     public String getTradesmanId() {
@@ -89,10 +79,12 @@ public class Timeslot {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+        this.reverseStartTime = -1L * startTime;
     }
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
+        this.reverseEndTime = -1L * endTime;
     }
 
     public void setSlotLength(long slotLength) {
@@ -123,6 +115,14 @@ public class Timeslot {
         this.serviceId = serviceId;
     }
 
+    public long getReverseStartTime() {
+        return reverseStartTime;
+    }
+
+    public long getReverseEndTime() {
+        return reverseEndTime;
+    }
+
     //////////////
     /// Helper ///
     //////////////
@@ -132,11 +132,13 @@ public class Timeslot {
         return Strings.isEmpty(tradesmanId) || startTime == 0 || endTime == 0;
     }
 
+    @Exclude
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", getId());
+        Map<String, Object> map = super.toMap();
         map.put("startTime", getStartTime());
         map.put("endTime", getEndTime());
+        map.put("reverseStartTime", getReverseStartTime());
+        map.put("reverseEndTime", getReverseEndTime());
         map.put("slotLength", getSlotLength());
         map.put("type", getType());
         map.put("tradesmanId", getTradesmanId());
@@ -164,7 +166,7 @@ public class Timeslot {
             d.setTime(t.getEndTime());
             String end = TimeUtils.formatDataFormal(d) + " " + TimeUtils.formatDateToHoursMinutes(t.getEndTime());
 
-            MyLog.e("Timeslot", t.getType() + " " + start + " -> " + end);
+            MyLog.e("Timeslot", t.getId() + ": " + t.getType() + " " + start + " -> " + end);
         }
     }
 

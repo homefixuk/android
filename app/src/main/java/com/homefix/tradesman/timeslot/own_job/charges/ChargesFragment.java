@@ -3,38 +3,34 @@ package com.homefix.tradesman.timeslot.own_job.charges;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.homefix.tradesman.BuildConfig;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
-import com.homefix.tradesman.api.HomeFix;
+import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.base.presenter.DefaultFragementPresenter;
 import com.homefix.tradesman.base.view.BaseFragmentView;
+import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Charge;
 import com.homefix.tradesman.model.Service;
-import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.string.Strings;
 
-import java.util.List;
-import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by samuel on 7/27/2016.
@@ -47,10 +43,11 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
     @BindView(R.id.amount)
     protected TextView mTotalCost;
 
-    @BindView(R.id.list)
-    protected ListView mListView;
+    @BindView(R.id.recycler_view)
+    protected RecyclerView mRecyclerView;
 
-    private ArrayAdapter<Charge> mAdapter;
+    private MyFirebaseRecyclerAdapter<Charge, ChargeViewHolder> adapter;
+    private DatabaseReference chargesRef;
 
     public ChargesFragment() {
         super(ChargesFragment.class.getSimpleName());
@@ -68,137 +65,136 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         return R.layout.charges_layout;
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public class ChargeViewHolder extends RecyclerView.ViewHolder {
 
-        ServiceSet serviceSet = service != null ? service.getServiceSet() : null;
-
-        if (serviceSet != null) updateTotalCost(serviceSet.getTotalCost());
-
-        if (mAdapter == null) {
-            mAdapter = new ArrayAdapter<Charge>(getActivity(), R.layout.charges_item_layout) {
-
-                @NonNull
-                @Override
-                public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                    View view = convertView;
-
-                    if (view == null) {
-                        LayoutInflater inflater = getActivity().getLayoutInflater();
-                        view = inflater.inflate(R.layout.charges_item_layout, parent, false);
-                    }
-
-                    TextView mLbl = ButterKnife.findById(view, R.id.label);
-                    TextView mAmount = ButterKnife.findById(view, R.id.amount);
-                    TextView mQuantity = ButterKnife.findById(view, R.id.quantity);
-
-                    final Charge charge = getItem(position);
-
-                    mLbl.setText(charge.getDescription());
-                    mAmount.setText(String.format("£%s", Strings.priceToString(charge.getAmount())));
-                    mQuantity.setText(String.format("%s", Strings.priceToString(charge.getQuantity())));
-
-                    view.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showEditCharge(charge);
-                        }
-                    });
-                    view.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.light_grey));
-
-                    // show long touch listener to ask if the user wants to delete the charge
-                    view.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            MaterialDialogWrapper.getNegativeConfirmationDialog(
-                                    getActivity(),
-                                    "Would you like to delete this charge?",
-                                    "DELETE",
-                                    "CANCEL",
-                                    new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            // call API to delete charge
-                                            removeChargeClicked(charge);
-                                            dialog.dismiss();
-                                        }
-                                    }, new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            dialog.dismiss();
-                                        }
-                                    }).show();
-
-                            return true;
-                        }
-                    });
-
-                    return view;
-                }
-
-                @Override
-                public void notifyDataSetChanged() {
-                    super.notifyDataSetChanged();
-
-                    double totalCharges = 0;
-                    Charge charge;
-                    for (int i = 0, len = getCount(); i < len; i++) {
-                        charge = getItem(i);
-                        if (charge == null) continue;
-                        totalCharges += charge.getTotalCost();
-                    }
-                    updateTotalCost(totalCharges);
-                }
-            };
-
-            List<Charge> chargeList = serviceSet != null ? serviceSet.getCharges() : null;
-            if (chargeList != null) {
-                mAdapter.addAll(chargeList);
-                mAdapter.notifyDataSetChanged();
-            }
+        public ChargeViewHolder(AddChargeView addChargeView) {
+            super(addChargeView);
         }
 
-        mListView.setAdapter(mAdapter);
+        public void bind(final Charge charge) {
+            TextView mLbl = ButterKnife.findById(itemView, R.id.label);
+            TextView mAmount = ButterKnife.findById(itemView, R.id.amount);
+            TextView mQuantity = ButterKnife.findById(itemView, R.id.quantity);
+
+            mLbl.setText(charge.getDescription());
+            mAmount.setText(String.format("£%s", Strings.priceToString(charge.getAmount())));
+            mQuantity.setText(String.format("%s", Strings.priceToString(charge.getQuantity())));
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showEditCharge(charge);
+                }
+            });
+            itemView.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.light_grey));
+
+            // show long touch listener to ask if the user wants to delete the charge
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    MaterialDialogWrapper.getNegativeConfirmationDialog(
+                            getActivity(),
+                            "Would you like to delete this charge?",
+                            "DELETE",
+                            "CANCEL",
+                            new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    // call API to delete charge
+                                    removeChargeClicked(charge);
+                                    dialog.dismiss();
+                                }
+                            }, new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
+
+                    return true;
+                }
+            });
+        }
     }
 
-    private void updateTotalCost(double totalCost) {
+    @Override
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        chargesRef = getChargesRef();
+        if (chargesRef == null) {
+            Toast.makeText(getContext(), "Unable to update the charges", Toast.LENGTH_SHORT).show();
+            getBaseActivity().finishWithIntentAndAnimation(null);
+            return;
+        }
+
+        chargesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                double totalCharges = 0;
+                Charge charge;
+                for (int i = 0, len = adapter.getItemCount(); i < len; i++) {
+                    charge = adapter.getItem(i);
+                    if (charge == null) continue;
+                    totalCharges += charge.getTotalCost();
+                }
+                updateTotalCostView(totalCharges);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        adapter = new MyFirebaseRecyclerAdapter<Charge, ChargeViewHolder>(
+                getBaseActivity(),
+                Charge.class,
+                ChargeViewHolder.class,
+                R.layout.charges_item_layout,
+                chargesRef) {
+            @Override
+            protected void populateViewHolder(ChargeViewHolder viewHolder, Charge model, int position) {
+                viewHolder.bind(model);
+            }
+        };
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseActivity());
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+        mRecyclerView.setAdapter(adapter);
+    }
+
+    private DatabaseReference getChargesRef() {
+        if (chargesRef != null) return chargesRef;
+
+        String serviceSetId = service != null ? service.getServiceSetId() : null;
+        DatabaseReference ref = FirebaseUtils.getSpecificServiceSetRef(serviceSetId);
+        return ref == null ? chargesRef : ref.child("charges");
+    }
+
+    private void updateTotalCostView(double totalCost) {
         if (mTotalCost != null)
             mTotalCost.setText(String.format("£%s", Strings.priceToString(totalCost)));
     }
 
     private void removeChargeClicked(final Charge charge) {
-        if (charge == null || Strings.isEmpty(charge.getId())) return;
+        chargesRef = getChargesRef();
+        if (chargesRef == null || charge == null || Strings.isEmpty(charge.getId())) return;
 
         // show loading dialog
         showDialog("Removing Charge...", true);
 
-        Callback<Map<String, Object>> callback = new Callback<Map<String, Object>>() {
+        chargesRef.child(charge.getId()).removeValue(new DatabaseReference.CompletionListener() {
             @Override
-            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                Map<String, Object> results = response.body();
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                hideDialog();
 
-                // if not successful
-                if (results == null || !results.containsKey("success") || !(Boolean) results.get("success")) {
-                    onFailure(call, null);
-                    return;
+                if (databaseError != null) {
+                    Toast.makeText(getContext(), "Sorry, unable to remove the charge right now. Please try again", Toast.LENGTH_SHORT).show();
                 }
-
-                // else successful //
-                hideDialog();
-                if (mAdapter != null) mAdapter.remove(charge);
             }
-
-            @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                if (BuildConfig.DEBUG && t != null) t.printStackTrace();
-
-                hideDialog();
-                Toast.makeText(getContext(), "Sorry, unable to remove the charge right now. Please try again", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        HomeFix.getAPI().deleteCharge(TradesmanController.getToken(), charge.getId()).enqueue(callback);
+        });
     }
 
     public void addClicked() {
@@ -214,7 +210,7 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
 
         if (isEmpty) {
             charge = new Charge();
-            charge.setService(service.getId());
+            charge.setId("" + System.currentTimeMillis());
         }
 
         final Charge finalCharge = charge;
@@ -248,7 +244,11 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
     }
 
     private boolean addOrEditCharge(AddChargeView view, final Charge originalCharge, final Charge newCharge) {
-        if (view == null || newCharge == null) return false;
+        chargesRef = getChargesRef();
+        if (chargesRef == null || view == null || newCharge == null) {
+            Toast.makeText(getContext(), "Sorry, unable to add/edit charge", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
         // make sure there's a valid name or description
         if (Strings.isEmpty(newCharge.getDescription())) {
@@ -265,54 +265,18 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         // show loading dialog
         showDialog((originalCharge == null ? "Adding" : "Updating") + " Charge...", true);
 
-        Callback<Charge> callback = new Callback<Charge>() {
+        chargesRef.child(newCharge.getId()).setValue(newCharge, new DatabaseReference.CompletionListener() {
             @Override
-            public void onResponse(Call<Charge> call, Response<Charge> response) {
-                Charge charge1 = response.body();
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                hideDialog();
 
-                if (charge1 == null) {
-                    onFailure(call, null);
-                    return;
+                if (databaseError != null) {
+                    Toast.makeText(getContext(), "Sorry, unable to add/edit charge", Toast.LENGTH_SHORT).show();
                 }
-
-                hideDialog();
-                updateChargeInAdapter(originalCharge, charge1); // take the Charge returned from the server
             }
-
-            @Override
-            public void onFailure(Call<Charge> call, Throwable t) {
-                if (BuildConfig.DEBUG && t != null) t.printStackTrace();
-
-                hideDialog();
-                showEditCharge(originalCharge);
-                Toast.makeText(getContext(), "Sorry, unable to do this right now. Please try again", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        // send the request to the server
-        if (originalCharge == null) {
-            HomeFix.getAPI().addCharge(TradesmanController.getToken(), newCharge.toMap()).enqueue(callback);
-        } else {
-            HomeFix.getAPI().updateCharge(TradesmanController.getToken(), originalCharge.getId(), newCharge.toMap()).enqueue(callback);
-        }
+        });
 
         return true;
-    }
-
-    private void updateChargeInAdapter(Charge originalCharge, Charge newCharge) {
-        if (mAdapter == null) return;
-
-        // update the Charge in the adapter
-        for (int i = 0, len = mAdapter.getCount(); i < len; i++) {
-            if (mAdapter.getItem(i).equals(originalCharge)) {
-                mAdapter.remove(originalCharge);
-                mAdapter.insert(newCharge, i);
-                return;
-            }
-        }
-
-        // else if it was not originally in the adapter, add it to the end
-        mAdapter.add(newCharge);
     }
 
     public void setService(Service service) {

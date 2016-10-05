@@ -10,10 +10,9 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Property {
+public class Property extends BaseModel {
 
-    private String groupId;
-    private String addressLine1, addressLine2, addressLine3, country, postcode, phone;
+    private String groupId, addressLine1, addressLine2, addressLine3, country, postcode, phone;
     private int numberTennants, numberBedrooms;
     private double latitude, longitude;
     private Map<String, Boolean> customerProperties;
@@ -21,8 +20,12 @@ public class Property {
     public Property() {
     }
 
-    public String getGroup() {
-        return groupId;
+    public String getGroupId() {
+        return Strings.returnSafely(groupId);
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     public String getAddressLine1() {
@@ -133,4 +136,24 @@ public class Property {
     public void setCustomerProperties(Map<String, Boolean> customerProperties) {
         this.customerProperties = customerProperties;
     }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        map.put("groupId", getGroupId());
+        map.put("addressLine1", getAddressLine1());
+        map.put("addressLine2", getAddressLine2());
+        map.put("addressLine3", getAddressLine3());
+        map.put("country", getCountry());
+        map.put("postcode", getPostcode());
+        map.put("phone", getPhone());
+        map.put("numberTennants", getNumberTennants());
+        map.put("numberBedrooms", getNumberBedrooms());
+        map.put("latitude", getLatitude());
+        map.put("longitude", getLongitude());
+        map.put("customerProperties", getCustomerProperties());
+        return map;
+    }
+
 }
+

@@ -93,6 +93,9 @@ dependencies {
     compile 'com.android.support:design:24.2.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha1'
     compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.android.gms:play-services-location:9.6.1'
+    compile 'com.google.android.gms:play-services-maps:9.6.1'
+    compile 'com.google.android.gms:play-services-places:9.6.1'
     // Firebase
     compile 'com.google.firebase:firebase-core:9.6.1'
     compile 'com.google.firebase:firebase-database:9.6.1'
@@ -144,7 +147,7 @@ dependencies {
         exclude module: 'support'
     }
     // Location https://github.com/mrmans0n/smart-location-lib
-    compile 'io.nlopez.smartlocation:library:3.2.4'
+    compile 'io.nlopez.smartlocation:library:3.2.7'
     // Week-View https://github.com/alamkanak/Android-Week-View
     compile 'com.github.alamkanak:android-week-view:1.2.6'
     // Calendar https://github.com/SundeepK/CompactCalendarView

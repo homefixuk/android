@@ -12,7 +12,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class User {
+public class User extends BaseModel {
 
     private String firstName, lastName, email, mobilePhone, role, homePhone;
     private String homeAddressLine1, homeAddressLine2, homeAddressLine3, homePostcode, homeCountry;
@@ -22,6 +22,23 @@ public class User {
     @Exclude
     public String getName() {
         return Strings.combineNames(firstName, lastName);
+    }
+
+    @Exclude
+    public void setName(String name) {
+        if (Strings.isEmpty(name)) return;
+
+        String[] names = name.split(" ");
+        if (names.length > 0) {
+            firstName = names[0];
+
+            lastName = "";
+            for (int i = 1; i < names.length; i++) {
+                lastName += names[i];
+
+                if (i < names.length - 1) lastName += " ";
+            }
+        }
     }
 
     public String getFirstName() {
@@ -159,5 +176,28 @@ public class User {
 
     public void setGroups(Map<String, Boolean> groups) {
         this.groups = groups;
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = super.toMap();
+        map.put("firstName", getFirstName());
+        map.put("lastName", getLastName());
+        map.put("email", getEmail());
+        map.put("mobilePhone", getMobilePhone());
+        map.put("role", getRole());
+        map.put("homePhone", getHomePhone());
+        map.put("homeAddressLine1", getHomeAddressLine1());
+        map.put("homeAddressLine2", getHomeAddressLine2());
+        map.put("homeAddressLine3", getHomeAddressLine3());
+        map.put("homePostcode", getHomePostcode());
+        map.put("homeCountry", getHomeCountry());
+        map.put("billingAddressLine1", getBillingAddressLine1());
+        map.put("billingAddressLine2", getBillingAddressLine2());
+        map.put("billingAddressLine3", getBillingAddressLine3());
+        map.put("billingPostcode", getBillingPostcode());
+        map.put("billingCountry", getBillingCountry());
+        map.put("groups", getGroups());
+        return map;
     }
 }

@@ -73,7 +73,7 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(final Activity activity, Timeslot timeslot, TimeslotClickedListener clickedListener) {
-        if (!ActivityHelper.canActivityDo(activity) || timeslot == null) return;
+        if (!ActivityHelper.canActivityDo(activity) || timeslot == null || itemView == null) return;
 
         this.activity = activity;
 
@@ -126,7 +126,7 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
         // setup the new one
         String serviceId = timeslot.getServiceId();
         serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
-        if (serviceRef != null) serviceRef.addValueEventListener(serviceValueEventListener);
+//        if (serviceRef != null) serviceRef.addValueEventListener(serviceValueEventListener);
     }
 
     private ValueEventListener serviceValueEventListener = new ValueEventListener() {

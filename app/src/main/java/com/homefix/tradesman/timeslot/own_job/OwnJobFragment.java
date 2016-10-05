@@ -44,7 +44,7 @@ import butterknife.OnClick;
  * Created by samuel on 7/19/2016.
  */
 
-public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> implements BaseServiceView {
+public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresenter> implements OwnJobView {
 
     @BindView(R.id.invoice_bar)
     protected View mInvoiceBar;
@@ -60,8 +60,6 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
     @BindView(R.id.payments_txt)
     protected TextView mPaymentsTxt;
-
-    private DatabaseReference serviceRef, serviceSetRef, customerPropertyRef, customerRef, propertyRef;
 
     public OwnJobFragment() {
     }
@@ -178,7 +176,12 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
 
         // else they are updating an already existing job //
         getPresenter().updateJob(
-                mTimeslot,
+                mTimeslot != null ? mTimeslot.getId() : "",
+                mService != null ? mService.getId() : "",
+                mServiceSet != null ? mServiceSet.getId() : "",
+                mCustomer != null ? mCustomer.getId() : "",
+                mProperty != null ? mProperty.getId() : "",
+                mCustomerProperty != null ? mCustomerProperty.getId() : "",
                 mStartCal,
                 mEndCal,
                 mJobTypeTxt.getText().toString(),
@@ -322,16 +325,6 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobPresenter> impleme
         }
 
         goToActivitySendingService(PaymentsActivity.class, Ids.UPDATE_PAYMENTS);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // if we just came from the charges or payments page, refresh the service
-        if (requestCode == Ids.UPDATE_CHARGES || requestCode == Ids.UPDATE_PAYMENTS) {
-            refreshService();
-        }
     }
 
 }

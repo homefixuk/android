@@ -38,6 +38,7 @@ import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.MyLog;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.BackgroundViewColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -59,8 +60,8 @@ import static android.app.Activity.RESULT_OK;
  * Created by samuel on 7/19/2016.
  */
 
-public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresenter<BaseServiceView>>
-        extends BaseTimeslotFragment<TimeslotActivity, BaseServiceView, P>
+public abstract class BaseServiceFragment<V extends BaseServiceView, P extends BaseTimeslotFragmentPresenter<V>>
+        extends BaseTimeslotFragment<TimeslotActivity, V, P>
         implements BaseServiceView {
 
     @BindView(R.id.location_bar)
@@ -176,15 +177,24 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
     private ValueEventListener serviceValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            MyLog.e(TAG, "[serviceValueEventListener] got snapshot");
+
             Service service = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Service.class) : null;
             if (service == null) return;
 
+            MyLog.e(TAG, "[serviceValueEventListener] got snapshot: SUCCESS");
             setupServiceView(service);
             setupServiceSet(service.getServiceSetId());
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
+            MyLog.e(TAG, "[serviceValueEventListener] error");
+            if (databaseError != null) {
+                MyLog.e(TAG, databaseError.getDetails());
+                MyLog.e(TAG, databaseError.getMessage());
+                MyLog.printStackTrace(databaseError.toException());
+            }
         }
     };
 
@@ -626,4 +636,8 @@ public abstract class BaseServiceFragment<P extends BaseTimeslotFragmentPresente
         }).show();
     }
 
+    @Override
+    public ServiceSet getServiceSet() {
+        return mServiceSet;
+    }
 }
