@@ -130,7 +130,7 @@ public class LocationService extends Service {
                             strStatus = String.valueOf(status);
                             break;
                     }
-                    MyLog.e(TAG, "Status: " + strStatus);
+//                    MyLog.e(TAG, "Status: " + strStatus);
 
                 } catch (Exception e) {
                     MyLog.printStackTrace(e);
@@ -192,11 +192,11 @@ public class LocationService extends Service {
         if (isLocationNew()) {
             OnNewLocationReceived(location);
 
-            MyLog.e(TAG, location.toString());
+//            MyLog.e(TAG, location.toString());
             return;
         }
 
-        MyLog.e(TAG, "[gotLocation] location is not new: " + (location != null ? location.toString() : "<null>"));
+//        MyLog.e(TAG, "[gotLocation] location is not new: " + (location != null ? location.toString() : "<null>"));
     }
 
     private static boolean isLocationNew() {

@@ -94,6 +94,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
     @Override
     public void onPause() {
         super.onPause();
+        Tradesman.removeCurrentTradesmanListener(tradesmanListener);
     }
 
     private final OnGotObjectListener<Tradesman> tradesmanListener = new OnGotObjectListener<Tradesman>() {
@@ -104,34 +105,28 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
         }
     };
 
-    private final ValueEventListener currentTradesmanRef = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            mCurrentTradesman = dataSnapshot != null ? dataSnapshot.getValue(Tradesman.class) : mCurrentTradesman;
-            setupView();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-
     private void setupView() {
         if (mCurrentTradesman == null) return;
 
         // load the profile image
         Uri imageUri = Uri.parse(Strings.checkUrl(mCurrentTradesman.getPicture()));
-        imageView.setImageURI(imageUri);
+        if (imageView != null) imageView.setImageURI(imageUri);
 
-        nameView.setText(Strings.returnSafely(mCurrentTradesman.getName(), "No Name"));
-        emailView.setText(Strings.returnSafely(mCurrentTradesman.getEmail(), "your@email.com"));
-        homePhoneView.setText(Strings.returnSafely(mCurrentTradesman.getHomePhone(), "Long hold here to set your home phone"));
-        mobilePhoneView.setText(Strings.returnSafely(mCurrentTradesman.getMobilePhone(), "Long hold here to set your mobile phone"));
-        addressView.setText(Strings.returnSafely(getReadableLocationString(", "), "Long hold here to set your address"));
-        yearsExperienceView.setText(Strings.formatRaised(mCurrentTradesman.getExperience()));
+        if (nameView != null)
+            nameView.setText(Strings.returnSafely(mCurrentTradesman.getName(), "No Name"));
+        if (emailView != null)
+            emailView.setText(Strings.returnSafely(mCurrentTradesman.getEmail(), "your@email.com"));
+        if (homePhoneView != null)
+            homePhoneView.setText(Strings.returnSafely(mCurrentTradesman.getHomePhone(), "Long hold here to set your home phone"));
+        if (mobilePhoneView != null)
+            mobilePhoneView.setText(Strings.returnSafely(mCurrentTradesman.getMobilePhone(), "Long hold here to set your mobile phone"));
+        if (addressView != null)
+            addressView.setText(Strings.returnSafely(getReadableLocationString(", "), "Long hold here to set your address"));
+        if (yearsExperienceView != null)
+            yearsExperienceView.setText(Strings.formatRaised(mCurrentTradesman.getExperience()));
 
-        workAreasView.setText(Strings.returnSafely(Strings.flattenMap(mCurrentTradesman.getWorkAreas(), ", "), "Long hold here to set your work areas"));
+        if (workAreasView != null)
+            workAreasView.setText(Strings.returnSafely(Strings.flattenMap(mCurrentTradesman.getWorkAreas(), ", "), "Long hold here to set your work areas"));
     }
 
     protected String getReadableLocationString(String delimiter) {

@@ -543,42 +543,4 @@ public class CalendarFragment<A extends HomeFixBaseActivity>
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == Ids.TIMESLOT_CHANGE) {
-            String timeslotId = IntentHelper.getStringSafely(data, "timeslotId");
-            if (Strings.isEmpty(timeslotId)) {
-                MyLog.e(TAG, "[onActivityResult] timeslotId is empty");
-                return;
-            }
-
-            Timeslot timeslot = Timeslot.getSenderReceiver().get(timeslotId);
-            if (timeslot == null) {
-                MyLog.e(TAG, "[onActivityResult] timeslot is NULL");
-                return;
-            }
-
-            String action = IntentHelper.getStringSafely(data, "action");
-            if ("deleted".equals(action)) {
-                removeTimeslot(timeslot);
-
-            } else {
-                // remove the original timeslot
-                HomeFixCal.changeEvent(timeslot, timeslot);
-                if (mView != null) mView.notifyDatasetChanged();
-
-                HomeFixCal.updateTimeslotService(timeslot, new OnGotObjectListener<Service>() {
-
-                    @Override
-                    public void onGotThing(Service o) {
-                        MyLog.e(TAG, "Service update: " + (o == null ? "Failed" : "Success"));
-                        if (mView != null) mView.notifyDatasetChanged();
-                    }
-                });
-            }
-        }
-    }
-
 }

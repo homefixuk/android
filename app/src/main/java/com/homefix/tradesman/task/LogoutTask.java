@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.base.view.BaseView;
+import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.splashscreen.SplashScreenActivity;
 
 import io.nlopez.smartlocation.SmartLocation;
@@ -57,6 +58,8 @@ public class LogoutTask extends AsyncTask<Void, Void, Boolean> {
 
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseAuth.signOut();
+
+        Tradesman.onLogout();
 
         return mFirebaseAuth.getCurrentUser() == null;
     }

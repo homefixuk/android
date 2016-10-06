@@ -103,6 +103,11 @@ public class Tradesman extends User {
         mCurrentTradesman = tradesman;
     }
 
+    public static void onLogout() {
+        setCurrentTradesman(null);
+        getCurrentTradesmanListeners().clear();
+    }
+
     public static void setupCurrentTradesman() {
         DatabaseReference currentTradesmanRef = FirebaseUtils.getCurrentTradesmanRef();
         if (currentTradesmanRef == null) return;

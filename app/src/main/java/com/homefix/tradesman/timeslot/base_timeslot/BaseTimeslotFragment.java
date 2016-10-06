@@ -62,7 +62,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     protected TextView mSaveTxt;
 
     private DatabaseReference timeslotRef;
-    protected Calendar mStartCal, mEndCal;
+    protected Calendar mStartCal, mEndCal, mStartCalNew, mEndCalNew;
 
     public BaseTimeslotFragment() {
         super(BaseTimeslotFragment.class.getSimpleName());
@@ -379,6 +379,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.MONTH, monthOfYear);
                         calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         setStartTime(calNew);
+
+                        if (mStartCalNew == null) mStartCalNew = Calendar.getInstance();
+                        mStartCalNew.set(Calendar.YEAR, year);
+                        mStartCalNew.set(Calendar.MONTH, monthOfYear);
+                        mStartCalNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                     }
 
                 },
@@ -403,6 +408,12 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         calNew.set(Calendar.MINUTE, minute);
                         setStartTime(calNew);
+
+                        if (mStartCalNew == null) mStartCalNew = Calendar.getInstance();
+                        mStartCalNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        mStartCalNew.set(Calendar.MINUTE, minute);
+                        mStartCalNew.set(Calendar.SECOND, 0);
+                        mStartCalNew.set(Calendar.MILLISECOND, 0);
                     }
 
                 },
@@ -427,6 +438,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.MONTH, monthOfYear);
                         calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         setEndTime(calNew);
+
+                        if (mEndCalNew == null) mEndCalNew = Calendar.getInstance();
+                        mEndCalNew.set(Calendar.YEAR, year);
+                        mEndCalNew.set(Calendar.MONTH, monthOfYear);
+                        mEndCalNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                     }
 
                 },
@@ -451,6 +467,12 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         calNew.set(Calendar.MINUTE, minute);
                         setEndTime(calNew);
+
+                        if (mEndCalNew == null) mEndCalNew = Calendar.getInstance();
+                        mEndCalNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        mEndCalNew.set(Calendar.MINUTE, minute);
+                        mEndCalNew.set(Calendar.SECOND, 0);
+                        mEndCalNew.set(Calendar.MILLISECOND, 0);
                     }
 
                 },

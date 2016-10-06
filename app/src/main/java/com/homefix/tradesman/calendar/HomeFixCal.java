@@ -6,6 +6,7 @@ import android.util.SparseArray;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.firebase.FirebaseUtils;
@@ -435,18 +436,25 @@ public class HomeFixCal {
 //                });
     }
 
-    public static void loadMonth(Context context, final int year, final int month, final OnGetListListener<Timeslot> listener) {
+    private static final HashMap<String, Query> referenceHashMap = new HashMap<>();
+
+    public static void loadMonth(Context context, final int year, final int month, @NonNull final OnGetListListener<Timeslot> listener) {
         String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
         if (Strings.isEmpty(tradesmanId) || year < 0 || month < 0) {
-            if (listener != null) listener.onGetListFinished(null);
+            listener.onGetListFinished(null);
             return;
         }
 
         // if there is no network connection, try and load from cache
         if (!NetworkManager.hasConnection(context)) {
             Month m = CacheUtils.readObjectFile("month_" + year + "_" + month, Month.class);
-            if (listener != null)
-                listener.onGetListFinished(m != null ? m.events : new ArrayList<Timeslot>());
+            listener.onGetListFinished(m != null ? m.events : new ArrayList<Timeslot>());
+            return;
+        }
+
+        // if we have already setup a ref for this month
+        if (referenceHashMap.containsKey("" + getMonthKey(year, month))) {
+            listener.onGetListFinished(getEvents(year, month));
             return;
         }
 
@@ -472,13 +480,13 @@ public class HomeFixCal {
                 .startAt(startTime)
                 .endAt(endTime);
         MyLog.e(TAG, "Getting tradesmanTimeslots between " + startTime + " and " + endTime);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 MyLog.e(TAG, "got tradesmanTimeslots: " + (dataSnapshot != null && dataSnapshot.exists()));
 
                 if (dataSnapshot == null) {
-                    if (listener != null) listener.onGetListFinished(null);
+                    listener.onGetListFinished(null);
                     return;
                 }
 
@@ -489,38 +497,19 @@ public class HomeFixCal {
                     timeslots.add(childrenSnapshot.getValue(Timeslot.class));
                 }
 
-                Timeslot.printList(timeslots);
-
                 addMonth(year, month, timeslots);
-                if (listener != null) listener.onGetListFinished(timeslots);
-
-//                FirebaseUtils.GetMultiFirebaseObjects<Timeslot> get = new FirebaseUtils.GetMultiFirebaseObjects<>(Timeslot.class, new OnGetListListener<Timeslot>() {
-//
-//                    @Override
-//                    public void onGetListFinished(List<Timeslot> list) {
-//                        if (list == null) list = new ArrayList<>();
-//
-//                        addMonth(year, month, list);
-//                        if (listener != null) listener.onGetListFinished(list);
-//                    }
-//
-//                });
-//
-//                // add all the keys to the multi get
-//                Iterable<DataSnapshot> childrenSnapshots = dataSnapshot.getChildren();
-//                for (DataSnapshot childrenSnapshot : childrenSnapshots) {
-//                    get.add(childrenSnapshot.getKey());
-//                }
-//
-//                get.run();
+                listener.onGetListFinished(timeslots);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 if (databaseError != null) MyLog.printStackTrace(databaseError.toException());
-                if (listener != null) listener.onGetListFinished(null);
+                listener.onGetListFinished(null);
             }
         });
+
+        // save the query so we never lose updates to the events
+        referenceHashMap.put("" + getMonthKey(year, month), query);
     }
 
 }
