@@ -10,6 +10,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
@@ -23,6 +24,7 @@ import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnFinishListener;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -335,7 +337,7 @@ public class FirebaseUtils {
     }
 
     @IgnoreExtraProperties
-    public static class TradesmanTimeslot {
+    public static class TimeslotTimes {
 
         private long startTime, endTime;
 
@@ -370,7 +372,7 @@ public class FirebaseUtils {
         long endTime = System.currentTimeMillis();
 
         // get all keys for the Timeslots for this tradesman that started in the last 8 hours
-        Query query = getBaseRef().child("tradesmanTimeslots").child(id).orderByChild("startTime").startAt(startTime).endAt(endTime);
+        Query query = getBaseRef().child("tradesmanServiceTimeslots").child(id).orderByChild("startTime").startAt(startTime).endAt(endTime);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -379,17 +381,18 @@ public class FirebaseUtils {
 
                 String timeslotId = null;
                 DataSnapshot child;
-                TradesmanTimeslot tradesmanTimeslot;
+                TimeslotTimes timeslotTimes;
                 boolean hasCurrentTimeslotId = false;
                 while (!hasCurrentTimeslotId && iterator.hasNext()) {
                     child = iterator.next();
-                    tradesmanTimeslot = child.getValue(TradesmanTimeslot.class);
-                    if (tradesmanTimeslot.getStartTime() < System.currentTimeMillis() && tradesmanTimeslot.getEndTime() > System.currentTimeMillis()) {
+                    timeslotTimes = child.getValue(TimeslotTimes.class);
+                    if (timeslotTimes.getStartTime() < System.currentTimeMillis() && timeslotTimes.getEndTime() > System.currentTimeMillis()) {
                         timeslotId = child.getKey();
                         hasCurrentTimeslotId = true;
                     }
                 }
 
+                MyLog.e(TAG, "[current] timeslotId: " + Strings.returnSafely(timeslotId));
                 if (Strings.isEmpty(timeslotId)) {
                     onGotObjectListener.onGotThing(null);
                     return;
@@ -430,11 +433,23 @@ public class FirebaseUtils {
         }
 
         // get all keys for the Timeslots for this tradesman that started in the last 8 hours
-        Query query = getBaseRef().child("tradesmanTimeslots").child(id).orderByChild("startTime").startAt(System.currentTimeMillis()).limitToFirst(1);
+        Query query = getBaseRef().child("tradesmanServiceTimeslots").child(id).orderByChild("startTime").startAt(System.currentTimeMillis()).limitToFirst(1);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String timeslotId = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getKey() : null;
+                if (dataSnapshot == null || !dataSnapshot.exists()) {
+                    onGotObjectListener.onGotThing(null);
+                    return;
+                }
+
+                GenericTypeIndicator<Map<String, Object>> genericTypeIndicator = new GenericTypeIndicator<Map<String, Object>>() {
+                };
+                Map<String, Object> value = dataSnapshot.getValue(genericTypeIndicator);
+                Set<String> keys = value.keySet();
+                List<String> list = new ArrayList<>(keys);
+                String timeslotId = !list.isEmpty() ? list.get(0) : null;
+                MyLog.e(TAG, "[next] timeslotId: " + timeslotId);
+
                 if (Strings.isEmpty(timeslotId)) {
                     onGotObjectListener.onGotThing(null);
                     return;
@@ -575,6 +590,12 @@ public class FirebaseUtils {
         timeslot.setTradesmanId(tradesmanId);
         timeslot.setServiceId(serviceKey);
 
+        Map<String, Object> startTimesMap = new HashMap<>();
+        startTimesMap.put("startTime", timeslot.getStartTime());
+        startTimesMap.put("reverseStartTime", timeslot.getReverseStartTime());
+        startTimesMap.put("endTime", timeslot.getEndTime());
+        startTimesMap.put("reverseEndTime", timeslot.getReverseEndTime());
+
         Map<String, Object> map = new HashMap<>();
 
         map.put("/customers/" + customerKey, customer.toMap());
@@ -586,6 +607,7 @@ public class FirebaseUtils {
         map.put("/services/" + serviceKey, service.toMap());
         map.put("/timeslots/" + timeslotKey, timeslot.toMap());
         map.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslotKey, timeslot.toMap());
+        map.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslotKey, startTimesMap);
 
         // update all the references at the same that, that way either all or none get set
         FirebaseUtils.getBaseRef().updateChildren(map, new DatabaseReference.CompletionListener() {

@@ -6,7 +6,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
@@ -30,7 +34,7 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
     @BindView(R.id.recycler_view)
     protected RecyclerView recyclerView;
 
-    private MyFirebaseRecyclerAdapter<Timeslot, OwnJobViewHolder> adapter;
+    private MyFirebaseRecyclerAdapter<Object, OwnJobViewHolder> adapter;
 
     public RecentServicesFragment() {
         super(RecentServicesFragment.class.getSimpleName());
@@ -59,28 +63,49 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
             return;
         }
 
-        Query query = FirebaseUtils.getBaseRef().child("tradesmanTimeslots").child(tradesmanId).orderByChild("reverseStartTime");
-        adapter = new MyFirebaseRecyclerAdapter<Timeslot, OwnJobViewHolder>(
+        Query query = FirebaseUtils
+                .getBaseRef()
+                .child("tradesmanServiceTimeslots")
+                .child(tradesmanId)
+                .orderByChild("reverseStartTime")
+                .startAt(-1L * System.currentTimeMillis()); // only show jobs before right now
+        adapter = new MyFirebaseRecyclerAdapter<Object, OwnJobViewHolder>(
                 getBaseActivity(),
-                Timeslot.class,
+                Object.class,
                 OwnJobViewHolder.class,
                 R.layout.own_job_summary_layout,
                 query) {
 
             @Override
-            protected void populateViewHolder(OwnJobViewHolder viewHolder, Timeslot model, int position) {
-                //            DatabaseReference ref = getRef(position);
-//            String key = ref != null ? ref.getKey() : "";
-//
-//            if (Strings.isEmpty(key)) return;
-
+            protected void populateViewHolder(final OwnJobViewHolder viewHolder, final Object model, int position) {
                 viewHolder.showTimeUntil = false; // do not show the time until time
-                viewHolder.bind(getBaseActivity(), model, new OwnJobViewHolder.TimeslotClickedListener() {
-                    @Override
-                    public void onTimeslotClicked(Timeslot timeslot, boolean longClick) {
-                        HomefixServiceHelper.goToTimeslot(getBaseActivity(), timeslot, longClick);
-                    }
-                });
+
+                // get the timeslot key
+                DatabaseReference ref = getRef(position);
+                if (ref == null) return;
+
+                String timeslotKey = ref.getKey();
+                DatabaseReference timeslotRef = FirebaseUtils.getSpecificTimeslotRef(timeslotKey);
+                if (timeslotRef != null) {
+                    timeslotRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+                            Timeslot model = dataSnapshot.getValue(Timeslot.class);
+                            viewHolder.bind(getBaseActivity(), model, new OwnJobViewHolder.TimeslotClickedListener() {
+                                @Override
+                                public void onTimeslotClicked(Timeslot timeslot, boolean longClick) {
+                                    HomefixServiceHelper.goToTimeslot(getBaseActivity(), timeslot, longClick);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
             }
         };
 

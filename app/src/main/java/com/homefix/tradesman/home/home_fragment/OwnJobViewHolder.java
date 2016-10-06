@@ -126,13 +126,15 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
         // setup the new one
         String serviceId = timeslot.getServiceId();
         serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
-//        if (serviceRef != null) serviceRef.addValueEventListener(serviceValueEventListener);
+        if (serviceRef != null) serviceRef.addValueEventListener(serviceValueEventListener);
     }
 
     private ValueEventListener serviceValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            Service service = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Service.class) : null;
+            if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+            Service service = dataSnapshot.getValue(Service.class);
             if (service != null) {
                 if (serviceNameView != null)
                     serviceNameView.setText(Strings.isEmpty(service.getServiceType()) ? "Own Job" : service.getServiceType());
@@ -143,7 +145,6 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
         }
     };
 
@@ -162,7 +163,9 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
     private ValueEventListener serviceSetValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            ServiceSet serviceSet = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(ServiceSet.class) : null;
+            if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+            ServiceSet serviceSet = dataSnapshot.getValue(ServiceSet.class);
             if (serviceSet == null) return;
 
             setupCustomerProperty(serviceSet.getCustomerPropertyId());
@@ -170,7 +173,6 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
         }
     };
 
@@ -182,14 +184,16 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
             customerPropertyRef.removeEventListener(customerPropertyIdListener);
 
         // setup the new one
-        customerPropertyRef = FirebaseUtils.getBaseRef().child("customerProperties").child(customerPropertyId);
+        customerPropertyRef = FirebaseUtils.getBaseRef().child("customerPropertyInfos").child(customerPropertyId);
         customerPropertyRef.addValueEventListener(customerPropertyIdListener);
     }
 
     private ValueEventListener customerPropertyIdListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            CustomerProperty customerProperty = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(CustomerProperty.class) : null;
+            if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+            CustomerProperty customerProperty = dataSnapshot.getValue(CustomerProperty.class);
             if (customerProperty == null) return;
 
             String customerId = customerProperty.getCustomerId();
@@ -201,7 +205,6 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
         }
     };
 
@@ -213,13 +216,15 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
         // setup the new one
         customerRef = FirebaseUtils.getBaseRef().child("customers").child(customerId);
-        customerRef.addValueEventListener(propertyListener);
+        customerRef.addValueEventListener(customerListener);
     }
 
     private ValueEventListener customerListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            Customer customer = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Customer.class) : null;
+            if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+            Customer customer = dataSnapshot.getValue(Customer.class);
             if (customer == null) return;
 
             if (contactNameView != null) contactNameView.setText(customer.getName());
@@ -261,7 +266,6 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
         }
     };
 
@@ -307,7 +311,6 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
         }
     };
 

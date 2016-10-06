@@ -279,9 +279,8 @@ public class VariableUtils {
         }
 
         for (String name : example.keySet()) {
-            String key = name.toString();
             String value = example.get(name).toString();
-            MyLog.e("HashMap", key + " " + value);
+            MyLog.e("HashMap", name + " " + value);
         }
     }
 
@@ -292,9 +291,8 @@ public class VariableUtils {
         }
 
         for (String name : example.keySet()) {
-            String key = name.toString();
             String value = example.get(name).toString();
-            MyLog.e("HashMap", key + " " + value);
+            MyLog.e("HashMap", name + " " + value);
         }
     }
 

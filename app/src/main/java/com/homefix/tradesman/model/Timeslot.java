@@ -129,7 +129,7 @@ public class Timeslot extends BaseModel {
 
     @Exclude
     public boolean isEmpty() {
-        return Strings.isEmpty(tradesmanId) || startTime == 0 || endTime == 0;
+        return Strings.isEmpty(tradesmanId);
     }
 
     @Exclude

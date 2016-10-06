@@ -138,6 +138,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                         // if the timeslot has a service, remove it too
                         if (Timeslot.TYPE.OWN_JOB.getName().equals(timeslot.getType()) && !Strings.isEmpty(timeslot.getServiceId())) {
                             childUpdates.put("/services/" + timeslot.getServiceId(), null);
+                            childUpdates.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslot.getId(), null);
                         }
 
                         FirebaseUtils.getBaseRef().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {

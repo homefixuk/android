@@ -99,8 +99,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
         // if the timeslot is empty or not a job
         if (currentTimeslot == null
-                || currentTimeslot.isEmpty()
-                || !currentTimeslot.getType().equals(Timeslot.TYPE.OWN_JOB.getName())) {
+                || currentTimeslot.isEmpty()) {
             if (MyLog.isIsLogEnabled())
                 Timeslot.printList(Collections.singletonList(currentTimeslot));
             currentJobLayout.setVisibility(View.GONE);
@@ -124,8 +123,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
 
         // if the timeslot is empty or not a job
         if (nextTimeslot == null
-                || nextTimeslot.isEmpty()
-                || !nextTimeslot.getType().equals(Timeslot.TYPE.OWN_JOB.getName())) {
+                || nextTimeslot.isEmpty()) {
             if (MyLog.isIsLogEnabled()) Timeslot.printList(Collections.singletonList(nextTimeslot));
             nextJobLayout.setVisibility(View.GONE);
             nextJobView.setVisibility(View.GONE);
