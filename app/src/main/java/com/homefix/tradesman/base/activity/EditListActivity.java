@@ -120,9 +120,9 @@ public class EditListActivity extends BaseToolbarActivity<BaseToolbarActivityVie
                 text1.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
 
                 // add click listener to allow the current items to be removed
-                view.setOnClickListener(new View.OnClickListener() {
+                view.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
-                    public void onClick(View view) {
+                    public boolean onLongClick(View view) {
                         showConfirmDialog(
                                 "Would you like to remove: " + s + "?",
                                 "REMOVE",
@@ -134,6 +134,7 @@ public class EditListActivity extends BaseToolbarActivity<BaseToolbarActivityVie
                                     }
                                 }
                         );
+                        return true;
                     }
                 });
 

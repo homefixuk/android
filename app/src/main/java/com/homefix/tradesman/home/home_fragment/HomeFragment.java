@@ -114,6 +114,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         viewHolder.bind(getActivity(), currentTimeslot, getPresenter());
         currentJobLayout.requestLayout();
         setRefreshingCurrentJob(false);
+        onFinishRefreshingJobs();
     }
 
     private void setNextJob(Timeslot timeslot) {
@@ -137,6 +138,7 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         viewHolder.bind(getActivity(), nextTimeslot, getPresenter());
         nextJobLayout.requestLayout();
         setRefreshingNextJob(false);
+        onFinishRefreshingJobs();
     }
 
     public synchronized boolean isRefreshingCurrentJob() {

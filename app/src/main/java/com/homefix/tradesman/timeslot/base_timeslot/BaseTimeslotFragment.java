@@ -23,6 +23,7 @@ import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.KeyboardUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
 
@@ -138,6 +139,8 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         if (mSaveTxt != null) {
             mSaveTxt.setText(!isEdit ? "DONE" : (mTimeslot != null ? "SAVE" : "ADD"));
         }
+
+        if (!isEdit) KeyboardUtils.hideKeyboard(getView());
 
         hasMadeChanges = false;
     }
