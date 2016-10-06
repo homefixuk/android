@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,13 +18,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
-import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
-import com.homefix.tradesman.base.presenter.DefaultFragementPresenter;
-import com.homefix.tradesman.base.view.BaseFragmentView;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Charge;
 import com.homefix.tradesman.model.Service;
+import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.MyLog;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.string.Strings;
 
@@ -36,7 +34,9 @@ import butterknife.ButterKnife;
  * Created by samuel on 7/27/2016.
  */
 
-public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFragmentView, BaseFragmentPresenter<BaseFragmentView>> {
+public class ChargesFragment
+        extends BaseCloseFragment<ChargesActivity, ChargesFragmentView, ChargesFragmentPresenter>
+        implements ChargesFragmentView {
 
     private Service service;
 
@@ -54,8 +54,8 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
     }
 
     @Override
-    protected BaseFragmentPresenter getPresenter() {
-        if (presenter == null) presenter = new DefaultFragementPresenter(this);
+    protected ChargesFragmentPresenter getPresenter() {
+        if (presenter == null) presenter = new ChargesFragmentPresenter(this);
 
         return presenter;
     }
@@ -65,13 +65,15 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         return R.layout.charges_layout;
     }
 
-    public class ChargeViewHolder extends RecyclerView.ViewHolder {
+    public static class ChargeViewHolder extends RecyclerView.ViewHolder {
 
-        public ChargeViewHolder(AddChargeView addChargeView) {
-            super(addChargeView);
+        public ChargeViewHolder(View view) {
+            super(view);
         }
 
-        public void bind(final Charge charge) {
+        public void bind(final ChargesFragmentView view, final Charge charge) {
+            if (view == null) return;
+
             TextView mLbl = ButterKnife.findById(itemView, R.id.label);
             TextView mAmount = ButterKnife.findById(itemView, R.id.amount);
             TextView mQuantity = ButterKnife.findById(itemView, R.id.quantity);
@@ -83,17 +85,17 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showEditCharge(charge);
+                    view.showEditCharge(charge);
                 }
             });
-            itemView.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.light_grey));
+            itemView.setOnTouchListener(new BackgroundColourOnTouchListener(view.getContext(), R.color.transparent, R.color.light_grey));
 
             // show long touch listener to ask if the user wants to delete the charge
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     MaterialDialogWrapper.getNegativeConfirmationDialog(
-                            getActivity(),
+                            view.getBaseActivity(),
                             "Would you like to delete this charge?",
                             "DELETE",
                             "CANCEL",
@@ -101,7 +103,7 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     // call API to delete charge
-                                    removeChargeClicked(charge);
+                                    view.removeChargeClicked(charge);
                                     dialog.dismiss();
                                 }
                             }, new MaterialDialog.SingleButtonCallback() {
@@ -131,31 +133,40 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         chargesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                double totalCharges = 0;
-                Charge charge;
-                for (int i = 0, len = adapter.getItemCount(); i < len; i++) {
-                    charge = adapter.getItem(i);
-                    if (charge == null) continue;
-                    totalCharges += charge.getTotalCost();
-                }
-                updateTotalCostView(totalCharges);
+                DatabaseReference ref = FirebaseUtils.getSpecificServiceSetRef(service != null ? service.getServiceSetId() : null);
+                if (ref == null) return;
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+                        ServiceSet serviceSet = dataSnapshot.getValue(ServiceSet.class);
+                        if (serviceSet != null) {
+                            serviceSet.update();
+                            updateTotalCostView(serviceSet.getTotalCost());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
         adapter = new MyFirebaseRecyclerAdapter<Charge, ChargeViewHolder>(
-                getBaseActivity(),
+                getActivity(),
                 Charge.class,
                 ChargeViewHolder.class,
                 R.layout.charges_item_layout,
                 chargesRef) {
             @Override
             protected void populateViewHolder(ChargeViewHolder viewHolder, Charge model, int position) {
-                viewHolder.bind(model);
+                viewHolder.bind(getThisView(), model);
             }
         };
 
@@ -163,6 +174,10 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
         mRecyclerView.setAdapter(adapter);
+    }
+
+    public ChargesFragmentView getThisView() {
+        return this;
     }
 
     private DatabaseReference getChargesRef() {
@@ -178,7 +193,7 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
             mTotalCost.setText(String.format("£%s", Strings.priceToString(totalCost)));
     }
 
-    private void removeChargeClicked(final Charge charge) {
+    public void removeChargeClicked(final Charge charge) {
         chargesRef = getChargesRef();
         if (chargesRef == null || charge == null || Strings.isEmpty(charge.getId())) return;
 
@@ -201,7 +216,7 @@ public class ChargesFragment extends BaseCloseFragment<ChargesActivity, BaseFrag
         showEditCharge(null);
     }
 
-    private void showEditCharge(Charge charge) {
+    public void showEditCharge(Charge charge) {
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
 
         final AddChargeView view = (AddChargeView) getActivity().getLayoutInflater().inflate(R.layout.add_charge_layout, null);

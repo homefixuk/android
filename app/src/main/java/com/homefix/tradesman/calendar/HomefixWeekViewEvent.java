@@ -24,6 +24,8 @@ import java.util.List;
 public class HomefixWeekViewEvent extends WeekViewEvent implements ValueEventListener {
 
     private Timeslot timeslot;
+    private Service service;
+    private String name;
     private DatabaseReference serviceRef;
 
     public HomefixWeekViewEvent() {
@@ -84,10 +86,19 @@ public class HomefixWeekViewEvent extends WeekViewEvent implements ValueEventLis
                 break;
             case OWN_JOB:
                 String serviceId = timeslot.getServiceId();
-                setName(Strings.returnSafely(serviceId, "Own Job"));
 
-                serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
-                if (serviceRef != null) serviceRef.addValueEventListener(this);
+                // if we don't have the service, set a placeholder name and fetch it
+                if (service == null) {
+                    setName(Strings.returnSafely(name));
+                    if (serviceRef != null) serviceRef.removeEventListener(this);
+                    serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
+                    if (serviceRef != null) serviceRef.addValueEventListener(this);
+                    break;
+                }
+
+                // else set the name of the service job type
+                name = service.getServiceType();
+                setName(Strings.returnSafely(name, "Own Job"));
                 break;
 
             default:
@@ -164,9 +175,10 @@ public class HomefixWeekViewEvent extends WeekViewEvent implements ValueEventLis
     public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot == null || !dataSnapshot.exists()) return;
 
-        Service service = dataSnapshot.getValue(Service.class);
+        service = dataSnapshot.getValue(Service.class);
         if (service == null) return;
-        setName(Strings.returnSafely(service.getServiceType(), "Own Job"));
+        name = service.getServiceType();
+        setName(Strings.returnSafely(name, "Own Job"));
     }
 
     @Override

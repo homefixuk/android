@@ -1,8 +1,12 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.homefix.tradesman.common.SendReceiver;
+import com.homefix.tradesman.firebase.FirebaseUtils;
+import com.samdroid.common.MyLog;
 import com.samdroid.string.Strings;
 
 import java.util.HashMap;
@@ -173,4 +177,46 @@ public class ServiceSet extends BaseModel {
         return map;
     }
 
+    @Exclude
+    public void update() {
+        if (Strings.isEmpty(getId())) return;
+
+        // sum up the total cost from the charges
+        Map<String, Charge> cs = getCharges();
+        Set<String> keys = cs.keySet();
+        double totalCharges = 0;
+        for (String key : keys) {
+            Charge c = cs.get(key);
+            if (c == null) continue;
+            totalCharges += c.getTotalCost();
+        }
+        this.totalCost = totalCharges;
+
+        Map<String, Payment> ps = getPayments();
+        keys = ps.keySet();
+        double totalPayments = 0;
+        for (String key : keys) {
+            Payment p = ps.get(key);
+            if (p == null) continue;
+            totalPayments += p.getAmount();
+        }
+        this.amountPaid = totalPayments;
+
+        Map<String, Object> changes = new HashMap<>();
+        changes.put("totalCost", totalCost);
+        changes.put("amountPaid", amountPaid);
+
+        // update the service set with the total cost of the charges
+        DatabaseReference ref = FirebaseUtils.getSpecificServiceSetRef(getId());
+        if (ref != null) {
+            ref.updateChildren(changes, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null)
+                        MyLog.e(ServiceSet.class.getSimpleName(), "Error updating service set: " + databaseError.getMessage());
+                    else MyLog.e(ServiceSet.class.getSimpleName(), "Updated service set");
+                }
+            });
+        }
+    }
 }

@@ -18,15 +18,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
-import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
-import com.homefix.tradesman.base.presenter.DefaultFragementPresenter;
-import com.homefix.tradesman.base.view.BaseFragmentView;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Payment;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
-import com.homefix.tradesman.timeslot.own_job.charges.ChargesActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.ColorUtils;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
@@ -39,7 +35,9 @@ import butterknife.ButterKnife;
  * Created by samuel on 7/27/2016.
  */
 
-public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFragmentView, BaseFragmentPresenter<BaseFragmentView>> {
+public class PaymentsFragment
+        extends BaseCloseFragment<PaymentsActivity, PaymentsFragmentView, PaymentsFragmentPresenter>
+        implements PaymentsFragmentView {
 
     private Service service;
 
@@ -63,8 +61,8 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
     }
 
     @Override
-    protected BaseFragmentPresenter getPresenter() {
-        if (presenter == null) presenter = new DefaultFragementPresenter(this);
+    protected PaymentsFragmentPresenter getPresenter() {
+        if (presenter == null) presenter = new PaymentsFragmentPresenter(this);
 
         return presenter;
     }
@@ -85,11 +83,27 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
             return;
         }
 
-        paymentsRef.getParent().addValueEventListener(new ValueEventListener() {
+        paymentsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                ServiceSet serviceSet = dataSnapshot != null ? dataSnapshot.getValue(ServiceSet.class) : null;
-                updateServiceSetView(serviceSet);
+                DatabaseReference ref = FirebaseUtils.getSpecificServiceSetRef(service != null ? service.getServiceSetId() : null);
+                if (ref == null) return;
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot == null || !dataSnapshot.exists()) return;
+
+                        ServiceSet serviceSet = dataSnapshot.getValue(ServiceSet.class);
+                        if (serviceSet != null) {
+                            serviceSet.update();
+                            updateServiceSetView(serviceSet);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
             }
 
             @Override
@@ -97,7 +111,6 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
 
             }
         });
-
 
         adapter = new MyFirebaseRecyclerAdapter<Payment, PaymentViewHolder>(
                 getBaseActivity(),
@@ -107,7 +120,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
                 paymentsRef) {
             @Override
             protected void populateViewHolder(PaymentViewHolder viewHolder, Payment model, int position) {
-                viewHolder.bind(model);
+                viewHolder.bind(getThisView(), model);
             }
         };
 
@@ -115,6 +128,10 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
         mRecyclerView.setAdapter(adapter);
+    }
+
+    public PaymentsFragmentView getThisView() {
+        return this;
     }
 
     private void updateServiceSetView(ServiceSet serviceSet) {
@@ -142,13 +159,15 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
         return ref == null ? paymentsRef : ref.child("payments");
     }
 
-    public class PaymentViewHolder extends RecyclerView.ViewHolder {
+    public static class PaymentViewHolder extends RecyclerView.ViewHolder {
 
         public PaymentViewHolder(View itemView) {
             super(itemView);
         }
 
-        public void bind(final Payment payment) {
+        public void bind(final PaymentsFragmentView view, final Payment payment) {
+            if (view == null) return;
+
             TextView mLbl = ButterKnife.findById(itemView, R.id.label);
             TextView mAmount = ButterKnife.findById(itemView, R.id.amount);
 
@@ -165,17 +184,17 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showEditPayment(payment);
+                    view.showEditPayment(payment);
                 }
             });
-            itemView.setOnTouchListener(new BackgroundColourOnTouchListener(getContext(), R.color.transparent, R.color.light_grey));
+            itemView.setOnTouchListener(new BackgroundColourOnTouchListener(view.getContext(), R.color.transparent, R.color.light_grey));
 
             // show long touch listener to ask if the user wants to delete the charge
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     MaterialDialogWrapper.getNegativeConfirmationDialog(
-                            getActivity(),
+                            view.getBaseActivity(),
                             "Would you like to delete this payment?",
                             "DELETE",
                             "CANCEL",
@@ -183,7 +202,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     // call API to delete charge
-                                    removePaymentClicked(payment);
+                                    view.removePaymentClicked(payment);
                                     dialog.dismiss();
                                 }
                             }, new MaterialDialog.SingleButtonCallback() {
@@ -199,7 +218,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
         }
     }
 
-    private void removePaymentClicked(final Payment payment) {
+    public void removePaymentClicked(final Payment payment) {
         paymentsRef = getPaymentsRef();
         if (paymentsRef == null || payment == null || Strings.isEmpty(payment.getId())) return;
 
@@ -227,7 +246,7 @@ public class PaymentsFragment extends BaseCloseFragment<ChargesActivity, BaseFra
         showEditPayment(null);
     }
 
-    private void showEditPayment(Payment payment) {
+    public void showEditPayment(Payment payment) {
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity());
 
         final AddPaymentView view = (AddPaymentView) getActivity().getLayoutInflater().inflate(R.layout.add_payment_layout, null);

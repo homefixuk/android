@@ -16,10 +16,6 @@ public abstract class MyFirebaseRecyclerAdapter<T extends Object, V extends Recy
 
     protected String TAG = MyFirebaseRecyclerAdapter.class.getSimpleName();
 
-    public static final int TYPE_NORMAL = 0, TYPE_FOOTER = 1;
-
-    protected boolean isShowingFooter = false;
-
     public MyFirebaseRecyclerAdapter(
             Activity activity,
             Class<T> modelClass,
@@ -38,27 +34,6 @@ public abstract class MyFirebaseRecyclerAdapter<T extends Object, V extends Recy
             DatabaseReference ref) {
         super(modelClass, modelLayout, holderClass, ref);
         mActivity = activity;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        if (isShowingFooter && position == getItemCount() - 1) return TYPE_FOOTER;
-
-        return TYPE_NORMAL;
-    }
-
-    public int getViewTypeCount() {
-        return 2;
-    }
-
-    /**
-     * Set if showing the footer
-     *
-     * @param isShowingFooter
-     */
-    public void setIsShowingFooter(boolean isShowingFooter) {
-        this.isShowingFooter = isShowingFooter;
-        notify();
     }
 
     public Activity getActivity() {
