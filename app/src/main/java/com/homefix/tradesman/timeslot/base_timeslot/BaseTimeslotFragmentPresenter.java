@@ -57,13 +57,15 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
             timeslotKey = FirebaseUtils.getTimeslotsRef().push().getKey();
 
             timeslot = new Timeslot(timeslotKey);
-            timeslot.setStartTime(mStart.getTimeInMillis());
-            timeslot.setEndTime(mEnd.getTimeInMillis());
             timeslot.setType(mType.getName());
 
         } else {
             timeslotKey = timeslot.getId();
         }
+
+        // always update the time from the view
+        timeslot.setStartTime(mStart.getTimeInMillis());
+        timeslot.setEndTime(mEnd.getTimeInMillis());
 
         if (Strings.isEmpty(timeslotKey)) {
             getView().showErrorDialog();

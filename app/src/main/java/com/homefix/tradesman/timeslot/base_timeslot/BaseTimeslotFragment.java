@@ -237,7 +237,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         if (mStartTimeTxt != null) mStartTimeTxt.setText(TimeUtils.getShortTimeString(mStartCal));
 
         // if the newly selected start date is after the end date
-        if (mEndCal == null || mStartCal.getTimeInMillis() > mEndCal.getTimeInMillis()) {
+        if (mEndCal == null || mStartCal.getTimeInMillis() >= mEndCal.getTimeInMillis()) {
             // automatically set the end time after the new start time
             mEndCal = Calendar.getInstance();
             mEndCal.setTimeInMillis(mStartCal.getTimeInMillis() + (currentLength > 0 ? currentLength : TimeUtils.getHoursInMillis(1)));
@@ -380,7 +380,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         setStartTime(calNew);
 
-                        if (mStartCalNew == null) mStartCalNew = Calendar.getInstance();
+                        if (mStartCalNew == null) mStartCalNew = (Calendar) mStartCal.clone();
                         mStartCalNew.set(Calendar.YEAR, year);
                         mStartCalNew.set(Calendar.MONTH, monthOfYear);
                         mStartCalNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -409,9 +409,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.MINUTE, minute);
                         setStartTime(calNew);
 
-                        if (mStartCalNew == null) mStartCalNew = Calendar.getInstance();
-                        mStartCalNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        mStartCalNew.set(Calendar.MINUTE, minute);
+                        if (mStartCalNew == null) mStartCalNew = (Calendar) mStartCal.clone();
+                        else {
+                            mStartCalNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            mStartCalNew.set(Calendar.MINUTE, minute);
+                        }
                         mStartCalNew.set(Calendar.SECOND, 0);
                         mStartCalNew.set(Calendar.MILLISECOND, 0);
                     }
@@ -439,10 +441,12 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         setEndTime(calNew);
 
-                        if (mEndCalNew == null) mEndCalNew = Calendar.getInstance();
-                        mEndCalNew.set(Calendar.YEAR, year);
-                        mEndCalNew.set(Calendar.MONTH, monthOfYear);
-                        mEndCalNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        if (mEndCalNew == null) mEndCalNew = (Calendar) calNew.clone();
+                        else {
+                            mEndCalNew.set(Calendar.YEAR, year);
+                            mEndCalNew.set(Calendar.MONTH, monthOfYear);
+                            mEndCalNew.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        }
                     }
 
                 },
@@ -468,9 +472,11 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                         calNew.set(Calendar.MINUTE, minute);
                         setEndTime(calNew);
 
-                        if (mEndCalNew == null) mEndCalNew = Calendar.getInstance();
-                        mEndCalNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        mEndCalNew.set(Calendar.MINUTE, minute);
+                        if (mEndCalNew == null) mEndCalNew = (Calendar) calNew.clone();
+                        else {
+                            mEndCalNew.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            mEndCalNew.set(Calendar.MINUTE, minute);
+                        }
                         mEndCalNew.set(Calendar.SECOND, 0);
                         mEndCalNew.set(Calendar.MILLISECOND, 0);
                     }
@@ -490,7 +496,10 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
             return;
         }
 
-        getPresenter().save(mTimeslot, mStartCal, mEndCal);
+        getPresenter().save(
+                mTimeslot,
+                mStartCalNew != null ? mStartCalNew : mStartCal,
+                mEndCalNew != null ? mEndCalNew : mEndCal);
     }
 
 }

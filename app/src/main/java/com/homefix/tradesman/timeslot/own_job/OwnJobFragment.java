@@ -155,8 +155,8 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
         // if the user is creating a new job
         if (mTimeslot == null) {
             getPresenter().addNewJob(
-                    mStartCal,
-                    mEndCal,
+                    mStartCalNew != null ? mStartCalNew : mStartCal,
+                    mEndCalNew != null ? mEndCalNew : mEndCal,
                     mJobTypeTxt.getText().toString(),
                     addressLine1,
                     addressLine2,
