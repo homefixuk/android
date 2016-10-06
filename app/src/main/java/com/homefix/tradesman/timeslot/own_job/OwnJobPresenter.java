@@ -10,9 +10,7 @@ import com.homefix.tradesman.calendar.HomeFixCal;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
-import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
-import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotView;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
@@ -125,9 +123,10 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         Map<String, Object> childUpdates = new HashMap<>();
                         childUpdates.put("/timeslots/" + timeslot.getId(), null);
                         childUpdates.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslot.getId(), null);
+                        childUpdates.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslot.getId(), null);
 
-                        // if the timeslot has a service, remove it too
-                        if (Timeslot.TYPE.OWN_JOB.getName().equals(timeslot.getType()) && !Strings.isEmpty(timeslot.getServiceId())) {
+                        // remove the service too
+                        if (!Strings.isEmpty(timeslot.getServiceId())) {
                             childUpdates.put("/services/" + timeslot.getServiceId(), null);
 
                             // remove service from service set

@@ -13,6 +13,7 @@ import com.homefix.tradesman.calendar.HomeFixCal;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.MyLog;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
