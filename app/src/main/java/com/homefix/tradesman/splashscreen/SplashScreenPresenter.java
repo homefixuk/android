@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
 import com.homefix.tradesman.service.LocationService;
@@ -24,8 +25,13 @@ public class SplashScreenPresenter extends BaseActivityPresenter<SplashScreenVie
 
         if (!isViewAttached()) return;
 
-        // Initialize Firebase Auth
-        // Firebase instance variables
+        try {
+            HomeFixApplication.setupFirebase(getView().getContext());
+        } catch (Exception e) {
+            MyLog.printStackTrace(e);
+            FirebaseCrash.report(e.getCause());
+        }
+
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
 

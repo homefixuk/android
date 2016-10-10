@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -242,22 +241,24 @@ public class VariableUtils {
     }
 
     public static <T> String listToString(List<T> list) {
-        if (list == null) {
-            return "[]";
-        }
+        return "[" + listToString(list, ", ") + "]";
+    }
 
-        String s = "[";
+    public static <T> String listToString(List<T> list, String delimiter) {
+        if (list == null) return "";
+
+        delimiter = Strings.returnSafely(delimiter);
+
+        String s = "";
         for (int i = 0; i < list.size(); i++) {
             Object next = list.get(i);
-
             if (next == null) continue;
 
-            if (i > 0) s += ", ";
-
+            if (i > 0) s += delimiter;
             s += "" + next;
         }
 
-        return s + "]";
+        return s;
     }
 
     public static <T> void printArray(T[] array) {

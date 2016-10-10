@@ -16,8 +16,8 @@ android {
         applicationId "com.homefix.tradesman"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 2
-        versionName "2.0"
+        versionCode 3
+        versionName "3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -101,6 +101,7 @@ dependencies {
     compile 'com.google.firebase:firebase-database:9.6.0'
     compile 'com.google.firebase:firebase-crash:9.6.0'
     compile 'com.google.firebase:firebase-auth:9.6.0'
+    compile 'com.google.firebase:firebase-config:9.6.0'
     // FirebaseUI
     compile 'com.firebaseui:firebase-ui:0.6.0'
     // UI

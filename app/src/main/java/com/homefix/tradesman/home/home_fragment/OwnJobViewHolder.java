@@ -1,6 +1,7 @@
 package com.homefix.tradesman.home.home_fragment;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.common.ActivityHelper;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Customer;
 import com.homefix.tradesman.model.CustomerProperty;
@@ -249,6 +251,13 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
                             @Override
                             public void onClick(View view) {
                                 HomefixServiceHelper.onEmailClicked(activity, email, "");
+
+                                Bundle b = new Bundle();
+                                b.putString("email", email);
+                                AnalyticsHelper.track(
+                                        activity,
+                                        "clickedEmailCustomer",
+                                        b);
                             }
                         });
                     } else {
@@ -278,6 +287,13 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
                             @Override
                             public void onClick(View view) {
                                 HomefixServiceHelper.onPhoneClicked(activity, finalPhone);
+
+                                Bundle b = new Bundle();
+                                b.putString("phone", finalPhone);
+                                AnalyticsHelper.track(
+                                        activity,
+                                        "clickedPhoneCustomer",
+                                        b);
                             }
                         });
                     } else {
@@ -315,7 +331,7 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
             final String postcode = property.getPostcode();
             final String country = property.getCountry();
             if (addressView != null) {
-                String address = HomefixServiceHelper.getReadableLocationString(", ", addressLine1, addressLine2, addressLine3, postcode, country);
+                final String address = HomefixServiceHelper.getReadableLocationString(", ", addressLine1, addressLine2, addressLine3, postcode, country);
                 View locationIcon = ButterKnife.findById(itemView, R.id.location_icon);
 
                 if (Strings.isEmpty(address)) {
@@ -336,6 +352,13 @@ public class OwnJobViewHolder extends RecyclerView.ViewHolder {
                             @Override
                             public void onClick(View view) {
                                 HomefixServiceHelper.onLocationClicked(activity, latitude, longitude, addressLine1, addressLine2, addressLine3, postcode, country);
+
+                                Bundle b = new Bundle();
+                                b.putString("address", Strings.combineStrings(",", addressLine1, addressLine2, addressLine3, postcode, country));
+                                AnalyticsHelper.track(
+                                        activity,
+                                        "clickedGetJobDirections",
+                                        b);
                             }
                         });
                     } else {

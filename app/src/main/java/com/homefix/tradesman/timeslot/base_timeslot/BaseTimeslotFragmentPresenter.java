@@ -1,5 +1,6 @@
 package com.homefix.tradesman.timeslot.base_timeslot;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -10,6 +11,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.base.presenter.BaseFragmentPresenter;
 import com.homefix.tradesman.calendar.HomeFixCal;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
@@ -34,7 +36,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
         mType = type;
     }
 
-    public void save(Timeslot timeslot, Calendar mStart, Calendar mEnd) {
+    public void save(Timeslot timeslot, final Calendar mStart, final Calendar mEnd) {
         if (!isViewAttached()) return;
 
         // if the user has made no changes to the timeslot
@@ -49,10 +51,12 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
             return;
         }
 
-        getView().showDialog((timeslot == null ? "Adding" : "Updating") + " timeslot...", true);
+        final boolean isNewTimeslot = timeslot == null;
+
+        getView().showDialog((isNewTimeslot ? "Adding" : "Updating") + " timeslot...", true);
 
         final String timeslotKey;
-        if (timeslot == null) {
+        if (isNewTimeslot) {
             // create a new Timeslot record
             timeslotKey = FirebaseUtils.getTimeslotsRef().push().getKey();
 
@@ -88,6 +92,17 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                     getView().showErrorDialog();
                     return;
                 }
+
+                // track the save
+                Bundle b = new Bundle();
+                b.putString("timeslotId", finalTimeslot.getId());
+                b.putString("type", mType.getName());
+                b.putLong("startTime", mStart.getTimeInMillis());
+                b.putLong("endTime", mEnd.getTimeInMillis());
+                AnalyticsHelper.track(
+                        getView().getContext(),
+                        isNewTimeslot ? "addTimeslot" : "editTimeslot",
+                        b);
 
                 DatabaseReference ref = FirebaseUtils.getSpecificTimeslotRef(timeslotKey);
                 if (ref == null) {
@@ -151,6 +166,15 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                                     getView().showErrorDialog();
                                     return;
                                 }
+
+                                // track the delete
+                                Bundle b = new Bundle();
+                                b.putString("timeslotId", timeslot.getId());
+                                b.putString("type", mType.getName());
+                                AnalyticsHelper.track(
+                                        getView().getContext(),
+                                        "deleteTimeslot",
+                                        b);
 
                                 // remove the original timeslot
                                 HomeFixCal.removeEvent(timeslot);

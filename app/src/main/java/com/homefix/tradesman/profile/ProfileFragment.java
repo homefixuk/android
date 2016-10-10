@@ -2,6 +2,7 @@ package com.homefix.tradesman.profile;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.InputType;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,10 +16,12 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.base.activity.EditListActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
@@ -89,6 +92,8 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
     public void onResume() {
         super.onResume();
         Tradesman.addCurrentTradesmanListener(tradesmanListener);
+
+        AnalyticsHelper.track(getContext(), "openProfile", new Bundle());
     }
 
     @Override
@@ -171,10 +176,9 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                             return;
                         }
 
-                        String homePhoneNew = Strings.returnSafely(String.valueOf(changed));
+                        final String homePhoneNew = Strings.returnSafely(String.valueOf(changed));
 
                         showDialog("Updating Home Phone...", true);
-
 
                         ref.child("homePhone").setValue(homePhoneNew, new DatabaseReference.CompletionListener() {
                             @Override
@@ -183,6 +187,9 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                                     showErrorDialog();
                                     return;
                                 }
+
+                                AnalyticsHelper.setUserProperty(getContext(), "homePhone", homePhoneNew);
+                                AnalyticsHelper.track(getContext(), "changedHomePhoneNumber", new Bundle());
 
                                 hideDialog();
                             }
@@ -222,7 +229,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                             return;
                         }
 
-                        String mobilePhoneNew = Strings.returnSafely(String.valueOf(changed));
+                        final String mobilePhoneNew = Strings.returnSafely(String.valueOf(changed));
 
                         showDialog("Updating Mobile Phone...", true);
 
@@ -233,6 +240,9 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                                     showErrorDialog();
                                     return;
                                 }
+
+                                AnalyticsHelper.setUserProperty(getContext(), "mobilePhone", mobilePhoneNew);
+                                AnalyticsHelper.track(getContext(), "changedMobilePhoneNumber", new Bundle());
 
                                 hideDialog();
                             }
@@ -278,7 +288,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
         MaterialDialogWrapper.getMultiInputDialog(getActivity(), "SET ADDRESS", keys, values, new OnGotObjectListener<HashMap<String, String>>() {
 
             @Override
-            public void onGotThing(HashMap<String, String> newAddress) {
+            public void onGotThing(final HashMap<String, String> newAddress) {
                 if (newAddress == null) return;
 
                 DatabaseReference ref = FirebaseUtils.getCurrentTradesmanRef();
@@ -304,6 +314,10 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                             showErrorDialog();
                             return;
                         }
+
+                        AnalyticsHelper.setUserProperty(getContext(), "homeCountry", Strings.returnSafely(newAddress.get(_COUNTRY)));
+                        AnalyticsHelper.setUserProperty(getContext(), "homePostcode", Strings.returnSafely(newAddress.get(_POSTCODE)));
+                        AnalyticsHelper.track(getContext(), "changedHomeAddress", new Bundle());
 
                         hideDialog();
                     }
@@ -353,6 +367,7 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
             workAreasMap.put(workArea, true);
         }
 
+        final ArrayList<String> finalWorkAreas = workAreas;
         ref.child("workAreas").setValue(workAreasMap, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -360,6 +375,9 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                     showErrorDialog();
                     return;
                 }
+
+                AnalyticsHelper.setUserProperty(getContext(), "workAreas", VariableUtils.listToString(finalWorkAreas, ","));
+                AnalyticsHelper.track(getContext(), "changedWorkAreas", new Bundle());
 
                 hideDialog();
             }

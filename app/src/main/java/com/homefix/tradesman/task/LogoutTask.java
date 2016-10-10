@@ -2,11 +2,13 @@ package com.homefix.tradesman.task;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.view.BaseActivityView;
 import com.homefix.tradesman.base.view.BaseView;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.splashscreen.SplashScreenActivity;
 
@@ -72,6 +74,8 @@ public class LogoutTask extends AsyncTask<Void, Void, Boolean> {
             baseView.showDialog("Sorry, unable to log out right now. Please try again", false);
             return;
         }
+
+        AnalyticsHelper.track(baseView.getContext(), "logout", new Bundle());
 
         // restart the app
         baseView.getBaseActivity().startActivity(new Intent(baseView.getContext(), SplashScreenActivity.class));

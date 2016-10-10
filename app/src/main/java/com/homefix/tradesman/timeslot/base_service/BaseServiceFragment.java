@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.firebase.FirebaseUtils;
@@ -75,7 +77,7 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
     protected TextView mLocationTxt;
 
     @BindView(R.id.property_type_txt)
-    protected TextView mCustomerPropertyType;
+    protected TextView mCustomerPropertyTypeView;
 
     @BindView(R.id.location_icon)
     protected ImageView mLocationIcon;
@@ -183,6 +185,7 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         if (serviceRef != null) {
             MyLog.e(TAG, "[setupServiceRefListener] add listener to serviceRef");
             serviceRef.addValueEventListener(serviceValueEventListener);
+            serviceRef.keepSynced(true);
         } else {
             MyLog.e(TAG, "[setupServiceRefListener] serviceRef is NULL");
         }
@@ -245,9 +248,10 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         // setup the new one
         serviceSetRef = FirebaseUtils.getSpecificServiceSetRef(serviceSetId);
-        if (serviceSetRef != null)
+        if (serviceSetRef != null) {
             serviceSetRef.addValueEventListener(serviceSetValueEventListener);
-        else MyLog.e(TAG, "[setupServiceSet] serviceSetRef is NULL");
+            serviceSetRef.keepSynced(true);
+        } else MyLog.e(TAG, "[setupServiceSet] serviceSetRef is NULL");
     }
 
     private ValueEventListener serviceSetValueEventListener = new ValueEventListener() {
@@ -287,9 +291,10 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         // setup the new one
         customerPropertyRef = FirebaseUtils.getBaseRef().child("customerPropertyInfos").child(customerPropertyId);
-        if (customerPropertyRef != null)
+        if (customerPropertyRef != null) {
             customerPropertyRef.addValueEventListener(customerPropertyIdListener);
-        else MyLog.e(TAG, "[setupCustomerProperty] NULL");
+            customerPropertyRef.keepSynced(true);
+        } else MyLog.e(TAG, "[setupCustomerProperty] NULL");
     }
 
     private ValueEventListener customerPropertyIdListener = new ValueEventListener() {
@@ -324,8 +329,8 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         mCustomerProperty = customerProperty;
         if (mCustomerProperty == null) return;
 
-        if (mCustomerPropertyType != null)
-            mCustomerPropertyType.setText(mCustomerProperty.getType());
+        if (mCustomerPropertyTypeView != null)
+            mCustomerPropertyTypeView.setText(Strings.returnSafely(mCustomerProperty.getType(), "owner"));
     }
 
     private void setupCustomer(String customerId) {
@@ -336,8 +341,10 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         // setup the new one
         customerRef = FirebaseUtils.getBaseRef().child("customers").child(customerId);
-        if (customerRef != null) customerRef.addValueEventListener(customerListener);
-        else MyLog.e(TAG, "[setupCustomer] ref is NULL");
+        if (customerRef != null) {
+            customerRef.addValueEventListener(customerListener);
+            customerRef.keepSynced(true);
+        } else MyLog.e(TAG, "[setupCustomer] ref is NULL");
     }
 
     private ValueEventListener customerListener = new ValueEventListener() {
@@ -383,8 +390,10 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
         // setup the new one
         propertyRef = FirebaseUtils.getBaseRef().child("properties").child(propertyId);
-        if (propertyRef != null) propertyRef.addValueEventListener(propertyListener);
-        else MyLog.e(TAG, "[setupProperty] NULL");
+        if (propertyRef != null) {
+            propertyRef.addValueEventListener(propertyListener);
+            propertyRef.keepSynced(true);
+        } else MyLog.e(TAG, "[setupProperty] NULL");
     }
 
     private ValueEventListener propertyListener = new ValueEventListener() {
@@ -655,6 +664,13 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         }
 
         HomefixServiceHelper.onLocationClicked(getActivity(), latitude, longitude, addressLine1, addressLine2, addressLine3, postcode, country);
+
+        Bundle b = new Bundle();
+        b.putString("address", Strings.combineStrings(",", addressLine1, addressLine2, addressLine3, postcode, country));
+        AnalyticsHelper.track(
+                getContext(),
+                "clickedGetJobDirections",
+                b);
     }
 
     @OnLongClick(R.id.location_bar)
@@ -677,6 +693,13 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         }
 
         HomefixServiceHelper.onEmailClicked(getActivity(), email, "");
+
+        Bundle b = new Bundle();
+        b.putString("email", email);
+        AnalyticsHelper.track(
+                getContext(),
+                "clickedEmailCustomer",
+                b);
     }
 
     @OnClick({R.id.phone_icon, R.id.person_phone_number_txt})
@@ -686,16 +709,23 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         String phone = mPersonPhoneNumberTxt.getText().toString();
 
         HomefixServiceHelper.onPhoneClicked(getActivity(), phone);
+
+        Bundle b = new Bundle();
+        b.putString("phone", phone);
+        AnalyticsHelper.track(
+                getContext(),
+                "clickedPhoneCustomer",
+                b);
     }
 
     @OnClick(R.id.property_type_txt)
     public void onCustomerPropertyRelationshipClicked() {
-        if (!isEdit || mCustomerPropertyType == null) return;
+        if (!isEdit || mCustomerPropertyTypeView == null) return;
 
         MaterialDialogWrapper.getListDialog(getActivity(), "Users relation to property", new CharSequence[]{"owner", "tenant", "manager"}, new MaterialDialog.ListCallback() {
             @Override
             public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                mCustomerPropertyType.setText(text);
+                mCustomerPropertyTypeView.setText(text);
             }
         }).show();
     }

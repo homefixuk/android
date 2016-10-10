@@ -15,6 +15,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.home.home_fragment.OwnJobViewHolder;
 import com.homefix.tradesman.model.Timeslot;
@@ -119,4 +120,9 @@ public class RecentServicesFragment<A extends HomeFixBaseActivity>
     public void refresh() {
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        AnalyticsHelper.track(getContext(), "openRecentJobs", new Bundle());
+    }
 }

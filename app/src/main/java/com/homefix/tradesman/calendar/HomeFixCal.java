@@ -445,13 +445,6 @@ public class HomeFixCal {
             return;
         }
 
-        // if there is no network connection, try and load from cache
-        if (!NetworkManager.hasConnection(context)) {
-            Month m = CacheUtils.readObjectFile("month_" + year + "_" + month, Month.class);
-            listener.onGetListFinished(m != null ? m.events : new ArrayList<Timeslot>());
-            return;
-        }
-
         // if we have already setup a ref for this month
         if (referenceHashMap.containsKey("" + getMonthKey(year, month))) {
             listener.onGetListFinished(getEvents(year, month));
@@ -479,6 +472,7 @@ public class HomeFixCal {
                 .orderByChild("startTime")
                 .startAt(startTime)
                 .endAt(endTime);
+        query.keepSynced(true);
         MyLog.e(TAG, "Getting tradesmanTimeslots between " + startTime + " and " + endTime);
         query.addValueEventListener(new ValueEventListener() {
             @Override

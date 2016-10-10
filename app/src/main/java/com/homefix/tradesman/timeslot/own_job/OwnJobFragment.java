@@ -22,7 +22,6 @@ import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.timeslot.base_service.BaseServiceFragment;
-import com.homefix.tradesman.timeslot.base_service.BaseServiceView;
 import com.homefix.tradesman.timeslot.own_job.charges.ChargesActivity;
 import com.homefix.tradesman.timeslot.own_job.invoice.OwnJobInvoice;
 import com.homefix.tradesman.timeslot.own_job.payments.PaymentsActivity;
@@ -168,7 +167,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
                     mPersonNameTxt.getText().toString(),
                     mPersonEmailTxt.getText().toString(),
                     mPersonPhoneNumberTxt.getText().toString(),
-                    mCustomerPropertyType.getText().toString(),
+                    mCustomerPropertyTypeView.getText().toString(),
                     mDescriptionTxt.getText().toString());
 
             return;
@@ -195,7 +194,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
                 mPersonNameTxt.getText().toString(),
                 mPersonEmailTxt.getText().toString(),
                 mPersonPhoneNumberTxt.getText().toString(),
-                mCustomerPropertyType.getText().toString(),
+                mCustomerPropertyTypeView.getText().toString(),
                 mDescriptionTxt.getText().toString());
     }
 

@@ -126,6 +126,7 @@ public class Tradesman extends User {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+        currentTradesmanRef.keepSynced(true);
     }
 
     private static final List<OnGotObjectListener<Tradesman>> mCurrentTradesmanListeners = new ArrayList<>();

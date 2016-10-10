@@ -1,12 +1,14 @@
 package com.homefix.tradesman.home.home_fragment;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
@@ -61,12 +63,11 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         super.onResume();
         presenter.attachView(this);
         refresh();
+        AnalyticsHelper.track(getContext(), "openHome", new Bundle());
     }
 
     @Override
     public void refresh() {
-        MyLog.e(TAG, "[refresh]");
-
         setCurrentJob(currentTimeslot);
         setNextJob(nextTimeslot);
 

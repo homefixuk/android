@@ -163,7 +163,7 @@ public class IntentHelper {
 
     public static boolean sendEmail(
             final Context context,
-            final String toEmail,
+            final List<String> toEmails,
             final String emailSubject,
             final String emailBody,
             final ArrayList<String> attachments) {
@@ -172,7 +172,7 @@ public class IntentHelper {
             ResolveInfo selectedEmailActivity = null;
 
             Intent emailDummyIntent = new Intent(Intent.ACTION_SENDTO);
-            emailDummyIntent.setData(Uri.parse("mailto:" + toEmail));
+            emailDummyIntent.setData(Uri.parse("mailto:" + VariableUtils.listToString(toEmails, ",")));
 
             List<ResolveInfo> emailActivities = pm.queryIntentActivities(emailDummyIntent, 0);
             if (null == emailActivities || emailActivities.size() == 0) {
@@ -196,7 +196,7 @@ public class IntentHelper {
 
                 if (null != selectedEmailActivity) {
                     // Send email using the only/default email activity
-                    sendEmailUsingSelectedEmailApp(context, toEmail, emailSubject, emailBody, attachments, selectedEmailActivity);
+                    sendEmailUsingSelectedEmailApp(context, toEmails, emailSubject, emailBody, attachments, selectedEmailActivity);
 
                 } else {
                     final List<ResolveInfo> emailActivitiesForDialog = emailActivities;
@@ -211,7 +211,7 @@ public class IntentHelper {
                     builder.setItems(availableEmailAppsName, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            sendEmailUsingSelectedEmailApp(context, toEmail, emailSubject, emailBody, attachments, emailActivitiesForDialog.get(which));
+                            sendEmailUsingSelectedEmailApp(context, toEmails, emailSubject, emailBody, attachments, emailActivitiesForDialog.get(which));
                         }
                     });
 
@@ -219,7 +219,7 @@ public class IntentHelper {
                 }
 
             } else {
-                sendEmailUsingSelectedEmailApp(context, toEmail, emailSubject, emailBody, attachments, null);
+                sendEmailUsingSelectedEmailApp(context, toEmails, emailSubject, emailBody, attachments, null);
             }
 
         } catch (Exception ex) {
@@ -233,7 +233,7 @@ public class IntentHelper {
 
     protected static boolean sendEmailUsingSelectedEmailApp(
             final Context context,
-            final String toEmail,
+            final List<String> toEmails,
             final String emailSubject,
             final String emailBody,
             final ArrayList<String> attachments,
@@ -241,7 +241,8 @@ public class IntentHelper {
         try {
             Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 
-            String aEmailList[] = {toEmail};
+            String aEmailList[] = new String[toEmails.size()];
+            aEmailList = toEmails.toArray(aEmailList);
 
             emailIntent.putExtra(Intent.EXTRA_EMAIL, aEmailList);
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, null != emailSubject ? emailSubject : "");

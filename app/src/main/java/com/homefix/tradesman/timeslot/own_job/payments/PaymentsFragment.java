@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.common.HtmlHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Payment;
@@ -232,6 +233,14 @@ public class PaymentsFragment
 
                 if (databaseError != null) {
                     Toast.makeText(getContext(), "Sorry, unable to remove the payment right now. Please try again", Toast.LENGTH_SHORT).show();
+                } else {
+                    Bundle b = new Bundle();
+                    b.putDouble("amount", payment.getAmount());
+                    b.putString("type", payment.getType());
+                    AnalyticsHelper.track(
+                            getView().getContext(),
+                            "removeCharge",
+                            b);
                 }
             }
         });
@@ -305,6 +314,14 @@ public class PaymentsFragment
 
                 if (databaseError != null) {
                     Toast.makeText(getContext(), "Sorry, unable to add/edit payment", Toast.LENGTH_SHORT).show();
+                } else {
+                    Bundle b = new Bundle();
+                    b.putDouble("amount", newPayment.getAmount());
+                    b.putString("type", newPayment.getType());
+                    AnalyticsHelper.track(
+                            getView().getContext(),
+                            originalPayment == null ? "addPayment" : "updatePayment",
+                            b);
                 }
             }
         });

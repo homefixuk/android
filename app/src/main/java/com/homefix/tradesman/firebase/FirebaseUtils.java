@@ -24,7 +24,6 @@ import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
-import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnFinishListener;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -88,8 +87,8 @@ public class FirebaseUtils {
 
             // only enable this once in the whole app and set by the remote config
             try {
-                if (CacheUtils.readObjectFile("set_data_persistence_enabled", Boolean.class))
-                    firebaseDatabase.setPersistenceEnabled(true);
+                Boolean isEnabled = CacheUtils.readObjectFile("set_data_persistence_enabled", Boolean.class);
+                if (isEnabled != null && isEnabled) firebaseDatabase.setPersistenceEnabled(true);
             } catch (Exception e) {
                 MyLog.printStackTrace(e);
                 FirebaseCrash.report(e);
@@ -373,6 +372,7 @@ public class FirebaseUtils {
 
         // get all keys for the Timeslots for this tradesman that started in the last 8 hours
         Query query = getBaseRef().child("tradesmanServiceTimeslots").child(id).orderByChild("startTime").startAt(startTime).endAt(endTime);
+        query.keepSynced(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -434,6 +434,7 @@ public class FirebaseUtils {
 
         // get all keys for the Timeslots for this tradesman that started in the last 8 hours
         Query query = getBaseRef().child("tradesmanServiceTimeslots").child(id).orderByChild("startTime").startAt(System.currentTimeMillis()).limitToFirst(1);
+        query.keepSynced(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -623,24 +624,6 @@ public class FirebaseUtils {
                 }
 
                 listener.onGotThing(timeslot);
-
-//                FirebaseUtils.getSpecificTimeslotRef(timeslotKey).addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        Timeslot timeslot1 = dataSnapshot != null ? dataSnapshot.getValue(Timeslot.class) : timeslot;
-//                        listener.onGotThing(timeslot1);
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                        MyLog.e(TAG, "Something went wrong fetching Timeslot");
-//                        if (databaseError != null) {
-//                            MyLog.e(TAG, databaseError.getDetails());
-//                            MyLog.printStackTrace(databaseError.toException());
-//                        }
-//                        listener.onGotThing(timeslot);
-//                    }
-//                });
             }
         });
     }

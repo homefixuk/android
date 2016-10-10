@@ -22,6 +22,7 @@ import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.base.fragment.BaseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.common.Ids;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
@@ -29,6 +30,7 @@ import com.homefix.tradesman.timeslot.HomefixServiceHelper;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.homefix.tradesman.BuildConfig;
+import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.IntentHelper;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
@@ -114,7 +116,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity>
         mView.setNowLineColor(Color.argb(255, 255, 255, 0));
         mView.setNowLineThickness(5);
 
-        setNumberDays(5); // default to 5 days showing
+        Integer numberDays = CacheUtils.readObjectFile("numberDays", Integer.class);
+        if (numberDays == null) numberDays = 5; // default to 5 days showing
+        setNumberDays(numberDays);
 
         mView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)); // go to the current hour
 
@@ -320,11 +324,9 @@ public class CalendarFragment<A extends HomeFixBaseActivity>
         if (mView == null) return;
 
         numberDays = Math.min(numberDays, 7); // at most 7
+        CacheUtils.writeObjectFile("numberDays", numberDays);
 
         mView.setNumberOfVisibleDays(numberDays);
-
-//        if (numberDays > 3)
-//            mView.setHeaderColumnPadding(getResources().getDimensionPixelSize(R.dimen.base_padding_half));
 
         // update the view dimensions
         if (numberDays <= 1) {
@@ -355,13 +357,6 @@ public class CalendarFragment<A extends HomeFixBaseActivity>
                 mView.goToHour(TimeUtils.getCurrentHour());
             }
         }, 500);
-    }
-
-    public void removeTimeslot(Timeslot timeslot) {
-        if (timeslot == null || timeslot.getStartTime() == 0) return;
-
-        HomeFixCal.removeEvent(timeslot);
-        if (mView != null) mView.notifyDatasetChanged();
     }
 
     /**
@@ -541,6 +536,8 @@ public class CalendarFragment<A extends HomeFixBaseActivity>
         if (needsNotifying && mView != null) {
             mView.notifyDatasetChanged();
         }
+
+        AnalyticsHelper.track(getContext(), "openCalendar", new Bundle());
     }
 
 }

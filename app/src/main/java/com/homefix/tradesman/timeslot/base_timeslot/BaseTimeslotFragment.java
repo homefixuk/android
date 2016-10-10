@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.TimeslotActivity;
@@ -26,6 +27,7 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.KeyboardUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
+import com.samdroid.string.Strings;
 
 import java.util.Calendar;
 
@@ -94,6 +96,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         if (mTimeslot == null) isEdit = true;
 
         setupView();
+        track();
     }
 
     public boolean isEditing() {
@@ -114,8 +117,6 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     }
 
     public void setupView() {
-        MyLog.e(TAG, "[setupView] BaseTimeslotFragment");
-
         if (mIcon != null) {
             if (mType == Timeslot.TYPE.BREAK)
                 mIcon.setImageResource(R.drawable.ic_food_grey600_48dp);
@@ -148,20 +149,17 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     private final ValueEventListener timeslotValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            MyLog.e(TAG, "[timeslotValueEventListener]");
             Timeslot timeslot = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Timeslot.class) : mTimeslot;
-//            Timeslot.printList(Collections.singletonList(mTimeslot));
             setupTimeslot(timeslot);
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            MyLog.e(TAG, "[timeslotValueEventListener] error");
-            if (databaseError != null) {
-                MyLog.e(TAG, databaseError.getDetails());
-                MyLog.e(TAG, databaseError.getMessage());
-                MyLog.printStackTrace(databaseError.toException());
-            }
+            if (databaseError == null) return;
+
+            MyLog.e(TAG, databaseError.getDetails());
+            MyLog.e(TAG, databaseError.getMessage());
+            MyLog.printStackTrace(databaseError.toException());
         }
     };
 
@@ -199,10 +197,8 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
         String timeslotId = mTimeslot != null ? mTimeslot.getId() : null;
         timeslotRef = FirebaseUtils.getSpecificTimeslotRef(timeslotId);
         if (timeslotRef != null) {
-            MyLog.e(TAG, "[setupView] add listener to timeslotRef");
             timeslotRef.addValueEventListener(timeslotValueEventListener);
-        } else {
-            MyLog.e(TAG, "[setupView] timeslotRef is NULL");
+            timeslotRef.keepSynced(true);
         }
     }
 
@@ -503,6 +499,20 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
                 mTimeslot,
                 mStartCalNew != null ? mStartCalNew : mStartCal,
                 mEndCalNew != null ? mEndCalNew : mEndCal);
+    }
+
+    protected void track() {
+        Bundle b = new Bundle();
+
+        if (mTimeslot == null) {
+            b.putString("type", mType != null ? mType.getName() : Timeslot.TYPE.NONE.getName());
+            AnalyticsHelper.track(getContext(), "newTimeslot", b);
+            return;
+        }
+
+        b.putString("timeslotId", mTimeslot.getId());
+        b.putString("type", mType != null ? mType.getName() : Timeslot.TYPE.NONE.getName());
+        AnalyticsHelper.track(getContext(), "openTimeslot", b);
     }
 
 }

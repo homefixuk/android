@@ -1,5 +1,6 @@
 package com.homefix.tradesman.timeslot.own_job;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -7,6 +8,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.homefix.tradesman.calendar.HomeFixCal;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
@@ -31,9 +33,9 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
     }
 
     public void addNewJob(
-            final Calendar start, Calendar end, String jobType, String addressLine1, String addressLine2,
-            String addressLine3, String postcode, String country, Double latitude, Double longitude,
-            String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description) {
+            final Calendar start, final Calendar end, final String jobType, final String addressLine1, String addressLine2,
+            String addressLine3, final String postcode, final String country, Double latitude, Double longitude,
+            final String customerName, final String customerEmail, final String customerPhone, final String customerPropertyRelationship, final String description) {
 
         if (!isViewAttached()) return;
 
@@ -56,6 +58,27 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         getView().setEditing(false);
                         getView().setupView();
 
+                        // track the add
+                        Bundle b = new Bundle();
+                        b.putString("timeslotId", o.getId());
+                        b.putString("type", o.getType());
+                        b.putBoolean("isOwnJob", true);
+                        b.putLong("startTime", start.getTimeInMillis());
+                        b.putLong("endTime", end.getTimeInMillis());
+                        b.putString("jobType", Strings.returnSafely(jobType));
+                        b.putString("addressLine1", Strings.returnSafely(addressLine1));
+                        b.putString("postcode", Strings.returnSafely(postcode));
+                        b.putString("country", Strings.returnSafely(country));
+                        b.putString("customerName", Strings.returnSafely(customerName));
+                        b.putString("customerEmail", Strings.returnSafely(customerEmail));
+                        b.putString("customerPhone", Strings.returnSafely(customerPhone));
+                        b.putString("customerPropertyRelationship", Strings.returnSafely(customerPropertyRelationship));
+                        b.putString("description", Strings.returnSafely(description));
+                        AnalyticsHelper.track(
+                                getView().getContext(),
+                                "addTimeslot",
+                                b);
+
                         getView().hideDialog();
                     }
                 });
@@ -68,9 +91,9 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
             final String customerId,
             final String propertyId,
             final String customerPropertyInfoId,
-            final Calendar start, final Calendar end, String jobType, String addressLine1, String addressLine2,
-            String addressLine3, String postcode, String country, Double latitude, Double longitude,
-            String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description) {
+            final Calendar start, final Calendar end, final String jobType, final String addressLine1, String addressLine2,
+            String addressLine3, final String postcode, final String country, Double latitude, Double longitude,
+            final String customerName, final String customerEmail, final String customerPhone, final String customerPropertyRelationship, final String description) {
 
         if (!isViewAttached()) return;
 
@@ -92,6 +115,32 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         getView().setTimeslot(o);
                         getView().setEditing(false);
                         getView().setupView();
+
+                        // track the add
+                        Bundle b = new Bundle();
+                        b.putString("timeslotId", o.getId());
+                        b.putBoolean("isOwnJob", true);
+                        b.putString("serviceId", Strings.returnSafely(serviceId));
+                        b.putString("serviceSetId", Strings.returnSafely(serviceSetId));
+                        b.putString("customerId", Strings.returnSafely(customerId));
+                        b.putString("propertyId", Strings.returnSafely(propertyId));
+                        b.putString("customerPropertyInfoId", Strings.returnSafely(customerPropertyInfoId));
+                        b.putString("type", o.getType());
+                        b.putLong("startTime", start.getTimeInMillis());
+                        b.putLong("endTime", end.getTimeInMillis());
+                        b.putString("jobType", Strings.returnSafely(jobType));
+                        b.putString("addressLine1", Strings.returnSafely(addressLine1));
+                        b.putString("postcode", Strings.returnSafely(postcode));
+                        b.putString("country", Strings.returnSafely(country));
+                        b.putString("customerName", Strings.returnSafely(customerName));
+                        b.putString("customerEmail", Strings.returnSafely(customerEmail));
+                        b.putString("customerPhone", Strings.returnSafely(customerPhone));
+                        b.putString("customerPropertyRelationship", Strings.returnSafely(customerPropertyRelationship));
+                        b.putString("description", Strings.returnSafely(description));
+                        AnalyticsHelper.track(
+                                getView().getContext(),
+                                "updateTimeslot",
+                                b);
 
                         getView().hideDialog();
                     }
@@ -144,6 +193,22 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                                     getView().showErrorDialog();
                                     return;
                                 }
+
+                                // track the delete
+                                Bundle b = new Bundle();
+                                b.putString("timeslotId", timeslot.getId());
+                                b.putString("serviceId", timeslot.getServiceId());
+                                b.putBoolean("isOwnJob", true);
+                                if (!Strings.isEmpty(timeslot.getType()))
+                                    b.putString("type", timeslot.getType());
+                                if (timeslot.getStartTime() > 0)
+                                    b.putLong("startTime", timeslot.getStartTime());
+                                if (timeslot.getEndTime() > 0)
+                                    b.putLong("endTime", timeslot.getEndTime());
+                                AnalyticsHelper.track(
+                                        getView().getContext(),
+                                        "deleteTimeslot",
+                                        b);
 
                                 // remove the original timeslot
                                 HomeFixCal.removeEvent(timeslot);

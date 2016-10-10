@@ -117,17 +117,6 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
 
     @Override
     public void showNewUser() {
-//        IntentHelper.openEmailWithAttachment(
-//                this,
-//                "contact@homefix.co.uk",
-//                "New Tradesman for the app",
-//                "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
-//                        "Full Name: <insert_name>\n" +
-//                        "Phone Number: <insert_phone_number>\n\n" +
-//                        "Additional notes: <insert_any_additional_notes>\n\n" +
-//                        "Kind Regards",
-//                null);
-
         MaterialDialogWrapper.getMultiInputDialogWithLabels(
                 this,
                 "Enter your information",
@@ -155,7 +144,7 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
 
                         IntentHelper.sendEmail(
                                 getBaseActivity(),
-                                "contact@homefix.co.uk",
+                                Arrays.asList("contact@homefix.co.uk", "george@homefix.co.uk", "sokratis@homefix.co.uk"),
                                 name + ": new Tradesman for the Android app",
                                 body,
                                 null);

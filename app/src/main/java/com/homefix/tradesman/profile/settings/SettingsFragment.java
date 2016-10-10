@@ -20,6 +20,7 @@ import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseToolbarActivity;
 import com.homefix.tradesman.base.adapter.MyListAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
@@ -166,7 +167,6 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }
@@ -226,6 +226,10 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                     showErrorDialog();
                                     return;
                                 }
+
+                                Bundle b = new Bundle();
+                                b.putString("field", "standardHourlyRate");
+                                AnalyticsHelper.track(getContext(), "updatedProfileSettings", b);
 
                                 if (mAdapter != null) mAdapter.notifyDataSetChanged();
                                 hideDialog();
@@ -289,6 +293,10 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                     showErrorDialog();
                                     return;
                                 }
+
+                                Bundle b = new Bundle();
+                                b.putString("field", "vatNumber");
+                                AnalyticsHelper.track(getContext(), "updatedProfileSettings", b);
 
                                 if (mAdapter != null) mAdapter.notifyDataSetChanged();
                                 hideDialog();
@@ -366,6 +374,10 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                     return;
                                 }
 
+                                Bundle b = new Bundle();
+                                b.putString("field", "bankDetails");
+                                AnalyticsHelper.track(getContext(), "updatedProfileSettings", b);
+
                                 if (mAdapter != null) mAdapter.notifyDataSetChanged();
                                 hideDialog();
                             }
@@ -425,6 +437,10 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                     showErrorDialog();
                                     return;
                                 }
+
+                                Bundle b = new Bundle();
+                                b.putString("field", "businessName");
+                                AnalyticsHelper.track(getContext(), "updatedProfileSettings", b);
 
                                 if (mAdapter != null) mAdapter.notifyDataSetChanged();
                                 hideDialog();

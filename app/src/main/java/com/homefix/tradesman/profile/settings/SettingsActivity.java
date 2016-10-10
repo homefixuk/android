@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.homefix.tradesman.base.activity.BaseCloseActivity;
+import com.homefix.tradesman.common.AnalyticsHelper;
 
 /**
  * Created by samuel on 9/6/2016.
@@ -26,5 +27,7 @@ public class SettingsActivity extends BaseCloseActivity {
             baseFragment = new SettingsFragment<>();
             replaceFragment(baseFragment);
         }
+
+        AnalyticsHelper.track(getContext(), "openProfileSettings", new Bundle());
     }
 }

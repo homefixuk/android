@@ -18,12 +18,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.adapter.MyFirebaseRecyclerAdapter;
 import com.homefix.tradesman.base.fragment.BaseCloseFragment;
+import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Charge;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.MyLog;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.string.Strings;
 
@@ -207,6 +207,18 @@ public class ChargesFragment
 
                 if (databaseError != null) {
                     Toast.makeText(getContext(), "Sorry, unable to remove the charge right now. Please try again", Toast.LENGTH_SHORT).show();
+                } else {
+                    Bundle b = new Bundle();
+                    b.putDouble("amount", charge.getAmount());
+                    b.putDouble("quantity", charge.getQuantity());
+                    b.putDouble("markup", charge.getMarkup());
+                    b.putBoolean("isWithVat", charge.isWithVat());
+                    b.putBoolean("isMarkupBeforeVat", charge.isMarkupBeforeVat());
+                    b.putDouble("totalCost", charge.getTotalCost());
+                    AnalyticsHelper.track(
+                            getView().getContext(),
+                            "removeCharge",
+                            b);
                 }
             }
         });
@@ -287,6 +299,18 @@ public class ChargesFragment
 
                 if (databaseError != null) {
                     Toast.makeText(getContext(), "Sorry, unable to add/edit charge", Toast.LENGTH_SHORT).show();
+                } else {
+                    Bundle b = new Bundle();
+                    b.putDouble("amount", newCharge.getAmount());
+                    b.putDouble("quantity", newCharge.getQuantity());
+                    b.putDouble("markup", newCharge.getMarkup());
+                    b.putBoolean("isWithVat", newCharge.isWithVat());
+                    b.putBoolean("isMarkupBeforeVat", newCharge.isMarkupBeforeVat());
+                    b.putDouble("totalCost", newCharge.getTotalCost());
+                    AnalyticsHelper.track(
+                            getView().getContext(),
+                            originalCharge == null ? "addCharge" : "updateCharge",
+                            b);
                 }
             }
         });
