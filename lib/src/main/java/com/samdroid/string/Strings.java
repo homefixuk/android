@@ -76,6 +76,30 @@ public class Strings {
     }
 
     /**
+     * @param s
+     * @return convert all words in s to start with an upper case letter
+     */
+    public static String toCamelCase(String s) {
+        String[] t = returnSafely(s).split(" ");
+        String res = "";
+        for (int i = 0; i < t.length; i++) {
+            if (i > 0) res += " ";
+
+            String next = t[i];
+            if (next.length() == 1) {
+                res += next.toUpperCase();
+                continue;
+            }
+
+            String start = next.substring(0, 1);
+            String end = next.substring(1, next.length());
+            res += start.toUpperCase() + end;
+        }
+
+        return res;
+    }
+
+    /**
      * Remove a substring from the end of the string
      *
      * @param s      Main string
