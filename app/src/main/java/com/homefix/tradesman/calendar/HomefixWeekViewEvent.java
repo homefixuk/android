@@ -10,6 +10,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.Timeslot;
+import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.TimeUtils;
 import com.samdroid.string.Strings;
 
@@ -87,9 +88,11 @@ public class HomefixWeekViewEvent extends WeekViewEvent implements ValueEventLis
             case OWN_JOB:
                 String serviceId = timeslot.getServiceId();
 
+                String fromCache = CacheUtils.readObjectFile(serviceId, String.class);
+
                 // if we don't have the service, set a placeholder name and fetch it
-                if (service == null) {
-                    setName(Strings.returnSafely(name));
+                if (service == null || Strings.isEmpty(service.getServiceType())) {
+                    setName(Strings.returnSafely(fromCache, name, "Own Job"));
                     if (serviceRef != null) serviceRef.removeEventListener(this);
                     serviceRef = FirebaseUtils.getSpecificServiceRef(serviceId);
                     if (serviceRef != null) serviceRef.addValueEventListener(this);
@@ -97,8 +100,9 @@ public class HomefixWeekViewEvent extends WeekViewEvent implements ValueEventLis
                 }
 
                 // else set the name of the service job type
-                name = service.getServiceType();
-                setName(Strings.returnSafely(name, "Own Job"));
+                name = Strings.returnSafely(fromCache, service.getServiceType(), "Own Job");
+                CacheUtils.writeObjectFile(serviceId, name);
+                setName(name);
                 break;
 
             default:
@@ -177,8 +181,11 @@ public class HomefixWeekViewEvent extends WeekViewEvent implements ValueEventLis
 
         service = dataSnapshot.getValue(Service.class);
         if (service == null) return;
-        name = service.getServiceType();
-        setName(Strings.returnSafely(name, "Own Job"));
+
+        String fromCache = CacheUtils.readObjectFile(service.getId(), String.class);
+        name = Strings.returnSafely(fromCache, service.getServiceType(), "Own Job");
+        CacheUtils.writeObjectFile(service.getId(), name);
+        setName(name);
     }
 
     @Override

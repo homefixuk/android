@@ -125,11 +125,28 @@ public class Strings {
      * Returns a string safely if it is empty or null
      *
      * @param s String to check
-     * @return if the string is null or has length zero
+     * @return
      */
     @NonNull
     public static String returnSafely(String s, @NonNull String defaultString) {
         return isEmpty(s) ? defaultString : s;
+    }
+
+    /**
+     * Returns the first non-empty string
+     *
+     * @param strings strings to check in preference order
+     * @return
+     */
+    @NonNull
+    public static String returnSafely(String... strings) {
+        if (strings == null || strings.length == 0) return "";
+
+        for (int i = 0; i < strings.length; i++) {
+            if (!Strings.isEmpty(strings[i])) return strings[i];
+        }
+
+        return "";
     }
 
     /**

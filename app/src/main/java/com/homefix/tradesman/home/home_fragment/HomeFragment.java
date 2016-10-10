@@ -172,6 +172,8 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         i.putExtra("goIntoEditMode", true);
         startActivity(i);
         getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+
+        AnalyticsHelper.track(getContext(), "clickedHomeAddAvailability", new Bundle());
     }
 
     @OnClick(R.id.add_own_job_button)
@@ -182,6 +184,8 @@ public class HomeFragment extends BaseFragment<HomeFixBaseActivity, HomeFragment
         i.putExtra("goIntoEditMode", true);
         startActivity(i);
         getActivity().overridePendingTransition(R.anim.right_slide_in, R.anim.expand_out_partial);
+
+        AnalyticsHelper.track(getContext(), "clickedHomeAddOwnJob", new Bundle());
     }
 
     @Override
