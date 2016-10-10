@@ -15,7 +15,7 @@
         android:layout_marginBottom="@dimen/base_padding_quad"
         android:layout_marginTop="@dimen/base_padding_quad"
         android:scaleType="fitXY"
-        android:src="@drawable/homefix_icon_512" />
+        android:src="@drawable/ic_homefix_logo" />
 
     <LinearLayout
         android:id="@+id/email_login_holder"

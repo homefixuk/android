@@ -13,7 +13,7 @@
         android:layout_width="@dimen/base_padding_five"
         android:layout_height="@dimen/base_padding_five"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/homefix_icon" />
+        android:src="@drawable/ic_homefix_logo" />
 
     <TextView
         android:id="@+id/user_name"

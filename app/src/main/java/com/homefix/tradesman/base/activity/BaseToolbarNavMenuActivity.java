@@ -140,7 +140,7 @@ public abstract class BaseToolbarNavMenuActivity<V extends BaseToolbarNavMenuAct
 
         drawerLayout.closeDrawers();
 
-        mFab.setImageResource(R.drawable.homefix_icon);
+        mFab.setImageResource(R.drawable.ic_homefix_logo);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
