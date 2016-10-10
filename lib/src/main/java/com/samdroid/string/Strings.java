@@ -72,7 +72,7 @@ public class Strings {
      * @return
      */
     public static String revertToCamelCase(String s) {
-        return s.replaceAll("\\s+", "");
+        return Strings.returnSafely(s).replaceAll("\\s+", "");
     }
 
     /**

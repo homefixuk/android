@@ -137,9 +137,9 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
                             return;
                         }
 
-                        String name = Strings.returnSafely(o.get("Name"));
+                        String name = Strings.revertToCamelCase(o.get("Name"));
                         String contactNumber = Strings.returnSafely(o.get("Contact Number"));
-                        String jobType = Strings.returnSafely(o.get("Plumber? Electrician? Other?"));
+                        String jobType = Strings.revertToCamelCase(o.get("Plumber? Electrician? Other?"));
                         String notes = Strings.returnSafely(o.get("Additional Notes"));
 
                         CacheUtils.writeFile("Name", name);
