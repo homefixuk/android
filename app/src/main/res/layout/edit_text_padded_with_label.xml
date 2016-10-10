@@ -23,7 +23,6 @@
         android:layout_height="wrap_content"
         android:autoLink="web"
         android:background="@color/transparent"
-        android:hint="Say something..."
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:textAppearance="@style/TextTheme" />
 

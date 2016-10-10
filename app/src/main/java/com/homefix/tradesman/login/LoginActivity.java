@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
+import com.homefix.tradesman.common.CacheUtilsHelper;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.rey.material.widget.EditText;
@@ -121,9 +122,13 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
                 this,
                 "Enter your information",
                 "OK",
-                Arrays.asList("Name", "Contact Number", "Additional Notes"),
-                Arrays.asList("Name", "Contact Number", "Additional Notes"),
-                Arrays.asList("", "", ""),
+                Arrays.asList("Name", "Contact Number", "Plumber? Electrician? Other?", "Additional Notes"),
+                Arrays.asList("Name", "Contact Number", "Plumber? Electrician? Other?", "Additional Notes"),
+                Arrays.asList(
+                        CacheUtilsHelper.getStringSafely("Name"),
+                        CacheUtilsHelper.getStringSafely("Contact Number"),
+                        CacheUtilsHelper.getStringSafely("Plumber? Electrician? Other?"),
+                        CacheUtilsHelper.getStringSafely("Additional Notes")),
                 new OnGotObjectListener<HashMap<String, String>>() {
                     @Override
                     public void onGotThing(HashMap<String, String> o) {
@@ -132,12 +137,21 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
                             return;
                         }
 
-                        String name = o.get("Name");
+                        String name = Strings.returnSafely(o.get("Name"));
+                        String contactNumber = Strings.returnSafely(o.get("Contact Number"));
+                        String jobType = Strings.returnSafely(o.get("Plumber? Electrician? Other?"));
+                        String notes = Strings.returnSafely(o.get("Additional Notes"));
+
+                        CacheUtils.writeFile("Name", name);
+                        CacheUtils.writeFile("Contact Number", contactNumber);
+                        CacheUtils.writeFile("Plumber? Electrician? Other?", jobType);
+                        CacheUtils.writeFile("Additional Notes", notes);
+
                         String body = "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
                                 "Name: " + name + " \n" +
-                                "Phone Number: " + o.get("Contact Number") + "\n\n";
+                                "Tradesman Type: " + Strings.returnSafely(jobType, "unknown") + " \n" +
+                                "Phone Number: " + contactNumber + "\n\n";
 
-                        String notes = o.get("Additional Notes");
                         if (!Strings.isEmpty(notes)) body += "Additional notes: " + notes + "\n\n";
 
                         body += "Kind Regards";
