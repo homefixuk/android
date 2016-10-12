@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.samdroid.string.Strings;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -573,4 +574,37 @@ public class VariableUtils {
 
         return true;
     }
+
+    public static List<Integer> jsonArrayToIntegerList(JSONArray jsonArray) {
+        if (jsonArray == null || jsonArray.length() == 0) return new ArrayList<>();
+
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0, len = jsonArray.length(); i < len; i++) {
+            String o = jsonArray.optString(i);
+            if (o == null) continue;
+
+            try {
+                list.add(Integer.valueOf(o));
+            } catch (Exception e) {
+            }
+        }
+
+        return list;
+    }
+
+    public static ArrayList<String> jsonStringsArrayToList(JSONArray jsonArray) {
+        if (jsonArray == null || jsonArray.length() == 0) return new ArrayList<>();
+
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0, len = jsonArray.length(); i < len; i++) {
+            String o = jsonArray.optString(i);
+
+            if (Strings.isEmpty(o)) continue;
+
+            list.add(o);
+        }
+
+        return list;
+    }
+
 }

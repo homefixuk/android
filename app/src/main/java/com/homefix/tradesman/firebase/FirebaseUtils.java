@@ -47,6 +47,7 @@ public class FirebaseUtils {
             REF_NAME_USERS = "users",
             REF_NAME_TRADESMAN = "tradesman",
             REF_NAME_CUSTOMERS = "customers",
+            REF_NAME_CUSTOMER_PROPERTY_INFOS = "customerPropertyInfos",
             REF_NAME_PROPERTIES = "properties",
             REF_NAME_SERVICE_SETS = "serviceSets",
             REF_NAME_SERVICES = "services",
@@ -118,6 +119,10 @@ public class FirebaseUtils {
         return getBaseRef().child(REF_NAME_PROPERTIES);
     }
 
+    public static DatabaseReference getCustomerPropertyInfosRef() {
+        return getBaseRef().child(REF_NAME_CUSTOMERS);
+    }
+
     public static DatabaseReference getServicesRef() {
         return getBaseRef().child(REF_NAME_SERVICES);
     }
@@ -143,6 +148,18 @@ public class FirebaseUtils {
 
     public static DatabaseReference getTimeslotsRef() {
         return getBaseRef().child(REF_NAME_TIMESLOTS);
+    }
+
+    public static DatabaseReference getCurrentTradesmanTimeslotsRef() {
+        String id = getCurrentTradesmanId();
+        if (Strings.isEmpty(id)) return null;
+        return getBaseRef().child("tradesmanTimeslots").child(id);
+    }
+
+    public static DatabaseReference getCurrentTradesmanServiceTimeslotsRef() {
+        String id = getCurrentTradesmanId();
+        if (Strings.isEmpty(id)) return null;
+        return getBaseRef().child("tradesmanServiceTimeslots").child(id);
     }
 
     public static boolean isUserLoggedIn() {

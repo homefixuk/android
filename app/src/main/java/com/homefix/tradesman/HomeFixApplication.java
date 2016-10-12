@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -70,8 +71,17 @@ public class HomeFixApplication extends MultiDexApplication {
         // setup the Firebase database
         FirebaseAuth.getInstance();
         setupFirebaseConfig(context);
+        FirebaseUtils.getBaseRef();
         FirebaseUtils.sendRegistrationToServer(FirebaseInstanceId.getInstance().getToken(), null);
         AnalyticsHelper.init(context.getApplicationContext());
+
+        // set the data points to keep synced
+        FirebaseUtils.getTimeslotsRef().keepSynced(true);
+        FirebaseUtils.getServicesRef().keepSynced(true);
+        FirebaseUtils.getServiceSetsRef().keepSynced(true);
+        FirebaseUtils.getCustomersRef().keepSynced(true);
+        FirebaseUtils.getCustomerPropertyInfosRef().keepSynced(true);
+
         isFirebaseSetup = true;
     }
 
@@ -90,7 +100,7 @@ public class HomeFixApplication extends MultiDexApplication {
                 // If developer mode is enabled reduce cacheExpiration to 0 so that
                 // each fetch goes to the server. This should not be used in release
                 // builds.
-                if (config.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+                if (BuildConfig.DEBUG || config.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
                     cacheExpiration = 0;
                 }
 
@@ -151,6 +161,18 @@ public class HomeFixApplication extends MultiDexApplication {
     public static void setupAppAfterLogin(Context context) {
         Tradesman.setupCurrentTradesman();
 
+        // set the data points to keep synced for the current tradesman
+        DatabaseReference currentTradesmanRef = FirebaseUtils.getCurrentTradesmanRef();
+        if (currentTradesmanRef != null) currentTradesmanRef.keepSynced(true);
+        DatabaseReference currentTradesmanPrivateRef = FirebaseUtils.getCurrentTradesmanPrivateRef();
+        if (currentTradesmanPrivateRef != null) currentTradesmanPrivateRef.keepSynced(true);
+        DatabaseReference currentTradesmanTimeslotsRef = FirebaseUtils.getCurrentTradesmanTimeslotsRef();
+        if (currentTradesmanTimeslotsRef != null) currentTradesmanTimeslotsRef.keepSynced(true);
+        DatabaseReference currentTradesmanServiceTimeslotsRef = FirebaseUtils.getCurrentTradesmanServiceTimeslotsRef();
+        if (currentTradesmanServiceTimeslotsRef != null)
+            currentTradesmanServiceTimeslotsRef.keepSynced(true);
+
+        // setup the analytics and track the login
         if (context == null) return;
         AnalyticsHelper.setupUser(context.getApplicationContext());
         AnalyticsHelper.track(context.getApplicationContext(), "loggedIn", new Bundle());

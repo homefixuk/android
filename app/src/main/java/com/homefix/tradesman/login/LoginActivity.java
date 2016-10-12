@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.common.CacheUtilsHelper;
+import com.homefix.tradesman.firebase.FirebaseConfigHelper;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.rey.material.widget.EditText;
@@ -158,7 +159,7 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
 
                         IntentHelper.sendEmail(
                                 getBaseActivity(),
-                                Arrays.asList("contact@homefix.co.uk", "george@homefix.co.uk", "sokratis@homefix.co.uk"),
+                                FirebaseConfigHelper.getConfigStringList(getContext(), "needAccountEmails"),
                                 name + ": new Tradesman for the Android app",
                                 body,
                                 null);
