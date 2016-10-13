@@ -124,7 +124,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         b.putString("serviceSetId", Strings.returnSafely(serviceSetId));
                         b.putString("customerId", Strings.returnSafely(customerId));
                         b.putString("propertyId", Strings.returnSafely(propertyId));
-                        b.putString("customerPropertyInfoId", Strings.returnSafely(customerPropertyInfoId));
+                        b.putString("custPropInfoId", Strings.returnSafely(customerPropertyInfoId));
                         b.putString("type", o.getType());
                         b.putLong("startTime", start.getTimeInMillis());
                         b.putLong("endTime", end.getTimeInMillis());
@@ -135,7 +135,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         b.putString("customerName", Strings.returnSafely(customerName));
                         b.putString("customerEmail", Strings.returnSafely(customerEmail));
                         b.putString("customerPhone", Strings.returnSafely(customerPhone));
-                        b.putString("customerPropertyRelationship", Strings.returnSafely(customerPropertyRelationship));
+                        b.putString("custPropRel", Strings.returnSafely(customerPropertyRelationship));
                         b.putString("description", Strings.returnSafely(description));
                         AnalyticsHelper.track(
                                 getView().getContext(),

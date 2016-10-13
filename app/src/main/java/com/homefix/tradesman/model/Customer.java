@@ -1,6 +1,7 @@
 package com.homefix.tradesman.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,4 +71,26 @@ public class Customer extends User {
         map.put("totalSpent", getTotalSpent());
         return map;
     }
+
+    @Override
+    public void addChangesToMap(Map<String, Object> map) {
+        super.addChangesToMap(map);
+
+        if (Strings.isEmpty(getId())) return;
+        String basePath = "/customers/" + getId() + "/";
+
+        map.put(basePath + "priority", getPriority());
+
+        if (preferredTradesman != null && !preferredTradesman.isEmpty())
+            map.put(basePath + "preferredTradesman", preferredTradesman);
+
+        if (customerProperties != null && !customerProperties.isEmpty())
+            map.put(basePath + "customerProperties", customerProperties);
+
+        if (invoices != null && !invoices.isEmpty())
+            map.put(basePath + "invoices", invoices);
+
+        map.put(basePath + "totalSpent", getTotalSpent());
+    }
+
 }

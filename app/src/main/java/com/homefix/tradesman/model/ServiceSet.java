@@ -187,6 +187,31 @@ public class ServiceSet extends BaseModel {
         return map;
     }
 
+    @Override
+    public void addChangesToMap(Map<String, Object> map) {
+        super.addChangesToMap(map);
+
+        if (Strings.isEmpty(getId())) return;
+        String basePath = "/serviceSets/" + getId() + "/";
+
+        map.put(basePath + "customerPropertyId", getCustomerPropertyId());
+        map.put(basePath + "createdAt", getCreatedAt());
+        map.put(basePath + "resolvedAt", getResolvedAt());
+        map.put(basePath + "customerDescription", getCustomerDescription());
+        map.put(basePath + "numberServices", getNumberServices());
+        map.put(basePath + "totalCost", getTotalCost());
+        map.put(basePath + "amountPaid", getAmountPaid());
+
+        // only add them if we have some
+        if (payments != null && !payments.isEmpty()) map.put(basePath + "payments", payments);
+
+        // only add them if we have some
+        if (charges != null && !charges.isEmpty()) map.put(basePath + "charges", charges);
+
+        // only add them if we have some
+        if (services != null && !services.isEmpty()) map.put(basePath + "services", services);
+    }
+
     @Exclude
     public void update() {
         if (Strings.isEmpty(getId())) return;

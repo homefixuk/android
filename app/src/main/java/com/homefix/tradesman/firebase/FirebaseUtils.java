@@ -616,13 +616,13 @@ public class FirebaseUtils {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put("/customers/" + customerKey, customer.toMap());
-        map.put("/properties/" + propertyKey, property.toMap());
+        customer.addChangesToMap(map);
+        property.addChangesToMap(map);
         map.put("/customerPropertyInfos/" + customerPropertyInfoKey, customerProperty.toMap());
         map.put("/customerProperties/" + customerKey + "/" + propertyKey, customerPropertyInfoKey);
         map.put("/propertyCustomers/" + propertyKey + "/" + customerKey, customerPropertyInfoKey);
-        map.put("/serviceSets/" + serviceSetKey, serviceSet.toMap());
-        map.put("/services/" + serviceKey, service.toMap());
+        serviceSet.addChangesToMap(map);
+        service.addChangesToMap(map);
         map.put("/timeslots/" + timeslotKey, timeslot.toMap());
         map.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslotKey, timeslot.toMap());
         map.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslotKey, startTimesMap);

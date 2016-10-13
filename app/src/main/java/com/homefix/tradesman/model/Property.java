@@ -155,5 +155,28 @@ public class Property extends BaseModel {
         return map;
     }
 
+    @Override
+    public void addChangesToMap(Map<String, Object> map) {
+        super.addChangesToMap(map);
+
+        if (Strings.isEmpty(getId())) return;
+        String basePath = "/properties/" + getId() + "/";
+
+        map.put(basePath + "groupId", getGroupId());
+        map.put(basePath + "addressLine1", getAddressLine1());
+        map.put(basePath + "addressLine2", getAddressLine2());
+        map.put(basePath + "addressLine3", getAddressLine3());
+        map.put(basePath + "country", getCountry());
+        map.put(basePath + "postcode", getPostcode());
+        map.put(basePath + "phone", getPhone());
+        map.put(basePath + "numberTennants", getNumberTennants());
+        map.put(basePath + "numberBedrooms", getNumberBedrooms());
+        map.put(basePath + "latitude", getLatitude());
+        map.put(basePath + "longitude", getLongitude());
+
+        if (customerProperties != null && !customerProperties.isEmpty())
+            map.put(basePath + "customerProperties", customerProperties);
+    }
+
 }
 

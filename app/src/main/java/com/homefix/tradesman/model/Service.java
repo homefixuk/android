@@ -202,12 +202,42 @@ public class Service extends BaseModel {
         map.put("incompleteReason", getIncompleteReason());
         map.put("actualDiagnosis", getActualDiagnosis());
         map.put("workCompletedDescription", getWorkCompletedDescription());
-        
+
         // only add them if we have some
         Map<String, Boolean> services = getPreviousServices();
         if (services.size() > 0) map.put("previousServices", services);
 
         return map;
+    }
+
+    @Override
+    public void addChangesToMap(Map<String, Object> map) {
+        super.addChangesToMap(map);
+
+        if (Strings.isEmpty(getId())) return;
+        String basePath = "/services/" + getId() + "/";
+
+        map.put(basePath + "serviceSetId", getServiceSetId());
+        map.put(basePath + "tradesmanId", getTradesmanId());
+        map.put(basePath + "status", getStatus());
+        map.put(basePath + "serviceType", getServiceType());
+        map.put(basePath + "requestTime", getRequestTime());
+        map.put(basePath + "arrivalTime", getArrivalTime());
+        map.put(basePath + "departTime", getDepartTime());
+        map.put(basePath + "estimatedDuration", getEstimatedDuration());
+        map.put(basePath + "estimatedCost", getEstimatedCost());
+        map.put(basePath + "actualDuration", getActualDuration());
+        map.put(basePath + "actualCost", getActualCost());
+        map.put(basePath + "tradesmanNotes", getTradesmanNotes());
+        map.put(basePath + "keyLocation", getKeyLocation());
+        map.put(basePath + "isOwnJob", isOwnJob());
+        map.put(basePath + "incompleteReason", getIncompleteReason());
+        map.put(basePath + "actualDiagnosis", getActualDiagnosis());
+        map.put(basePath + "workCompletedDescription", getWorkCompletedDescription());
+
+        // only add them if we have some
+        if (previousServices != null && !previousServices.isEmpty())
+            map.put(basePath + "previousServices", previousServices);
     }
 
 }

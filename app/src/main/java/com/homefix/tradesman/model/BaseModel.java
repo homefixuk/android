@@ -37,4 +37,8 @@ public class BaseModel {
         return map;
     }
 
+    public void addChangesToMap(Map<String, Object> map) {
+        if (map == null) map = new HashMap<>();
+    }
+
 }
