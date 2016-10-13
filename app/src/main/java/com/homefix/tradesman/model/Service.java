@@ -1,18 +1,9 @@
 package com.homefix.tradesman.model;
 
-import android.support.annotation.NonNull;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.common.SendReceiver;
-import com.homefix.tradesman.firebase.FirebaseUtils;
-import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -207,11 +198,15 @@ public class Service extends BaseModel {
         map.put("actualCost", getActualCost());
         map.put("tradesmanNotes", getTradesmanNotes());
         map.put("keyLocation", getKeyLocation());
-        map.put("previousServices", getPreviousServices());
         map.put("isOwnJob", isOwnJob());
         map.put("incompleteReason", getIncompleteReason());
         map.put("actualDiagnosis", getActualDiagnosis());
         map.put("workCompletedDescription", getWorkCompletedDescription());
+        
+        // only add them if we have some
+        Map<String, Boolean> services = getPreviousServices();
+        if (services.size() > 0) map.put("previousServices", services);
+
         return map;
     }
 

@@ -171,9 +171,19 @@ public class ServiceSet extends BaseModel {
         map.put("numberServices", getNumberServices());
         map.put("totalCost", getTotalCost());
         map.put("amountPaid", getAmountPaid());
-        map.put("payments", getPayments());
-        map.put("charges", getCharges());
-        map.put("services", getServices());
+
+        // only add them if we have some
+        Map<String, Payment> payments = getPayments();
+        if (payments.size() > 0) map.put("payments", payments);
+
+        // only add them if we have some
+        Map<String, Charge> charges = getCharges();
+        if (charges.size() > 0) map.put("charges", charges);
+
+        // only add them if we have some
+        Map<String, Object> services = getServices();
+        if (services.size() > 0) map.put("services", services);
+
         return map;
     }
 
