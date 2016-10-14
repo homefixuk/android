@@ -71,6 +71,7 @@ public class Charge extends BaseModel {
         this.markupBeforeVat = markupBeforeVat;
     }
 
+    @Exclude
     public double getAmountWithVatAndMarkup() {
         return getTotalCost() / quantity;
     }

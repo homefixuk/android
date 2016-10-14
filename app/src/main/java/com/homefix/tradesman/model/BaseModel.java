@@ -1,5 +1,6 @@
 package com.homefix.tradesman.model;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.samdroid.string.Strings;
 
@@ -16,7 +17,6 @@ public class BaseModel {
     private String id;
 
     public BaseModel() {
-
     }
 
     public BaseModel(String id) {
@@ -31,12 +31,14 @@ public class BaseModel {
         this.id = id;
     }
 
+    @Exclude
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("id", getId());
         return map;
     }
 
+    @Exclude
     public void addChangesToMap(Map<String, Object> map) {
         if (map == null) map = new HashMap<>();
     }

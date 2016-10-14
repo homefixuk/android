@@ -112,7 +112,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         }
 
                         // update the view
-                        getView().setTimeslot(o);
+//                        getView().setTimeslot(o);
                         getView().setEditing(false);
                         getView().setupView();
 

@@ -199,8 +199,9 @@ public class ServiceSet extends BaseModel {
         map.put(basePath + "resolvedAt", getResolvedAt());
         map.put(basePath + "customerDescription", getCustomerDescription());
         map.put(basePath + "numberServices", getNumberServices());
-        map.put(basePath + "totalCost", getTotalCost());
-        map.put(basePath + "amountPaid", getAmountPaid());
+
+        if (totalCost > 0) map.put(basePath + "totalCost", totalCost);
+        if (amountPaid > 0) map.put(basePath + "amountPaid", amountPaid);
 
         // only add them if we have some
         if (payments != null && !payments.isEmpty()) map.put(basePath + "payments", payments);

@@ -28,6 +28,7 @@ import com.homefix.tradesman.timeslot.own_job.payments.PaymentsActivity;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.ColorUtils;
 import com.samdroid.common.IntentHelper;
+import com.samdroid.common.MyLog;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.string.Strings;
@@ -100,7 +101,10 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
         if (serviceSet == null) return;
 
         if (mChargesTxt != null) {
+            MyLog.e(TAG, "Setting mChargesTxt. ServiceSet totalcost: " + serviceSet.getTotalCost());
             mChargesTxt.setText(HtmlHelper.fromHtml("£" + Strings.priceToString(serviceSet.getTotalCost()) + " total"));
+        } else {
+            MyLog.e(TAG, "mChargesTxt is NULL");
         }
 
         if (mPaymentsTxt != null) {
