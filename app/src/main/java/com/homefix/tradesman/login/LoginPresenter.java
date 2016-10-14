@@ -2,13 +2,18 @@ package com.homefix.tradesman.login;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.homefix.tradesman.HomeFixApplication;
 import com.homefix.tradesman.base.presenter.BaseActivityPresenter;
@@ -18,9 +23,6 @@ import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
-
-import java.util.Date;
-import java.util.HashMap;
 
 /**
  * Created by samuel on 6/22/2016.
@@ -82,7 +84,7 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
             return;
         }
 
-        getView().showAttemptingLogin();
+        getView().showAttemptingLogin(false);
 
         // cache the email
         CacheUtils.writeObjectFile("email", email);
@@ -125,4 +127,108 @@ public class LoginPresenter extends BaseActivityPresenter<LoginView> {
         getView().showNewUser();
     }
 
+    public void signUp(final String name, String email, String password, String confirmPassword) {
+        if (!isViewAttached()) return;
+
+        email = Strings.returnSafely(email).trim().toLowerCase();
+
+        String errorMessage = null;
+        // check name
+        if (Strings.isEmpty(name)) errorMessage = "Please enter your name";
+        else if (!Strings.isEmailValid(email)) errorMessage = "Please enter a valid email";
+        else if (Strings.isEmpty(password)) errorMessage = "Please enter a password";
+        else if (password.length() < 8) errorMessage = "Password length must be 8 or more";
+        else if (password.contains(" ")) errorMessage = "Passwords cannot contain spaces";
+        else if (!password.equals(confirmPassword)) errorMessage = "Passwords do not match";
+
+        if (!Strings.isEmpty(errorMessage)) {
+            Toast.makeText(getView().getContext(), errorMessage, Toast.LENGTH_LONG).show();
+            getView().showNewUser();
+            return;
+        }
+
+        getView().showAttemptingLogin(true);
+
+        // create the user on firebase
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        final String finalEmail = email;
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        // clear the cached signup details
+                        CacheUtils.writeFile("Name", "");
+                        CacheUtils.writeFile("Email", "");
+                        CacheUtils.writeFile("Password", "");
+                        CacheUtils.writeFile("Confirm Password", "");
+
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(name)
+                                .build();
+
+                        // setup the main user values
+                        DatabaseReference userRef = FirebaseUtils.getBaseRef().child("tradesman").child(user.getUid());
+                        userRef.child("name").setValue(name);
+
+                        String[] names = name.split(" ");
+                        if (names.length > 0) userRef.child("firstName").setValue(names[0]);
+                        if (names.length > 1) {
+                            // set the last name to be the remaining names
+                            String lastName = name.replace(names[0] + " ", "");
+                            userRef.child("lastName").setValue(lastName);
+                        }
+
+                        userRef.child("email").setValue(finalEmail);
+
+                        // initial values
+                        userRef.child("type").setValue("normal");
+                        userRef.child("createdAt").setValue(System.currentTimeMillis());
+
+                        user.updateProfile(profileUpdates)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        HomeFixApplication.setupAppAfterLogin(getView().getBaseActivity().getApplicationContext());
+
+                                        getView().goToApp();
+                                    }
+                                });
+                    }
+
+                })
+                .addOnFailureListener(new OnFailureListener() {
+
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        getView().hideAttemptingLogin();
+
+                        // Catch any error with logging in
+
+                        if (e instanceof FirebaseAuthUserCollisionException) {
+                            FirebaseAuthUserCollisionException e1 = (FirebaseAuthUserCollisionException) e;
+                            if (e1.getErrorCode().equals("ERROR_EMAIL_ALREADY_IN_USE")) {
+                                Toast.makeText(getView().getContext(), "Email already taken", Toast.LENGTH_LONG).show();
+                                getView().showNewUser();
+                                return;
+                            }
+
+                        } else if (e instanceof FirebaseAuthWeakPasswordException) {
+                            FirebaseAuthWeakPasswordException e1 = (FirebaseAuthWeakPasswordException) e;
+                            Toast.makeText(getView().getContext(), e1.getReason(), Toast.LENGTH_LONG).show();
+                            getView().showNewUser();
+                            return;
+                        }
+
+                        if (!NetworkManager.hasConnection(getView().getContext())) {
+                            getView().showDialog("Please make sure you have an internet connection and try again.", false);
+
+                        } else {
+                            getView().showDialog("Sorry, something went wrong. Please try again.", false);
+                        }
+                    }
+
+                });
+    }
 }

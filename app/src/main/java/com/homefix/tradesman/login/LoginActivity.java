@@ -7,11 +7,9 @@ import android.widget.Toast;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
 import com.homefix.tradesman.common.CacheUtilsHelper;
-import com.homefix.tradesman.firebase.FirebaseConfigHelper;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.rey.material.widget.EditText;
-import com.samdroid.common.IntentHelper;
 import com.samdroid.input.AsteriskPasswordTransformationMethod;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.resource.ColourUtils;
@@ -106,10 +104,10 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
     }
 
     @Override
-    public void showAttemptingLogin() {
+    public void showAttemptingLogin(boolean isSignup) {
         if (mEmailEdt != null) mEmailEdt.setError("");
         if (mPasswordEdt != null) mPasswordEdt.setError("");
-        showDialog("Logging in...", true);
+        showDialog(isSignup ? "Signing up..." : "Logging in...", true);
     }
 
     @Override
@@ -121,52 +119,92 @@ public class LoginActivity extends HomeFixBaseActivity<LoginView, LoginPresenter
     public void showNewUser() {
         MaterialDialogWrapper.getMultiInputDialogWithLabels(
                 this,
-                "Enter your information",
-                "OK",
-                Arrays.asList("Name", "Contact Number", "Plumber? Electrician? Other?", "Additional Notes"),
-                Arrays.asList("Name", "Contact Number", "Plumber? Electrician? Other?", "Additional Notes"),
+                "Enter your details",
+                "SIGN UP",
+                Arrays.asList("Name", "Email", "Password", "Confirm Password"),
+                Arrays.asList("Name", "Email", "Password", "Confirm Password"),
                 Arrays.asList(
                         CacheUtilsHelper.getStringSafely("Name"),
-                        CacheUtilsHelper.getStringSafely("Contact Number"),
-                        CacheUtilsHelper.getStringSafely("Plumber? Electrician? Other?"),
-                        CacheUtilsHelper.getStringSafely("Additional Notes")),
+                        CacheUtilsHelper.getStringSafely("Email"),
+                        CacheUtilsHelper.getStringSafely("Password"),
+                        CacheUtilsHelper.getStringSafely("Confirm Password")),
                 new OnGotObjectListener<HashMap<String, String>>() {
                     @Override
                     public void onGotThing(HashMap<String, String> o) {
                         if (o == null || o.isEmpty()) {
-                            Toast.makeText(getContext(), "Signup request not sent", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Sign up request not sent", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        String name = Strings.toCamelCase(o.get("Name"));
-                        String contactNumber = Strings.returnSafely(o.get("Contact Number"));
-                        String jobType = Strings.toCamelCase(o.get("Plumber? Electrician? Other?"));
-                        String notes = Strings.returnSafely(o.get("Additional Notes"));
+                        String name = Strings.toCamelCase(Strings.returnSafely(o.get("Name")));
+                        String email = Strings.returnSafely(Strings.returnSafely(o.get("Email")));
+                        String password = Strings.returnSafely(Strings.returnSafely(o.get("Password")));
+                        String confirmPassword = Strings.returnSafely(Strings.returnSafely(o.get("Confirm Password")));
 
                         CacheUtils.writeFile("Name", name);
-                        CacheUtils.writeFile("Contact Number", contactNumber);
-                        CacheUtils.writeFile("Plumber? Electrician? Other?", jobType);
-                        CacheUtils.writeFile("Additional Notes", notes);
+                        CacheUtils.writeFile("Email", email);
+                        CacheUtils.writeFile("Password", password);
+                        CacheUtils.writeFile("Confirm Password", confirmPassword);
 
-                        String body = "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
-                                "Name: " + name + " \n" +
-                                "Tradesman Type: " + Strings.returnSafely(jobType, "unknown") + " \n" +
-                                "Phone Number: " + contactNumber + "\n\n";
-
-                        if (!Strings.isEmpty(notes)) body += "Additional notes: " + notes + "\n\n";
-
-                        body += "Kind Regards";
-
-                        IntentHelper.sendEmail(
-                                getBaseActivity(),
-                                FirebaseConfigHelper.getConfigStringList(getContext(), "needAccountEmails"),
-                                name + ": new Tradesman for the Android app",
-                                body,
-                                null);
+                        getPresenter().signUp(name, email, password, confirmPassword);
                     }
                 }
         ).show();
 
+//        MaterialDialogWrapper.getMultiInputDialogWithLabels(
+//                this,
+//                "Enter your information",
+//                "OK",
+//                Arrays.asList("Name", "Contact Number", "Plumber? Electrician? Other?", "Additional Notes"),
+//                Arrays.asList("Name", "Contact Number", "Plumber? Electrician? Other?", "Additional Notes"),
+//                Arrays.asList(
+//                        CacheUtilsHelper.getStringSafely("Name"),
+//                        CacheUtilsHelper.getStringSafely("Contact Number"),
+//                        CacheUtilsHelper.getStringSafely("Plumber? Electrician? Other?"),
+//                        CacheUtilsHelper.getStringSafely("Additional Notes")),
+//                new OnGotObjectListener<HashMap<String, String>>() {
+//                    @Override
+//                    public void onGotThing(HashMap<String, String> o) {
+//                        if (o == null || o.isEmpty()) {
+//                            Toast.makeText(getContext(), "Signup request not sent", Toast.LENGTH_SHORT).show();
+//                            return;
+//                        }
+//
+//                        String name = Strings.toCamelCase(Strings.returnSafely(o.get("Name")));
+//                        String contactNumber = Strings.returnSafely(Strings.returnSafely(o.get("Contact Number")));
+//                        String jobType = Strings.toCamelCase(Strings.returnSafely(o.get("Plumber? Electrician? Other?")));
+//                        String notes = Strings.returnSafely(Strings.returnSafely(o.get("Additional Notes")));
+//
+//                        CacheUtils.writeFile("Name", name);
+//                        CacheUtils.writeFile("Contact Number", contactNumber);
+//                        CacheUtils.writeFile("Plumber? Electrician? Other?", jobType);
+//                        CacheUtils.writeFile("Additional Notes", notes);
+//
+//                        String body = "Hi Homefix, I would like an account in the Tradesman app.\n\n" +
+//                                "Name: " + name + " \n" +
+//                                "Tradesman Type: " + Strings.returnSafely(jobType, "unknown") + " \n" +
+//                                "Phone Number: " + contactNumber + "\n\n";
+//
+//                        if (!Strings.isEmpty(notes)) body += "Additional notes: " + notes + "\n\n";
+//
+//                        body += "Kind Regards";
+//
+//                        IntentHelper.sendEmail(
+//                                getBaseActivity(),
+//                                FirebaseConfigHelper.getConfigStringList(getContext(), "needAccountEmails"),
+//                                name + ": new Tradesman for the Android app",
+//                                body,
+//                                null);
+//                    }
+//                }
+//        ).show();
     }
 
+    @Override
+    public void onDestroy() {
+        CacheUtils.writeFile("Password", "");
+        CacheUtils.writeFile("Confirm Password", "");
+
+        super.onDestroy();
+    }
 }

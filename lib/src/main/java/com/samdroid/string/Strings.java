@@ -80,6 +80,8 @@ public class Strings {
      * @return convert all words in s to start with an upper case letter
      */
     public static String toCamelCase(String s) {
+        if (isEmpty(s)) return "";
+
         String[] t = returnSafely(s).split(" ");
         String res = "";
         for (int i = 0; i < t.length; i++) {

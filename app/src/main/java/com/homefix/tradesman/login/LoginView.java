@@ -12,7 +12,7 @@ public interface LoginView extends BaseActivityView {
 
     void showPasswordError(String message);
 
-    void showAttemptingLogin();
+    void showAttemptingLogin(boolean isSignup);
 
     void hideAttemptingLogin();
 
