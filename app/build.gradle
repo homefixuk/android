@@ -154,7 +154,7 @@ dependencies {
     // Calendar https://github.com/SundeepK/CompactCalendarView
     compile 'com.github.sundeepk:compact-calendar-view:1.8.5'
     // Pdf
-    compile 'com.itextpdf:itextg:5.5.9'
+    compile 'com.itextpdf:itextg:5.5.10'
     // jsoup HTML parser library @ http://jsoup.org/
     compile 'org.jsoup:jsoup:1.9.2'
     // Butterknife http://jakewharton.github.io/butterknife/
