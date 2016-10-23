@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.HomeFixBaseActivity;
+import com.samdroid.common.KeyHashUtils;
 
 /**
  * Created by samuel on 6/22/2016.

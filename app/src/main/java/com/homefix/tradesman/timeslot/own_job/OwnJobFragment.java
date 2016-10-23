@@ -147,10 +147,11 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
             return;
         }
 
-        // if the user has not made any changes
-        if (!hasMadeChanges) {
+        String jobType = mJobTypeTxt != null ? mJobTypeTxt.getText().toString() : null;
+
+        if (Strings.isEmpty(jobType)) {
             if (mTimeslot == null) {
-                Toast.makeText(getContext(), "Job is empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Job type is missing", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -160,7 +161,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
             getPresenter().addNewJob(
                     mStartCalNew != null ? mStartCalNew : mStartCal,
                     mEndCalNew != null ? mEndCalNew : mEndCal,
-                    mJobTypeTxt.getText().toString(),
+                    jobType,
                     addressLine1,
                     addressLine2,
                     addressLine3,
@@ -179,12 +180,12 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
 
         // else they are updating an already existing job //
         getPresenter().updateJob(
-                mTimeslot != null ? mTimeslot.getId() : "",
-                mService != null ? mService.getId() : "",
-                mServiceSet != null ? mServiceSet.getId() : "",
-                mCustomer != null ? mCustomer.getId() : "",
-                mProperty != null ? mProperty.getId() : "",
-                mCustomerProperty != null ? mCustomerProperty.getId() : "",
+                Strings.returnSafely(timeslotId, mTimeslot != null ? mTimeslot.getId() : ""),
+                Strings.returnSafely(serviceId, mService != null ? mService.getId() : ""),
+                Strings.returnSafely(serviceSetId, mServiceSet != null ? mServiceSet.getId() : ""),
+                Strings.returnSafely(customerId, mCustomer != null ? mCustomer.getId() : ""),
+                Strings.returnSafely(propertyId, mProperty != null ? mProperty.getId() : ""),
+                Strings.returnSafely(customerPropertyId, mCustomerProperty != null ? mCustomerProperty.getId() : ""),
                 mStartCalNew != null ? mStartCalNew : mStartCal,
                 mEndCalNew != null ? mEndCalNew : mEndCal,
                 mJobTypeTxt.getText().toString(),

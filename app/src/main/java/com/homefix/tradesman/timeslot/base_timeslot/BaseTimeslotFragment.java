@@ -27,7 +27,6 @@ import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.KeyboardUtils;
 import com.samdroid.common.MyLog;
 import com.samdroid.common.TimeUtils;
-import com.samdroid.string.Strings;
 
 import java.util.Calendar;
 
@@ -45,6 +44,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     protected Timeslot.TYPE mType;
     protected boolean isEdit = false, hasMadeChanges = false, didMakeChanges = false;
     protected Timeslot mTimeslot;
+    protected String timeslotId;
 
     @BindView(R.id.icon)
     protected ImageView mIcon;
@@ -166,6 +166,7 @@ public class BaseTimeslotFragment<A extends TimeslotActivity, V extends BaseTime
     protected void setupTimeslot(Timeslot timeslot) {
         if (timeslot == null) return;
 
+        timeslotId = timeslot.getId();
         setTimeslot(timeslot);
         setupView();
     }

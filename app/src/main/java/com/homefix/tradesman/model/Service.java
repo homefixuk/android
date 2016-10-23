@@ -217,6 +217,7 @@ public class Service extends BaseModel {
         if (Strings.isEmpty(getId())) return;
         String basePath = "/services/" + getId() + "/";
 
+        map.put(basePath + "id", getId());
         map.put(basePath + "serviceSetId", getServiceSetId());
         map.put(basePath + "tradesmanId", getTradesmanId());
         map.put(basePath + "status", getStatus());

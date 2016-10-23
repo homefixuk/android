@@ -8,13 +8,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDexApplication;
 
+import com.facebook.FacebookSdk;
+import com.facebook.LoggingBehavior;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -45,6 +47,8 @@ public class HomeFixApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
         instance = this;
 
@@ -52,6 +56,9 @@ public class HomeFixApplication extends MultiDexApplication {
         CacheUtils.configureCache(this);
 
         MyLog.setLoggingEnabled(BuildConfig.DEBUG);
+
+        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
+        FacebookSdk.addLoggingBehavior(LoggingBehavior.APP_EVENTS);
 
         Fresco.initialize(this);
     }
@@ -91,27 +98,23 @@ public class HomeFixApplication extends MultiDexApplication {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final FirebaseRemoteConfig config = getRemoteConfig(context);
-
-                if (config == null) return;
+                mRemoteConfig = getRemoteConfig();
+                if (mRemoteConfig == null) return;
 
                 long cacheExpiration = TimeUtils.getHoursInMillis(1);
 
                 // If developer mode is enabled reduce cacheExpiration to 0 so that
                 // each fetch goes to the server. This should not be used in release
                 // builds.
-                if (BuildConfig.DEBUG || config.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+                if (BuildConfig.DEBUG || mRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
                     cacheExpiration = 0;
                 }
 
                 // fetch the config from the server
-                config.fetch(cacheExpiration).addOnCompleteListener(new OnCompleteListener<Void>() {
+                mRemoteConfig.fetch(cacheExpiration).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        config.activateFetched();
-
-                        // save the boolean to cache so we can access it later without a context
-                        CacheUtils.writeObjectFile("set_data_persistence_enabled", config.getBoolean("set_data_persistence_enabled"));
+                        mRemoteConfig.activateFetched();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -125,13 +128,12 @@ public class HomeFixApplication extends MultiDexApplication {
         }).start();
     }
 
-    public synchronized static FirebaseRemoteConfig getRemoteConfig(Context context) {
-        if (FirebaseApp.getApps(context).isEmpty()) return mRemoteConfig;
+    public synchronized static FirebaseRemoteConfig getRemoteConfig() {
+        if (mRemoteConfig != null) return mRemoteConfig;
 
-        if (mRemoteConfig == null) {
+        try {
             mRemoteConfig = FirebaseRemoteConfig.getInstance();
-
-            if (mRemoteConfig == null) return mRemoteConfig;
+            if (mRemoteConfig == null) return null;
 
             FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
                     .setDeveloperModeEnabled(BuildConfig.DEBUG)
@@ -139,6 +141,8 @@ public class HomeFixApplication extends MultiDexApplication {
             mRemoteConfig.setConfigSettings(configSettings);
 
             mRemoteConfig.setDefaults(FirebaseConfigHelper.getDefaultFirebaseConfig());
+
+        } catch (Exception e) {
         }
 
         return mRemoteConfig;
@@ -161,21 +165,15 @@ public class HomeFixApplication extends MultiDexApplication {
     public static void setupAppAfterLogin(Context context) {
         Tradesman.setupCurrentTradesman();
 
-        // set the data points to keep synced for the current tradesman
-        DatabaseReference currentTradesmanRef = FirebaseUtils.getCurrentTradesmanRef();
-        if (currentTradesmanRef != null) currentTradesmanRef.keepSynced(true);
-        DatabaseReference currentTradesmanPrivateRef = FirebaseUtils.getCurrentTradesmanPrivateRef();
-        if (currentTradesmanPrivateRef != null) currentTradesmanPrivateRef.keepSynced(true);
-        DatabaseReference currentTradesmanTimeslotsRef = FirebaseUtils.getCurrentTradesmanTimeslotsRef();
-        if (currentTradesmanTimeslotsRef != null) currentTradesmanTimeslotsRef.keepSynced(true);
-        DatabaseReference currentTradesmanServiceTimeslotsRef = FirebaseUtils.getCurrentTradesmanServiceTimeslotsRef();
-        if (currentTradesmanServiceTimeslotsRef != null)
-            currentTradesmanServiceTimeslotsRef.keepSynced(true);
+        FirebaseUtils.setupSyncedRefs();
 
         // setup the analytics and track the login
         if (context == null) return;
         AnalyticsHelper.setupUser(context.getApplicationContext());
         AnalyticsHelper.track(context.getApplicationContext(), "loggedIn", new Bundle());
+
+        AppEventsLogger logger = AppEventsLogger.newLogger(context);
+        logger.logEvent("loggedIn");
     }
 
     public static HomeFixApplication getInstance() {

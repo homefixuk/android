@@ -194,6 +194,7 @@ public class ServiceSet extends BaseModel {
         if (Strings.isEmpty(getId())) return;
         String basePath = "/serviceSets/" + getId() + "/";
 
+        map.put(basePath + "id", getId());
         map.put(basePath + "customerPropertyId", getCustomerPropertyId());
         map.put(basePath + "createdAt", getCreatedAt());
         map.put(basePath + "resolvedAt", getResolvedAt());

@@ -14,6 +14,7 @@ import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
@@ -21,6 +22,8 @@ import com.samdroid.string.Strings;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import clojure.lang.Var;
 
 /**
  * Created by samuel on 7/19/2016.
@@ -97,6 +100,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
 
         if (!isViewAttached()) return;
 
+        VariableUtils.printStrings(timeslotId, serviceId, serviceSetId, customerId, propertyId, customerPropertyInfoId);
         FirebaseUtils.updateJob(
                 timeslotId, serviceId, serviceSetId, customerId, propertyId, customerPropertyInfoId,
                 true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,

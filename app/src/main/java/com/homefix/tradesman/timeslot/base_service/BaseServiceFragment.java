@@ -104,6 +104,7 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
     protected String addressLine1, addressLine2, addressLine3, country, postcode;
     protected Double latitude = null, longitude = null;
 
+    protected String serviceId, serviceSetId, customerPropertyId, customerId, propertyId;
     private DatabaseReference serviceRef, serviceSetRef, customerPropertyRef, customerRef, propertyRef;
     protected Service mService;
     protected ServiceSet mServiceSet;
@@ -206,15 +207,19 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         super.onPause();
     }
 
-    private ValueEventListener serviceValueEventListener = new ValueEventListener() {
+    private final ValueEventListener serviceValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             MyLog.e(TAG, "[serviceValueEventListener] got snapshot");
 
             Service service = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Service.class) : null;
-            if (service == null) return;
+            if (service == null) {
+                MyLog.e(TAG, "[serviceValueEventListener] SERVICE is NULL");
+                return;
+            }
 
-            MyLog.e(TAG, "[serviceValueEventListener] got snapshot: SUCCESS -> " + service.getServiceSetId());
+            MyLog.e(TAG, "[serviceValueEventListener] got snapshot: SUCCESS -> " + service.getId());
+            serviceId = service.getId();
             setupServiceView(service);
             setupServiceSet(service.getServiceSetId());
         }
@@ -249,12 +254,13 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         // setup the new one
         serviceSetRef = FirebaseUtils.getSpecificServiceSetRef(serviceSetId);
         if (serviceSetRef != null) {
+            MyLog.e(TAG, "[setupServiceSet] serviceSetId: " + serviceSetId);
             serviceSetRef.addValueEventListener(serviceSetValueEventListener);
             serviceSetRef.keepSynced(true);
         } else MyLog.e(TAG, "[setupServiceSet] serviceSetRef is NULL");
     }
 
-    private ValueEventListener serviceSetValueEventListener = new ValueEventListener() {
+    private final ValueEventListener serviceSetValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             ServiceSet serviceSet = dataSnapshot != null ? dataSnapshot.getValue(ServiceSet.class) : null;
@@ -263,7 +269,8 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
                 return;
             }
 
-            MyLog.e(TAG, "[serviceSetValueEventListener] serviceSet SUCCESS");
+            MyLog.e(TAG, "[serviceSetValueEventListener] serviceSet SUCCESS: " + serviceSet.getId());
+            serviceSetId = serviceSet.getId();
             setupServiceSetView(serviceSet);
             setupCustomerProperty(serviceSet.getCustomerPropertyId());
         }
@@ -292,22 +299,28 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         // setup the new one
         customerPropertyRef = FirebaseUtils.getBaseRef().child("customerPropertyInfos").child(customerPropertyId);
         if (customerPropertyRef != null) {
+            MyLog.e(TAG, "[setupCustomerProperty] setting customer property listener");
             customerPropertyRef.addValueEventListener(customerPropertyIdListener);
             customerPropertyRef.keepSynced(true);
         } else MyLog.e(TAG, "[setupCustomerProperty] NULL");
     }
 
-    private ValueEventListener customerPropertyIdListener = new ValueEventListener() {
+    private final ValueEventListener customerPropertyIdListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             CustomerProperty customerProperty = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(CustomerProperty.class) : null;
             setupCustomerPropertyView(customerProperty);
 
             if (customerProperty != null) {
-                String customerId = customerProperty.getCustomerId();
+                customerPropertyId = customerProperty.getId();
+                MyLog.e(TAG, "[customerPropertyIdListener] customerPropertyId: " + customerPropertyId);
+
+                customerId = customerProperty.getCustomerId();
+                MyLog.e(TAG, "[customerPropertyIdListener] customerId: " + customerId);
                 setupCustomer(customerId);
 
-                String propertyId = customerProperty.getPropertyId();
+                propertyId = customerProperty.getPropertyId();
+                MyLog.e(TAG, "[customerPropertyIdListener] propertyId: " + propertyId);
                 setupProperty(propertyId);
 
             } else {
@@ -347,7 +360,7 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         } else MyLog.e(TAG, "[setupCustomer] ref is NULL");
     }
 
-    private ValueEventListener customerListener = new ValueEventListener() {
+    private final ValueEventListener customerListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Customer customer = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Customer.class) : null;
@@ -396,7 +409,7 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
         } else MyLog.e(TAG, "[setupProperty] NULL");
     }
 
-    private ValueEventListener propertyListener = new ValueEventListener() {
+    private final ValueEventListener propertyListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Property property = dataSnapshot != null && dataSnapshot.exists() ? dataSnapshot.getValue(Property.class) : null;

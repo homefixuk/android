@@ -3,6 +3,7 @@ package com.samdroid.common;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.samdroid.string.Strings;
 
@@ -605,6 +606,11 @@ public class VariableUtils {
         }
 
         return list;
+    }
+
+    public static void printStrings(@NonNull String... strings) {
+        MyLog.e(TAG, "Printing strings");
+        for (int i = 0; i < strings.length; i++) MyLog.e(TAG, i + ": " + strings[i]);
     }
 
 }

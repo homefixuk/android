@@ -162,6 +162,7 @@ public class Property extends BaseModel {
         if (Strings.isEmpty(getId())) return;
         String basePath = "/properties/" + getId() + "/";
 
+        map.put(basePath + "id", getId());
         map.put(basePath + "groupId", getGroupId());
         map.put(basePath + "addressLine1", getAddressLine1());
         map.put(basePath + "addressLine2", getAddressLine2());

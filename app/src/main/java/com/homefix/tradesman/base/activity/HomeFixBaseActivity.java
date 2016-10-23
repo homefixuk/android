@@ -17,6 +17,7 @@ import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.applinks.AppLinkData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.homefix.tradesman.R;
@@ -117,6 +118,13 @@ public abstract class HomeFixBaseActivity<V extends BaseActivityView, P extends 
     public void onResume() {
         super.onResume();
         getPresenter().onResume();
+
+        AppLinkData.fetchDeferredAppLinkData(this,
+                new AppLinkData.CompletionHandler() {
+                    @Override
+                    public void onDeferredAppLinkDataFetched(AppLinkData appLinkData) {
+                    }
+                });
 
 //        // make sure we have the CCA
 //        if (checkCCA && mCca == null) {

@@ -79,6 +79,7 @@ public class Customer extends User {
         if (Strings.isEmpty(getId())) return;
         String basePath = "/customers/" + getId() + "/";
 
+        map.put(basePath + "id", getId());
         map.put(basePath + "priority", getPriority());
 
         if (preferredTradesman != null && !preferredTradesman.isEmpty())

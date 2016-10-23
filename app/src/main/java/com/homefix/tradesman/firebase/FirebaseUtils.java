@@ -22,8 +22,8 @@ import com.homefix.tradesman.model.Property;
 import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
-import com.lifeofcoding.cacheutlislibrary.CacheUtils;
 import com.samdroid.common.MyLog;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnFinishListener;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -88,8 +88,7 @@ public class FirebaseUtils {
 
             // only enable this once in the whole app and set by the remote config
             try {
-                Boolean isEnabled = CacheUtils.readObjectFile("set_data_persistence_enabled", Boolean.class);
-                if (isEnabled != null && isEnabled) firebaseDatabase.setPersistenceEnabled(true);
+                firebaseDatabase.setPersistenceEnabled(FirebaseConfigHelper.getConfigBoolean("set_data_persistence_enabled"));
             } catch (Exception e) {
                 MyLog.printStackTrace(e);
                 FirebaseCrash.report(e);
@@ -352,6 +351,22 @@ public class FirebaseUtils {
         }
     }
 
+    public static void setupSyncedRefs() {
+        // set the data points to keep synced for the current tradesman
+        DatabaseReference currentTradesmanRef = getCurrentTradesmanRef();
+        if (currentTradesmanRef != null) currentTradesmanRef.keepSynced(true);
+
+        DatabaseReference currentTradesmanPrivateRef = getCurrentTradesmanPrivateRef();
+        if (currentTradesmanPrivateRef != null) currentTradesmanPrivateRef.keepSynced(true);
+
+        DatabaseReference currentTradesmanTimeslotsRef = getCurrentTradesmanTimeslotsRef();
+        if (currentTradesmanTimeslotsRef != null) currentTradesmanTimeslotsRef.keepSynced(true);
+
+        DatabaseReference currentTradesmanServiceTimeslotsRef = getCurrentTradesmanServiceTimeslotsRef();
+        if (currentTradesmanServiceTimeslotsRef != null)
+            currentTradesmanServiceTimeslotsRef.keepSynced(true);
+    }
+
     @IgnoreExtraProperties
     public static class TimeslotTimes {
 
@@ -536,10 +551,10 @@ public class FirebaseUtils {
             String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
             @NonNull final OnGotObjectListener<Timeslot> listener) {
 
+        VariableUtils.printStrings(timeslotKey, serviceKey, serviceSetKey, customerKey, propertyKey, customerPropertyInfoKey);
+
         String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
-        if (Strings.isEmpty(tradesmanId) || Strings.isEmpty(timeslotKey) || Strings.isEmpty(serviceKey)
-                || Strings.isEmpty(serviceSetKey) || Strings.isEmpty(customerKey)
-                || Strings.isEmpty(propertyKey) || Strings.isEmpty(customerPropertyInfoKey)) {
+        if (Strings.isEmpty(tradesmanId) || Strings.isEmpty(timeslotKey) || Strings.isEmpty(serviceKey) || Strings.isEmpty(serviceSetKey)) {
             MyLog.e(TAG, "[updateJob] a key is empty");
             listener.onGotThing(null);
             return;
@@ -589,11 +604,9 @@ public class FirebaseUtils {
         serviceSetServices.put(serviceKey, true);
         serviceSet.setServices(serviceSetServices);
         serviceSet.setCreatedAt(System.currentTimeMillis());
-        serviceSet.setNumberServices(1);
-        serviceSet.setAmountPaid(0);
-        serviceSet.setTotalCost(0);
 
         Service service = new Service(serviceKey);
+        service.setId(serviceKey);
         service.setOwnJob(isOwnJob);
         service.setEstimatedDuration(endTime - startTime);
         service.setTradesmanId(tradesmanId);

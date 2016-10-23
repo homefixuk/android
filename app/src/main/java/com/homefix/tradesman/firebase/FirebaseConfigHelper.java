@@ -24,10 +24,7 @@ public class FirebaseConfigHelper {
     private static final HashMap<String, Object> defaultFirebaseConfig = new HashMap<>();
 
     static {
-        defaultFirebaseConfig.put("set_data_persistence_enabled", false);
-        // save the boolean to cache so we can access it later without a context
-        CacheUtils.writeObjectFile("set_data_persistence_enabled", false);
-
+        defaultFirebaseConfig.put("set_data_persistence_enabled", true);
         defaultFirebaseConfig.put("needAccountEmails", "[\"info@homefix.co.uk\",\"george@homefix.co.uk\",\"sokratis@homefix.co.uk\"]");
     }
 
@@ -35,8 +32,8 @@ public class FirebaseConfigHelper {
         return defaultFirebaseConfig;
     }
 
-    public static String getConfigString(Context context, String key) {
-        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig(context);
+    public static String getConfigString(String key) {
+        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig();
         if (config == null) {
             return defaultFirebaseConfig.containsKey(key) ? (String) defaultFirebaseConfig.get(key) : "";
         }
@@ -44,8 +41,8 @@ public class FirebaseConfigHelper {
         return Strings.returnSafely(config.getString(key));
     }
 
-    public static boolean getConfigBoolean(Context context, String key) {
-        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig(context);
+    public static boolean getConfigBoolean(String key) {
+        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig();
         if (config == null) {
             return defaultFirebaseConfig.containsKey(key) && (boolean) defaultFirebaseConfig.get(key);
         }
@@ -53,8 +50,8 @@ public class FirebaseConfigHelper {
         return config.getBoolean(key);
     }
 
-    public static int getConfigInteger(Context context, String key) {
-        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig(context);
+    public static int getConfigInteger(String key) {
+        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig();
         if (config == null) {
             return defaultFirebaseConfig.containsKey(key) ? (int) defaultFirebaseConfig.get(key) : 0;
         }
@@ -62,8 +59,8 @@ public class FirebaseConfigHelper {
         return (int) config.getLong(key);
     }
 
-    public static long getConfigLong(Context context, String key) {
-        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig(context);
+    public static long getConfigLong(String key) {
+        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig();
         if (config == null) {
             return defaultFirebaseConfig.containsKey(key) ? (long) defaultFirebaseConfig.get(key) : 0L;
         }
@@ -71,8 +68,8 @@ public class FirebaseConfigHelper {
         return config.getLong(key);
     }
 
-    public static double getConfigDouble(Context context, String key) {
-        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig(context);
+    public static double getConfigDouble(String key) {
+        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig();
         if (config == null) {
             return defaultFirebaseConfig.containsKey(key) ? (double) defaultFirebaseConfig.get(key) : 0.0;
         }
@@ -80,8 +77,8 @@ public class FirebaseConfigHelper {
         return config.getDouble(key);
     }
 
-    public static List<String> getConfigStringList(Context context, String key) {
-        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig(context);
+    public static List<String> getConfigStringList(String key) {
+        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig();
         String value;
         if (config == null) {
             if (!defaultFirebaseConfig.containsKey(key)) return new ArrayList<>();
@@ -100,8 +97,8 @@ public class FirebaseConfigHelper {
         }
     }
 
-    public static List<Integer> getConfigIntegerList(Context context, String key) {
-        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig(context);
+    public static List<Integer> getConfigIntegerList(String key) {
+        FirebaseRemoteConfig config = HomeFixApplication.getRemoteConfig();
         String value;
         if (config == null) {
             if (!defaultFirebaseConfig.containsKey(key)) return new ArrayList<>();
@@ -119,6 +116,5 @@ public class FirebaseConfigHelper {
             return new ArrayList<>();
         }
     }
-
 
 }
