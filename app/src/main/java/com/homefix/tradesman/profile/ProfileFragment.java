@@ -3,15 +3,17 @@ package com.homefix.tradesman.profile;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.firebase.database.DataSnapshot;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.homefix.tradesman.R;
 import com.homefix.tradesman.base.activity.BaseToolbarNavMenuActivity;
 import com.homefix.tradesman.base.activity.EditListActivity;
@@ -23,6 +25,7 @@ import com.homefix.tradesman.model.Tradesman;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
@@ -307,21 +310,31 @@ public class ProfileFragment<A extends BaseToolbarNavMenuActivity> extends BaseF
                 changes.put("homeCountry", Strings.returnSafely(newAddress.get(_COUNTRY)));
                 changes.put("homePostcode", Strings.returnSafely(newAddress.get(_POSTCODE)));
 
-                ref.updateChildren(changes, new DatabaseReference.CompletionListener() {
+                OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>() {
                     @Override
-                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        if (databaseError != null) {
-                            showErrorDialog();
-                            return;
-                        }
-
+                    public void onSuccess(Void aVoid) {
                         AnalyticsHelper.setUserProperty(getContext(), "homeCountry", Strings.returnSafely(newAddress.get(_COUNTRY)));
                         AnalyticsHelper.setUserProperty(getContext(), "homePostcode", Strings.returnSafely(newAddress.get(_POSTCODE)));
                         AnalyticsHelper.track(getContext(), "changedHomeAddress", new Bundle());
 
                         hideDialog();
                     }
-                });
+                };
+
+                Task<Void> task = ref.updateChildren(changes);
+
+                if (!NetworkManager.hasConnection(getContext())) {
+                    onSuccessListener.onSuccess(null);
+
+                } else {
+                    task.addOnSuccessListener(onSuccessListener);
+                    task.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            showErrorDialog();
+                        }
+                    });
+                }
 
             }
 

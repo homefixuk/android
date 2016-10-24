@@ -12,6 +12,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +29,7 @@ import com.homefix.tradesman.model.TradesmanPrivate;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
@@ -365,15 +369,9 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                             changes.put(key, newValues.get(key));
                         }
 
-                        // save the change in the DB
-                        ref.updateChildren(changes, new DatabaseReference.CompletionListener() {
+                        OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>() {
                             @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if (databaseError != null) {
-                                    showErrorDialog();
-                                    return;
-                                }
-
+                            public void onSuccess(Void aVoid) {
                                 Bundle b = new Bundle();
                                 b.putString("field", "bankDetails");
                                 AnalyticsHelper.track(getContext(), "updatedProfileSettings", b);
@@ -381,7 +379,24 @@ public class SettingsFragment<A extends BaseToolbarActivity> extends BaseCloseFr
                                 if (mAdapter != null) mAdapter.notifyDataSetChanged();
                                 hideDialog();
                             }
-                        });
+                        };
+
+                        // save the change in the DB
+                        Task<Void> task = ref.updateChildren(changes);
+
+                        if (!NetworkManager.hasConnection(getContext())) {
+                            onSuccessListener.onSuccess(null);
+
+                        } else {
+                            task.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    showErrorDialog();
+                                }
+                            });
+                            task.addOnSuccessListener(onSuccessListener);
+                        }
+
                     }
                 }
 

@@ -173,10 +173,6 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                             childUpdates.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslot.getId(), null);
                         }
 
-                        Task<Void> task = FirebaseUtils
-                                .getBaseRef()
-                                .updateChildren(childUpdates);
-
                         OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -195,6 +191,8 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                                 getView().onDeleteComplete(timeslot);
                             }
                         };
+
+                        Task<Void> task = FirebaseUtils.getBaseRef().updateChildren(childUpdates);
 
                         // when there's no network connection Firebase won't trigger callbacks
                         // http://sumatodev.com/implement-offline-support-android-using-firebase/
