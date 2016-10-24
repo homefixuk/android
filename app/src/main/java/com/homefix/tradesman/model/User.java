@@ -12,7 +12,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class User extends BaseModel {
+public abstract class User extends BaseModel {
 
     private String firstName, lastName, email, mobilePhone, role, homePhone;
     private String homeAddressLine1, homeAddressLine2, homeAddressLine3, homePostcode, homeCountry;
@@ -178,6 +178,10 @@ public class User extends BaseModel {
         this.groups = groups;
     }
 
+    @Exclude
+    public abstract String getPath();
+
+    @Exclude
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
@@ -200,4 +204,33 @@ public class User extends BaseModel {
         map.put("groups", getGroups());
         return map;
     }
+
+    @Exclude
+    @Override
+    public void addChangesToMap(Map<String, Object> map) {
+        super.addChangesToMap(map);
+        if (map == null) return;
+
+        String basePath = getPath();
+        if (Strings.isEmpty(basePath)) return;
+
+        map.put(basePath + "firstName", getFirstName());
+        map.put(basePath + "lastName", getLastName());
+        map.put(basePath + "email", getEmail());
+        map.put(basePath + "mobilePhone", getMobilePhone());
+        map.put(basePath + "homePhone", getHomePhone());
+        map.put(basePath + "homeAddressLine1", getHomeAddressLine1());
+        map.put(basePath + "homeAddressLine2", getHomeAddressLine2());
+        map.put(basePath + "homeAddressLine3", getHomeAddressLine3());
+        map.put(basePath + "homePostcode", getHomePostcode());
+        map.put(basePath + "homeCountry", getHomeCountry());
+        map.put(basePath + "billingAddressLine1", getBillingAddressLine1());
+        map.put(basePath + "billingAddressLine2", getBillingAddressLine2());
+        map.put(basePath + "billingAddressLine3", getBillingAddressLine3());
+        map.put(basePath + "billingPostcode", getBillingPostcode());
+        map.put(basePath + "billingCountry", getBillingCountry());
+
+        if (groups != null && !groups.isEmpty()) map.put(basePath + "groups", getGroups());
+    }
+
 }

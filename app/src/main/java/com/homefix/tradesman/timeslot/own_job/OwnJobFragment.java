@@ -31,6 +31,7 @@ import com.samdroid.common.IntentHelper;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.io.File;
@@ -158,6 +159,8 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
 
         // if the user is creating a new job
         if (mTimeslot == null) {
+            showDialog("Creating job...", true);
+
             getPresenter().addNewJob(
                     mStartCalNew != null ? mStartCalNew : mStartCal,
                     mEndCalNew != null ? mEndCalNew : mEndCal,
@@ -174,33 +177,33 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
                     mPersonPhoneNumberTxt.getText().toString(),
                     mCustomerPropertyTypeView.getText().toString(),
                     mDescriptionTxt.getText().toString());
+         } else {
+            showDialog("Updating job...", true);
 
-            return;
+            // else they are updating an already existing job //
+            getPresenter().updateJob(
+                    Strings.returnSafely(timeslotId, mTimeslot != null ? mTimeslot.getId() : ""),
+                    Strings.returnSafely(serviceId, mService != null ? mService.getId() : ""),
+                    Strings.returnSafely(serviceSetId, mServiceSet != null ? mServiceSet.getId() : ""),
+                    Strings.returnSafely(customerId, mCustomer != null ? mCustomer.getId() : ""),
+                    Strings.returnSafely(propertyId, mProperty != null ? mProperty.getId() : ""),
+                    Strings.returnSafely(customerPropertyId, mCustomerProperty != null ? mCustomerProperty.getId() : ""),
+                    mStartCalNew != null ? mStartCalNew : mStartCal,
+                    mEndCalNew != null ? mEndCalNew : mEndCal,
+                    mJobTypeTxt.getText().toString(),
+                    addressLine1,
+                    addressLine2,
+                    addressLine3,
+                    postcode,
+                    country,
+                    latitude,
+                    longitude,
+                    mPersonNameTxt.getText().toString(),
+                    mPersonEmailTxt.getText().toString(),
+                    mPersonPhoneNumberTxt.getText().toString(),
+                    mCustomerPropertyTypeView.getText().toString(),
+                    mDescriptionTxt.getText().toString());
         }
-
-        // else they are updating an already existing job //
-        getPresenter().updateJob(
-                Strings.returnSafely(timeslotId, mTimeslot != null ? mTimeslot.getId() : ""),
-                Strings.returnSafely(serviceId, mService != null ? mService.getId() : ""),
-                Strings.returnSafely(serviceSetId, mServiceSet != null ? mServiceSet.getId() : ""),
-                Strings.returnSafely(customerId, mCustomer != null ? mCustomer.getId() : ""),
-                Strings.returnSafely(propertyId, mProperty != null ? mProperty.getId() : ""),
-                Strings.returnSafely(customerPropertyId, mCustomerProperty != null ? mCustomerProperty.getId() : ""),
-                mStartCalNew != null ? mStartCalNew : mStartCal,
-                mEndCalNew != null ? mEndCalNew : mEndCal,
-                mJobTypeTxt.getText().toString(),
-                addressLine1,
-                addressLine2,
-                addressLine3,
-                postcode,
-                country,
-                latitude,
-                longitude,
-                mPersonNameTxt.getText().toString(),
-                mPersonEmailTxt.getText().toString(),
-                mPersonPhoneNumberTxt.getText().toString(),
-                mCustomerPropertyTypeView.getText().toString(),
-                mDescriptionTxt.getText().toString());
     }
 
     @OnClick(R.id.charges_bar)

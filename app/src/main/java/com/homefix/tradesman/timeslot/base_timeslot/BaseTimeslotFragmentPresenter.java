@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -15,7 +18,6 @@ import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.MyLog;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
@@ -46,7 +48,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
         }
 
         String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
-        if (Strings.isEmpty(tradesmanId) || mStart == null || mEnd == null || !NetworkManager.hasConnection(getView().getContext())) {
+        if (Strings.isEmpty(tradesmanId) || mStart == null || mEnd == null) {
             getView().showErrorDialog();
             return;
         }
@@ -85,14 +87,9 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
 
         final Timeslot finalTimeslot = timeslot;
 
-        FirebaseUtils.getBaseRef().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+        OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>() {
             @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError != null) {
-                    getView().showErrorDialog();
-                    return;
-                }
-
+            public void onSuccess(Void aVoid) {
                 // track the save
                 Bundle b = new Bundle();
                 b.putString("timeslotId", finalTimeslot.getId());
@@ -125,7 +122,22 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                     }
                 });
             }
+        };
+
+        Task<Void> task = FirebaseUtils.getBaseRef().updateChildren(childUpdates);
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                getView().showErrorDialog();
+            }
         });
+        task.addOnSuccessListener(onSuccessListener);
+
+        // when there's no network connection Firebase won't trigger callbacks
+        // http://sumatodev.com/implement-offline-support-android-using-firebase/
+        if (!NetworkManager.hasConnection(getView().getContext())) {
+            onSuccessListener.onSuccess(null);
+        }
     }
 
     public void delete(final Timeslot timeslot) {
@@ -133,7 +145,7 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
 
         final String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
 
-        if (Strings.isEmpty(tradesmanId) || timeslot == null || Strings.isEmpty(timeslot.getId()) || !NetworkManager.hasConnection(getView().getContext())) {
+        if (Strings.isEmpty(tradesmanId) || timeslot == null || Strings.isEmpty(timeslot.getId())) {
             getView().showErrorDialog();
             return;
         }
@@ -159,14 +171,13 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
                             childUpdates.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslot.getId(), null);
                         }
 
-                        FirebaseUtils.getBaseRef().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if (databaseError != null) {
-                                    getView().showErrorDialog();
-                                    return;
-                                }
+                        Task<Void> task = FirebaseUtils
+                                .getBaseRef()
+                                .updateChildren(childUpdates);
 
+                        OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
                                 // track the delete
                                 Bundle b = new Bundle();
                                 b.putString("timeslotId", timeslot.getId());
@@ -181,7 +192,21 @@ public class BaseTimeslotFragmentPresenter<V extends BaseTimeslotView> extends B
 
                                 getView().onDeleteComplete(timeslot);
                             }
+                        };
+
+                        task.addOnSuccessListener(onSuccessListener);
+                        task.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                getView().showErrorDialog();
+                            }
                         });
+
+                        // when there's no network connection Firebase won't trigger callbacks
+                        // http://sumatodev.com/implement-offline-support-android-using-firebase/
+                        if (!NetworkManager.hasConnection(getView().getContext())) {
+                            onSuccessListener.onSuccess(null);
+                        }
 
                     }
 

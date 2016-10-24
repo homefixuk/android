@@ -73,11 +73,17 @@ public class Customer extends User {
     }
 
     @Override
+    public String getPath() {
+        if (Strings.isEmpty(getId())) return null;
+        return "/customers/" + getId() + "/";
+    }
+
+    @Override
     public void addChangesToMap(Map<String, Object> map) {
         super.addChangesToMap(map);
 
-        if (Strings.isEmpty(getId())) return;
-        String basePath = "/customers/" + getId() + "/";
+        String basePath = getPath();
+        if (Strings.isEmpty(basePath)) return;
 
         map.put(basePath + "id", getId());
         map.put(basePath + "priority", getPriority());

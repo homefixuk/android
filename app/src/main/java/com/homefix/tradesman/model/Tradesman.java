@@ -82,6 +82,11 @@ public class Tradesman extends User {
         this.settings = settings;
     }
 
+    @Override
+    public String getPath() {
+        if (Strings.isEmpty(getId())) return null;
+        return "/tradesman/" + getId() + "/";
+    }
 
     @Exclude
     public ArrayList<String> getWorkAreasList() {
@@ -93,21 +98,26 @@ public class Tradesman extends User {
     /////// Static /////////
     ////////////////////////
 
+    @Exclude
     private static Tradesman mCurrentTradesman;
 
+    @Exclude
     public static synchronized Tradesman getCurrentTradesman() {
         return mCurrentTradesman;
     }
 
+    @Exclude
     private static synchronized void setCurrentTradesman(Tradesman tradesman) {
         mCurrentTradesman = tradesman;
     }
 
+    @Exclude
     public static void onLogout() {
         setCurrentTradesman(null);
         getCurrentTradesmanListeners().clear();
     }
 
+    @Exclude
     public static void setupCurrentTradesman() {
         DatabaseReference currentTradesmanRef = FirebaseUtils.getCurrentTradesmanRef();
         if (currentTradesmanRef == null) return;
@@ -129,21 +139,26 @@ public class Tradesman extends User {
         currentTradesmanRef.keepSynced(true);
     }
 
+    @Exclude
     private static final List<OnGotObjectListener<Tradesman>> mCurrentTradesmanListeners = new ArrayList<>();
 
+    @Exclude
     public static List<OnGotObjectListener<Tradesman>> getCurrentTradesmanListeners() {
         return mCurrentTradesmanListeners;
     }
 
+    @Exclude
     public static void addCurrentTradesmanListener(@NonNull OnGotObjectListener<Tradesman> listener) {
         getCurrentTradesmanListeners().add(listener);
         listener.onGotThing(getCurrentTradesman());
     }
 
+    @Exclude
     public static void removeCurrentTradesmanListener(@NonNull OnGotObjectListener<Tradesman> listener) {
         getCurrentTradesmanListeners().remove(listener);
     }
 
+    @Exclude
     private static void notifyCurrentTradesmanListeners() {
         List<OnGotObjectListener<Tradesman>> listeners = getCurrentTradesmanListeners();
         for (OnGotObjectListener<Tradesman> listener : listeners) {

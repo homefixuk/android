@@ -1,8 +1,14 @@
 package com.homefix.tradesman.firebase;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.crash.FirebaseCrash;
@@ -23,10 +29,10 @@ import com.homefix.tradesman.model.Service;
 import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
 import com.samdroid.common.MyLog;
-import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.interfaces.OnFinishListener;
 import com.samdroid.listener.interfaces.OnGetListListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
+import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.util.ArrayList;
@@ -515,7 +521,7 @@ public class FirebaseUtils {
         });
     }
 
-    public static void createService(final boolean isOwnJob, @NonNull final Calendar start, @NonNull final Calendar end, String jobType, String addressLine1, String addressLine2,
+    public static void createService(final Context context, final boolean isOwnJob, @NonNull final Calendar start, @NonNull final Calendar end, String jobType, String addressLine1, String addressLine2,
                                      String addressLine3, String postcode, String country, Double latitude, Double longitude,
                                      String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
                                      @NonNull final OnGotObjectListener<Timeslot> listener) {
@@ -533,13 +539,14 @@ public class FirebaseUtils {
         String serviceSetKey = getServiceSetsRef().push().getKey();
         final String timeslotKey = getTimeslotsRef().push().getKey();
 
-        updateJob(timeslotKey, serviceKey, serviceSetKey, customerKey, propertyKey, customerPropertyInfoKey,
+        updateJob(context, timeslotKey, serviceKey, serviceSetKey, customerKey, propertyKey, customerPropertyInfoKey,
                 isOwnJob, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country,
                 latitude, longitude, customerName, customerEmail, customerPhone, customerPropertyRelationship,
                 description, listener);
     }
 
     public static void updateJob(
+            final Context context,
             final String timeslotKey,
             final String serviceKey,
             final String serviceSetKey,
@@ -550,8 +557,6 @@ public class FirebaseUtils {
             String addressLine3, String postcode, String country, Double latitude, Double longitude,
             String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
             @NonNull final OnGotObjectListener<Timeslot> listener) {
-
-        VariableUtils.printStrings(timeslotKey, serviceKey, serviceSetKey, customerKey, propertyKey, customerPropertyInfoKey);
 
         String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
         if (Strings.isEmpty(tradesmanId) || Strings.isEmpty(timeslotKey) || Strings.isEmpty(serviceKey) || Strings.isEmpty(serviceSetKey)) {
@@ -640,22 +645,30 @@ public class FirebaseUtils {
         map.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslotKey, timeslot.toMap());
         map.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslotKey, startTimesMap);
 
+        MyLog.e(TAG, "4444 Pre update children");
         // update all the references at the same that, that way either all or none get set
-        FirebaseUtils.getBaseRef().updateChildren(map, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError != null) {
-                    MyLog.e(TAG, "Something went wrong updating timeslot and service");
-                    MyLog.e(TAG, databaseError.getDetails());
-                    MyLog.e(TAG, databaseError.getMessage());
-                    MyLog.printStackTrace(databaseError.toException());
-                    listener.onGotThing(null);
-                    return;
-                }
+        FirebaseUtils
+                .getBaseRef()
+                .updateChildren(map)
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        MyLog.e(TAG, "Something went wrong updating timeslot and service");
+                        MyLog.printStackTrace(e);
+                        listener.onGotThing(null);
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        MyLog.e(TAG, "OnSuccessListener");
+                        listener.onGotThing(timeslot);
+                    }
+                });
 
-                listener.onGotThing(timeslot);
-            }
-        });
+        // when there's no network connection Firebase won't trigger callbacks
+        // http://sumatodev.com/implement-offline-support-android-using-firebase/
+        if (!NetworkManager.hasConnection(context)) listener.onGotThing(timeslot);
     }
 
 

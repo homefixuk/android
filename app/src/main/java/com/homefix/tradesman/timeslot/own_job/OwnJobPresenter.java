@@ -5,8 +5,9 @@ import android.support.annotation.NonNull;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.homefix.tradesman.calendar.HomeFixCal;
 import com.homefix.tradesman.common.AnalyticsHelper;
 import com.homefix.tradesman.firebase.FirebaseUtils;
@@ -14,7 +15,7 @@ import com.homefix.tradesman.model.ServiceSet;
 import com.homefix.tradesman.model.Timeslot;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
-import com.samdroid.common.VariableUtils;
+import com.samdroid.common.MyLog;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
 import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
@@ -22,8 +23,6 @@ import com.samdroid.string.Strings;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import clojure.lang.Var;
 
 /**
  * Created by samuel on 7/19/2016.
@@ -44,7 +43,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
 
         getView().showDialog("Creating new job...", true);
 
-        FirebaseUtils.createService(true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
+        FirebaseUtils.createService(getView().getContext(), true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
                 customerName, customerEmail, customerPhone, customerPropertyRelationship, description, new OnGotObjectListener<Timeslot>() {
 
                     @Override
@@ -98,25 +97,34 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
             String addressLine3, final String postcode, final String country, Double latitude, Double longitude,
             final String customerName, final String customerEmail, final String customerPhone, final String customerPropertyRelationship, final String description) {
 
-        if (!isViewAttached()) return;
+        if (!isViewAttached()) {
+            MyLog.e(OwnJobPresenter.class.getSimpleName(), "View is not attached");
+            return;
+        }
 
-        VariableUtils.printStrings(timeslotId, serviceId, serviceSetId, customerId, propertyId, customerPropertyInfoId);
         FirebaseUtils.updateJob(
-                timeslotId, serviceId, serviceSetId, customerId, propertyId, customerPropertyInfoId,
+                getView().getContext(), timeslotId, serviceId, serviceSetId, customerId, propertyId, customerPropertyInfoId,
                 true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
                 customerName, customerEmail, customerPhone, customerPropertyRelationship, description, new OnGotObjectListener<Timeslot>() {
 
                     @Override
                     public void onGotThing(Timeslot o) {
-                        if (!isViewAttached()) return;
+                        MyLog.e(OwnJobPresenter.class.getSimpleName(), "OnGotObjectListener<Timeslot>");
+
+                        if (!isViewAttached()) {
+                            MyLog.e(OwnJobPresenter.class.getSimpleName(), "22222 View is not attached");
+                            return;
+                        }
 
                         if (o == null) {
                             getView().showDialog("Sorry, unable to update your job", false);
                             return;
                         }
 
+                        MyLog.e(OwnJobPresenter.class.getSimpleName(), "33333 Success");
+
                         // update the view
-//                        getView().setTimeslot(o);
+                        getView().hideDialog();
                         getView().setEditing(false);
                         getView().setupView();
 
@@ -145,8 +153,6 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                                 getView().getContext(),
                                 "updateTimeslot",
                                 b);
-
-                        getView().hideDialog();
                     }
                 });
     }
@@ -157,7 +163,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
 
         final String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
 
-        if (Strings.isEmpty(tradesmanId) || timeslot == null || Strings.isEmpty(timeslot.getId()) || !NetworkManager.hasConnection(getView().getContext())) {
+        if (Strings.isEmpty(tradesmanId) || timeslot == null || Strings.isEmpty(timeslot.getId())) {
             getView().showErrorDialog();
             return;
         }
@@ -190,14 +196,11 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                             }
                         }
 
-                        FirebaseUtils.getBaseRef().updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if (databaseError != null) {
-                                    getView().showErrorDialog();
-                                    return;
-                                }
+                        Task<Void> task = FirebaseUtils.getBaseRef().updateChildren(childUpdates);
 
+                        OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
                                 // track the delete
                                 Bundle b = new Bundle();
                                 b.putString("timeslotId", timeslot.getId());
@@ -219,7 +222,21 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
 
                                 getView().onDeleteComplete(timeslot);
                             }
+                        };
+
+                        task.addOnSuccessListener(onSuccessListener);
+                        task.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                getView().showErrorDialog();
+                            }
                         });
+
+                        // when there's no network connection Firebase won't trigger callbacks
+                        // http://sumatodev.com/implement-offline-support-android-using-firebase/
+                        if (!NetworkManager.hasConnection(getView().getContext())) {
+                            onSuccessListener.onSuccess(null);
+                        }
 
                     }
 
