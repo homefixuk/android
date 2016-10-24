@@ -224,18 +224,19 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                             }
                         };
 
-                        task.addOnSuccessListener(onSuccessListener);
-                        task.addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                getView().showErrorDialog();
-                            }
-                        });
-
                         // when there's no network connection Firebase won't trigger callbacks
                         // http://sumatodev.com/implement-offline-support-android-using-firebase/
                         if (!NetworkManager.hasConnection(getView().getContext())) {
                             onSuccessListener.onSuccess(null);
+
+                        } else {
+                            task.addOnSuccessListener(onSuccessListener);
+                            task.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    getView().showErrorDialog();
+                                }
+                            });
                         }
 
                     }

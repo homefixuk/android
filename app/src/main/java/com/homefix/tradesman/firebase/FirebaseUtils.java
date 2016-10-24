@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -645,30 +643,33 @@ public class FirebaseUtils {
         map.put("/tradesmanTimeslots/" + tradesmanId + "/" + timeslotKey, timeslot.toMap());
         map.put("/tradesmanServiceTimeslots/" + tradesmanId + "/" + timeslotKey, startTimesMap);
 
-        MyLog.e(TAG, "4444 Pre update children");
+        OnSuccessListener<Void> onSuccessListener = new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                MyLog.e(TAG, "OnSuccessListener");
+                listener.onGotThing(timeslot);
+            }
+        };
+
         // update all the references at the same that, that way either all or none get set
-        FirebaseUtils
-                .getBaseRef()
-                .updateChildren(map)
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        MyLog.e(TAG, "Something went wrong updating timeslot and service");
-                        MyLog.printStackTrace(e);
-                        listener.onGotThing(null);
-                    }
-                })
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        MyLog.e(TAG, "OnSuccessListener");
-                        listener.onGotThing(timeslot);
-                    }
-                });
+        Task<Void> task = FirebaseUtils.getBaseRef().updateChildren(map);
 
         // when there's no network connection Firebase won't trigger callbacks
         // http://sumatodev.com/implement-offline-support-android-using-firebase/
-        if (!NetworkManager.hasConnection(context)) listener.onGotThing(timeslot);
+        if (!NetworkManager.hasConnection(context)) {
+            onSuccessListener.onSuccess(null);
+
+        } else {
+            task.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    MyLog.e(TAG, "Something went wrong updating timeslot and service");
+                    MyLog.printStackTrace(e);
+                    listener.onGotThing(null);
+                }
+            });
+            task.addOnSuccessListener(onSuccessListener);
+        }
     }
 
 
