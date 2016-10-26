@@ -35,16 +35,17 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
     }
 
     public void addNewJob(
-            final Calendar start, final Calendar end, final String jobType, final String addressLine1, String addressLine2,
+            final Calendar start, final Calendar end, final String status, final String jobType, final String addressLine1, String addressLine2,
             String addressLine3, final String postcode, final String country, Double latitude, Double longitude,
-            final String customerName, final String customerEmail, final String customerPhone, final String customerPropertyRelationship, final String description) {
+            final String customerName, final String customerEmail, final String customerPhone, final String customerPropertyRelationship,
+            final String description) {
 
         if (!isViewAttached()) return;
 
         getView().showDialog("Creating new job...", true);
 
-        FirebaseUtils.createService(getView().getContext(), true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
-                customerName, customerEmail, customerPhone, customerPropertyRelationship, description, new OnGotObjectListener<Timeslot>() {
+        FirebaseUtils.createService(getView().getContext(), true, start, end, status, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
+                customerName, customerEmail, customerPhone, customerPropertyRelationship, description, getView().getAllServiceUpdates(), new OnGotObjectListener<Timeslot>() {
 
                     @Override
                     public void onGotThing(Timeslot o) {
@@ -67,6 +68,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         b.putBoolean("isOwnJob", true);
                         b.putLong("startTime", start.getTimeInMillis());
                         b.putLong("endTime", end.getTimeInMillis());
+                        b.putString("status", Strings.returnSafely(status));
                         b.putString("jobType", Strings.returnSafely(jobType));
                         b.putString("addressLine1", Strings.returnSafely(addressLine1));
                         b.putString("postcode", Strings.returnSafely(postcode));
@@ -93,7 +95,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
             final String customerId,
             final String propertyId,
             final String customerPropertyInfoId,
-            final Calendar start, final Calendar end, final String jobType, final String addressLine1, String addressLine2,
+            final Calendar start, final Calendar end, final String status, final String jobType, final String addressLine1, String addressLine2,
             String addressLine3, final String postcode, final String country, Double latitude, Double longitude,
             final String customerName, final String customerEmail, final String customerPhone, final String customerPropertyRelationship, final String description) {
 
@@ -104,8 +106,9 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
 
         FirebaseUtils.updateJob(
                 getView().getContext(), timeslotId, serviceId, serviceSetId, customerId, propertyId, customerPropertyInfoId,
-                true, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
-                customerName, customerEmail, customerPhone, customerPropertyRelationship, description, new OnGotObjectListener<Timeslot>() {
+                true, start, end, status, jobType, addressLine1, addressLine2, addressLine3, postcode, country, latitude, longitude,
+                customerName, customerEmail, customerPhone, customerPropertyRelationship, description,
+                getView().getAllServiceUpdates(), new OnGotObjectListener<Timeslot>() {
 
                     @Override
                     public void onGotThing(Timeslot o) {
@@ -132,6 +135,7 @@ public class OwnJobPresenter extends BaseTimeslotFragmentPresenter<OwnJobView> {
                         Bundle b = new Bundle();
                         b.putString("timeslotId", o.getId());
                         b.putBoolean("isOwnJob", true);
+                        b.putString("status", Strings.returnSafely(status));
                         b.putString("serviceId", Strings.returnSafely(serviceId));
                         b.putString("serviceSetId", Strings.returnSafely(serviceSetId));
                         b.putString("customerId", Strings.returnSafely(customerId));

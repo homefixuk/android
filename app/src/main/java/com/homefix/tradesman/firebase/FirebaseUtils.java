@@ -519,10 +519,12 @@ public class FirebaseUtils {
         });
     }
 
-    public static void createService(final Context context, final boolean isOwnJob, @NonNull final Calendar start, @NonNull final Calendar end, String jobType, String addressLine1, String addressLine2,
-                                     String addressLine3, String postcode, String country, Double latitude, Double longitude,
-                                     String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
-                                     @NonNull final OnGotObjectListener<Timeslot> listener) {
+    public static void createService(
+            final Context context, final boolean isOwnJob, @NonNull final Calendar start, @NonNull final Calendar end,
+            String status, String jobType, String addressLine1, String addressLine2,
+            String addressLine3, String postcode, String country, Double latitude, Double longitude,
+            String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
+            Map<Long, String> statusUpdates, @NonNull final OnGotObjectListener<Timeslot> listener) {
         String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
         if (Strings.isEmpty(tradesmanId)) {
             MyLog.e(TAG, "[createService] TradesmanId is empty");
@@ -538,9 +540,9 @@ public class FirebaseUtils {
         final String timeslotKey = getTimeslotsRef().push().getKey();
 
         updateJob(context, timeslotKey, serviceKey, serviceSetKey, customerKey, propertyKey, customerPropertyInfoKey,
-                isOwnJob, start, end, jobType, addressLine1, addressLine2, addressLine3, postcode, country,
+                isOwnJob, start, end, status, jobType, addressLine1, addressLine2, addressLine3, postcode, country,
                 latitude, longitude, customerName, customerEmail, customerPhone, customerPropertyRelationship,
-                description, listener);
+                description, statusUpdates, listener);
     }
 
     public static void updateJob(
@@ -551,10 +553,10 @@ public class FirebaseUtils {
             final String customerKey,
             final String propertyKey,
             final String customerPropertyInfoKey,
-            final boolean isOwnJob, final Calendar start, final Calendar end, String jobType, String addressLine1, String addressLine2,
+            final boolean isOwnJob, final Calendar start, final Calendar end, String status, String jobType, String addressLine1, String addressLine2,
             String addressLine3, String postcode, String country, Double latitude, Double longitude,
             String customerName, String customerEmail, String customerPhone, String customerPropertyRelationship, String description,
-            @NonNull final OnGotObjectListener<Timeslot> listener) {
+            Map<Long, String> statusUpdates, @NonNull final OnGotObjectListener<Timeslot> listener) {
 
         String tradesmanId = FirebaseUtils.getCurrentTradesmanId();
         if (Strings.isEmpty(tradesmanId) || Strings.isEmpty(timeslotKey) || Strings.isEmpty(serviceKey) || Strings.isEmpty(serviceSetKey)) {
@@ -610,12 +612,14 @@ public class FirebaseUtils {
 
         Service service = new Service(serviceKey);
         service.setId(serviceKey);
+        service.setStatus(status);
         service.setOwnJob(isOwnJob);
         service.setEstimatedDuration(endTime - startTime);
         service.setTradesmanId(tradesmanId);
         service.setServiceType(jobType);
         service.setTradesmanNotes(description);
         service.setServiceSetId(serviceSetKey);
+        service.setStatusUpdates(statusUpdates);
 
         final Timeslot timeslot = new Timeslot(timeslotKey);
         timeslot.setType((isOwnJob ? Timeslot.TYPE.OWN_JOB : Timeslot.TYPE.SERVICE).getName());

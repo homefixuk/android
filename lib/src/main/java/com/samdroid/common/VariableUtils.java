@@ -613,4 +613,37 @@ public class VariableUtils {
         for (int i = 0; i < strings.length; i++) MyLog.e(TAG, i + ": " + strings[i]);
     }
 
+
+    /**
+     * @param c
+     * @return get the last element from a collection
+     */
+    public static Long getBiggestElement(@NonNull final Collection<Long> c) {
+        final Iterator<Long> itr = c.iterator();
+        Long lastElement = itr.next();
+        while (itr.hasNext()) {
+            Long next = itr.next();
+            if (next > lastElement) lastElement = next;
+        }
+        return lastElement;
+    }
+
+    public static class LastElement<O> {
+
+        public LastElement() {
+        }
+
+        /**
+         * @param c
+         * @return get the last element from a collection
+         */
+        public O getLastElement(@NonNull final Collection<O> c) {
+            final Iterator<O> itr = c.iterator();
+            O lastElement = itr.next();
+            while (itr.hasNext()) lastElement = itr.next();
+            return lastElement;
+        }
+
+    }
+
 }

@@ -6,6 +6,8 @@ import com.samdroid.string.Strings;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Created by samuel on 6/15/2016.
@@ -22,6 +24,7 @@ public class Service extends BaseModel {
     private Map<String, Boolean> previousServices;
     private boolean isOwnJob;
     private String incompleteReason, actualDiagnosis, workCompletedDescription;
+    private Map<Long, String> statusUpdates;
 
     public Service() {
     }
@@ -182,6 +185,30 @@ public class Service extends BaseModel {
         this.tradesmanId = tradesmanId;
     }
 
+    public Map<Long, String> getStatusUpdates() {
+        if (statusUpdates == null) statusUpdates = new HashMap<>();
+
+        return statusUpdates;
+    }
+
+    public void setStatusUpdates(Map<Long, String> statusUpdates) {
+        this.statusUpdates = statusUpdates;
+    }
+
+    public Map<Long, String> addServiceUpdates(Map<Long, String> statusUpdatesNew) {
+        if (statusUpdates == null) statusUpdates = new HashMap<>();
+
+        if (statusUpdatesNew == null || statusUpdatesNew.isEmpty()) return statusUpdates;
+
+        // all them all to the current status updates
+        statusUpdates.putAll(statusUpdatesNew);
+        return statusUpdates;
+    }
+
+    public SortedMap<Long, String> getStatusUpdatesSorted() {
+        return new TreeMap<>(getStatusUpdates());
+    }
+
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
@@ -204,8 +231,11 @@ public class Service extends BaseModel {
         map.put("workCompletedDescription", getWorkCompletedDescription());
 
         // only add them if we have some
-        Map<String, Boolean> services = getPreviousServices();
-        if (services.size() > 0) map.put("previousServices", services);
+        if (previousServices != null && !previousServices.isEmpty())
+            map.put("previousServices", previousServices);
+
+        if (statusUpdates != null && !statusUpdates.isEmpty())
+            map.put("statusUpdates", statusUpdates);
 
         return map;
     }
@@ -239,6 +269,9 @@ public class Service extends BaseModel {
         // only add them if we have some
         if (previousServices != null && !previousServices.isEmpty())
             map.put(basePath + "previousServices", previousServices);
+
+        if (statusUpdates != null && !statusUpdates.isEmpty())
+            map.put(basePath + "statusUpdates", statusUpdates);
     }
 
 }

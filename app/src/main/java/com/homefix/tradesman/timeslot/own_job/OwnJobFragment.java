@@ -31,7 +31,6 @@ import com.samdroid.common.IntentHelper;
 import com.samdroid.common.MyLog;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
-import com.samdroid.network.NetworkManager;
 import com.samdroid.string.Strings;
 
 import java.io.File;
@@ -148,6 +147,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
             return;
         }
 
+        String status = mStatusTxt != null ? mStatusTxt.getText().toString() : null;
         String jobType = mJobTypeTxt != null ? mJobTypeTxt.getText().toString() : null;
 
         if (Strings.isEmpty(jobType)) {
@@ -164,6 +164,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
             getPresenter().addNewJob(
                     mStartCalNew != null ? mStartCalNew : mStartCal,
                     mEndCalNew != null ? mEndCalNew : mEndCal,
+                    status,
                     jobType,
                     addressLine1,
                     addressLine2,
@@ -177,7 +178,7 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
                     mPersonPhoneNumberTxt.getText().toString(),
                     mCustomerPropertyTypeView.getText().toString(),
                     mDescriptionTxt.getText().toString());
-         } else {
+        } else {
             showDialog("Updating job...", true);
 
             // else they are updating an already existing job //
@@ -190,7 +191,8 @@ public class OwnJobFragment extends BaseServiceFragment<OwnJobView, OwnJobPresen
                     Strings.returnSafely(customerPropertyId, mCustomerProperty != null ? mCustomerProperty.getId() : ""),
                     mStartCalNew != null ? mStartCalNew : mStartCal,
                     mEndCalNew != null ? mEndCalNew : mEndCal,
-                    mJobTypeTxt.getText().toString(),
+                    status,
+                    jobType,
                     addressLine1,
                     addressLine2,
                     addressLine3,

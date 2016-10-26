@@ -42,6 +42,7 @@ import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragment;
 import com.homefix.tradesman.timeslot.base_timeslot.BaseTimeslotFragmentPresenter;
 import com.homefix.tradesman.view.MaterialDialogWrapper;
 import com.samdroid.common.MyLog;
+import com.samdroid.common.VariableUtils;
 import com.samdroid.listener.BackgroundColourOnTouchListener;
 import com.samdroid.listener.BackgroundViewColourOnTouchListener;
 import com.samdroid.listener.interfaces.OnGotObjectListener;
@@ -50,8 +51,12 @@ import com.samdroid.view.ViewUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -72,6 +77,9 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
     @BindView(R.id.job_type_txt)
     protected EditText mJobTypeTxt;
+
+    @BindView(R.id.status_txt)
+    protected EditText mStatusTxt;
 
     @BindView(R.id.location_txt)
     protected TextView mLocationTxt;
@@ -111,6 +119,8 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
     protected CustomerProperty mCustomerProperty;
     protected Customer mCustomer;
     protected Property mProperty;
+
+    private Map<Long, String> statusChanges;
 
     public BaseServiceFragment() {
     }
@@ -238,6 +248,8 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
     protected void setupServiceView(Service service) {
         mService = service;
         if (mService == null) return;
+
+        if (mStatusTxt != null) mStatusTxt.setText(mService.getStatus());
 
         if (mJobTypeTxt != null) mJobTypeTxt.setText(mService.getServiceType());
     }
@@ -669,13 +681,60 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 //        }).show();
 //    }
 
-    @OnClick(R.id.location_bar)
-    public void onLocationClicked() {
-        if (isEdit) {
-            showPlacePicker();
+    private static final String[] statuses = new String[]{"assigned", "onsite", "complete", "incomplete"};
+
+    @OnClick(R.id.status_bar)
+    public void onStatusClicked() {
+        if (!isEdit) return;
+
+        // show list of service type names
+        CharSequence[] array = Arrays.asList(statuses).toArray(new String[statuses.length]);
+
+        MaterialDialogWrapper.getListDialog(getActivity(), "Select status", array, new MaterialDialog.ListCallback() {
+            @Override
+            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                hasMadeChanges = true;
+
+                // set the status text from the one they selected
+                mStatusTxt.setText(text);
+
+                addStatusChange(text.toString());
+            }
+        }).show();
+    }
+
+    private void addStatusChange(String text) {
+        if (Strings.isEmpty(text)) return;
+
+        if (statusChanges == null) statusChanges = new TreeMap<>();
+
+        // if the status is the same as the current service status, do nothing
+        if (mService != null && text.equals(mService.getStatus())) return;
+
+        // if there's no new updates, add this one
+        if (statusChanges.isEmpty()) {
+            statusChanges.put(System.currentTimeMillis(), text);
             return;
         }
 
+        Set<Long> keys = statusChanges.keySet();
+        Long lastKey = VariableUtils.getBiggestElement(keys);
+
+        // if the new status is the same as the last one, do nothing
+        if (text.equals(statusChanges.get(lastKey))) return;
+
+        // otherwise add this one
+        statusChanges.put(System.currentTimeMillis(), text);
+    }
+
+    @OnClick(R.id.location_bar)
+    public void onLocationClicked() {
+        if (isEdit) {
+            showManualLocationInput();
+            return;
+        }
+
+        // get directions for location
         HomefixServiceHelper.onLocationClicked(getActivity(), latitude, longitude, addressLine1, addressLine2, addressLine3, postcode, country);
 
         Bundle b = new Bundle();
@@ -688,10 +747,12 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
 
     @OnLongClick(R.id.location_bar)
     public boolean onLocationLongTouch() {
-        if (!isEdit) return false;
+        if (isEdit) {
+            showPlacePicker();
+            return true;
+        }
 
-        showManualLocationInput();
-        return true;
+        return false;
     }
 
     @OnClick({R.id.email_icon, R.id.person_email_txt})
@@ -747,4 +808,17 @@ public abstract class BaseServiceFragment<V extends BaseServiceView, P extends B
     public ServiceSet getServiceSet() {
         return mServiceSet;
     }
+
+    @Override
+    public Map<Long, String> getNewServiceUpdates() {
+        return statusChanges;
+    }
+
+    @Override
+    public Map<Long, String> getAllServiceUpdates() {
+        if (statusChanges == null) statusChanges = new HashMap<>();
+
+        return mService == null ? statusChanges : mService.addServiceUpdates(statusChanges);
+    }
+
 }
